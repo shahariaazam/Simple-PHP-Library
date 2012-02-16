@@ -22,14 +22,14 @@ class URL
      *
      * @var array
      */
-	private $_options;
+    private $_options;
 
     /**
      * Current url
      *
      * @var string
      */
-	private $_url;
+    private $_url;
 
     /**
      * What page is the user in
@@ -43,14 +43,14 @@ class URL
      *
      * @var string
      */
-	private $_pattern;
+    private $_pattern;
 
     /**
      * Array of params that the object will automatically load
      *
      * @var array
      */
-	private $_params = array();
+    private $_params = array();
 
     /**
      * Class constructor. It also validates the URL
@@ -58,17 +58,17 @@ class URL
      * @param string $url
      * @return boolean
      */
-	public function __construct($options=array())
-	{
-		// ==== Getting URL ==== //
-		$this->_url = getFullURL();
+    public function __construct($options=array())
+    {
+        // ==== Getting URL ==== //
+        $this->_url = getFullURL();
 
-		// ==== Validating URL ==== //
-		$is_valid = filter_var($this->_url, FILTER_VALIDATE_URL);
+        // ==== Validating URL ==== //
+        $is_valid = filter_var($this->_url, FILTER_VALIDATE_URL);
 
-		// == If valid == //
-		if($is_valid === true)
-		{
+        // == If valid == //
+        if($is_valid === true)
+        {
             // ==== Default options ==== //
             $this->_options['site_root']      = '';
             $this->_options['page_token']     = 'goto';
@@ -101,24 +101,24 @@ class URL
 
             // ==== Initializing the default params ==== //
             $this->initParams();
-		}
+        }
         else
         {
             trigger_error('Invalid URL. The URL class could not process the URL.', E_USER_WARNING);
         }
-	}
+    }
 
-	/**
-	 * Method that loads the parameters in the object
-	 *
-	 * @param void
-	 * @return void
-	 */
-	private function initParams()
-	{
-	    // ==== Checking if the get params option has some info in it ==== //
-	    if(count($this->_options['get_params']) > 0)
-	    {
+    /**
+     * Method that loads the parameters in the object
+     *
+     * @param void
+     * @return void
+     */
+    private function initParams()
+    {
+        // ==== Checking if the get params option has some info in it ==== //
+        if(count($this->_options['get_params']) > 0)
+        {
             // ==== Going through the $_GET params ==== //
             foreach($this->_options['get_params'] as $name)
             {
@@ -135,22 +135,22 @@ class URL
                     }
                 }
             }
-	    }
-	    else
-	    {
-	        // ==== Initializing empty array ==== //
-	        $this->_params = array();
-	    }
-	}
+        }
+        else
+        {
+            // ==== Initializing empty array ==== //
+            $this->_params = array();
+        }
+    }
 
-	/**
-	 * The method retrives data from the URL
-	 *
-	 * @param void
-	 * @return void
-	 */
-	private function getURLData()
-	{
+    /**
+     * The method retrives data from the URL
+     *
+     * @param void
+     * @return void
+     */
+    private function getURLData()
+    {
         // ==== Processing the URL only if it's not the site root ==== //
         if($this->_options['site_root'] != $this->_url)
         {
@@ -210,7 +210,7 @@ class URL
                 }
             }
         }
-	}
+    }
 
     /**
      * The method replaces the values in the first array with ones from the second one (similar to array_merge) but then appends the remaining values
@@ -240,18 +240,18 @@ class URL
         return $array;
     }
 
-	/**
-	 * The method builds the URL with the available data
-	 *
-	 * @param string $page Page to link to
-	 * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
+    /**
+     * The method builds the URL with the available data
+     *
+     * @param string $page Page to link to
+     * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
      * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
-	 * @return string
-	 */
-	public function get($page='', array $params=array(), $merge_get=false)
-	{
-	    // ==== Defaults ==== //
-	    $url = $this->_options['site_root'];
+     * @return string
+     */
+    public function get($page='', array $params=array(), $merge_get=false)
+    {
+        // ==== Defaults ==== //
+        $url = $this->_options['site_root'];
 
         // ==== Checking if a page has actualy been requested ==== //
         if(empty($page)) // Base link to the same page without the given params
@@ -331,19 +331,19 @@ class URL
             }
         }
 
-	    // ==== Returning result ==== //
-	    return $url;
-	}
+        // ==== Returning result ==== //
+        return $url;
+    }
 
-	/**
-	 * Class destructor.
-	 *
-	 * @param void
-	 * @return void
-	 */
-	public function __destruct()
-	{
+    /**
+     * Class destructor.
+     *
+     * @param void
+     * @return void
+     */
+    public function __destruct()
+    {
 
-	}
+    }
 }
 ?>
