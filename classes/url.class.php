@@ -114,7 +114,8 @@ class URL
     }
 
     /**
-     * Method that loads the parameters in the object
+     * The method initializes the parameters that must be passed along in the URL, with the values
+     * found in the URL
      *
      * @param void
      * @return void
