@@ -53,6 +53,13 @@ class URL
     private $_params = array();
 
     /**
+     * Rewrite active or not
+     *
+     * @var boolen
+     */
+    private $_rewrite;
+
+    /**
      * Class constructor. It also validates the URL
      *
      * @param string $url
@@ -60,51 +67,49 @@ class URL
      */
     public function __construct($options=array())
     {
+        // ==== Default options ==== //
+        $this->_options['site_root']      = '';
+        $this->_options['page_token']     = 'goto';
+        $this->_options['get_params']     = array();
+        $this->_options['rewrite']        = false;
+
+        // ==== Replacing options with custom ones ==== //
+        if(is_array($options))
+        {
+            $this->_options = array_replace($this->_options, $options);
+        }
+
+        // ==== Setting rewrite property ==== //
+        $this->_rewrite = $this->_options['rewrite'];
+
         // ==== Getting URL ==== //
         $this->_url = getFullURL();
 
-        // ==== Validating URL ==== //
+        // ==== Correcting the site root ==== //
+        if(strlen($this->_options['site_root']) > (strrpos($this->_options['site_root'], '/')+1))
+        {
+            $this->_options['site_root'] .= '/';
+        }
+
+        // ==== Correcting the URL ==== //
+        if($this->_rewrite && strlen($this->_url) > (strrpos($this->_url, '/')+1) && strpos($this->_url, '?'.$this->_options['page_token'].'=') === false)
+        {
+            $this->_url .= '/';
+        }
+
+        // ==== Getting the URL data ==== //
+        $this->getURLData();
+
+        // ==== Initializing the default params ==== //
+        $this->initParams();
+
+        // ==== Determining if the URL is valid ==== //
         $is_valid = filter_var($this->_url, FILTER_VALIDATE_URL);
 
-        // == If valid == //
-        if($is_valid === true)
+        // == If invalid == //
+        if($is_valid === false)
         {
-            // ==== Default options ==== //
-            $this->_options['site_root']      = '';
-            $this->_options['page_token']     = 'goto';
-            $this->_options['get_params']     = array();
-            $this->_options['rewrite']        = false;
-
-            // ==== Replacing options with custom ones ==== //
-            if(is_array($options))
-            {
-                $this->_options = array_replace($this->_options, $options);
-            }
-
-            // ==== Setting rewrite property ==== //
-            $this->rewrite = $this->_options['rewrite'];
-
-            // ==== Correcting the site root ==== //
-            if(strlen($this->_options['site_root']) > (strrpos($this->_options['site_root'], '/')+1))
-            {
-                $this->_options['site_root'] .= '/';
-            }
-
-            // ==== Correcting the URL ==== //
-            if($this->rewrite && strlen($this->_url) > (strrpos($this->_url, '/')+1) && strpos($this->_url, '?'.$this->_options['page_token'].'=') === false)
-            {
-                $this->_url .= '/';
-            }
-
-            // ==== Getting the URL data ==== //
-            $this->getURLData();
-
-            // ==== Initializing the default params ==== //
-            $this->initParams();
-        }
-        else
-        {
-            trigger_error('Invalid URL. The URL class could not process the URL.', E_USER_WARNING);
+            trigger_error('Invalid URL. The URL class could not process the URL. URL: '.$this->url, E_USER_WARNING);
         }
     }
 
@@ -136,11 +141,6 @@ class URL
                 }
             }
         }
-        else
-        {
-            // ==== Initializing empty array ==== //
-            $this->_params = array();
-        }
     }
 
     /**
@@ -155,7 +155,7 @@ class URL
         if($this->_options['site_root'] != $this->_url)
         {
             ////////////////////////////////////////////////////////////////
-            //    PROCESSING THE URL - REWRITE ENABLED
+            //    PROCESSING THE URL - REWRITE ENABLED/FOUND
             ///////////////////////////////////////////////////////////////
             // ==== Removing the site root from the URL ==== //
             $data = str_replace($this->_options['site_root'], '', $this->_url);
@@ -201,7 +201,7 @@ class URL
             else
             {
                 ////////////////////////////////////////////////////////////////
-                //    PROCESSING THE URL - REWRITE DISABLED
+                //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
                 ///////////////////////////////////////////////////////////////
                 // ==== Getting the current page ==== //
                 if(isset($_GET[$this->_options['page_token']]))
@@ -294,7 +294,7 @@ class URL
         }
 
         // ==== Processing the data to generate the URL ==== //
-        if($this->rewrite)
+        if($this->_rewrite)
         {
             ////////////////////////////////////////////////////////////////
             //    REWRITE ENABLED
@@ -333,17 +333,6 @@ class URL
 
         // ==== Returning result ==== //
         return $url;
-    }
-
-    /**
-     * Class destructor.
-     *
-     * @param void
-     * @return void
-     */
-    public function __destruct()
-    {
-
     }
 }
 ?>
