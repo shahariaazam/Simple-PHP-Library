@@ -323,16 +323,20 @@ class Image
                 break;
             }
 
-            // ==== Setting transparent background for new image ==== //
-            imagesavealpha($new, true);
-            $transparent = imagecolorallocatealpha($new, 0, 0, 0, 127);
-            imagefill($new, 0, 0, $transparent);
+            // ==== Checking if a new image was created ==== //
+            if(is_resource($new))
+            {
+                // ==== Setting transparent background for new image ==== //
+                imagesavealpha($new, true);
+                $transparent = imagecolorallocatealpha($new, 0, 0, 0, 127);
+                imagefill($new, 0, 0, $transparent);
 
-            // ==== Copying the picture over the new image at the determined coordinates ==== //
-            imagecopyresized($new, $old, $sX, $sY, 0, 0, $width, $height, $dim['width'], $dim['height']);
+                // ==== Copying the picture over the new image at the determined coordinates ==== //
+                imagecopyresized($new, $old, $sX, $sY, 0, 0, $width, $height, $dim['width'], $dim['height']);
 
-            // ==== Referencing the image ==== //
-            $result = &$new;
+                // ==== Referencing the image ==== //
+                $result = &$new;
+            }
         }
 
         // ==== Returning result ==== //
