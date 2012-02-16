@@ -5,7 +5,7 @@
  *
  * @author Brian
  * @link http://brian.hopto.org/framework_wiki/
- * @copyright 2011
+ * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Database
