@@ -74,8 +74,7 @@ class Image
     }
 
     /**
-     * This method gets the image file location, calls the resize method with the appropriate parameters.
-     * Both the file extension and the requested file extension must be suppored, else the method returns false.
+     * This method shows the given image but the resized version
      * 
      * @param string $image Image location
      * @param string $new_ext The type of image to output
@@ -100,25 +99,33 @@ class Image
             // ==== Resizing image ==== //
             $new = $this->resizeImg($image);
 
-            // ==== Setting page header and outputting image ===== //
-            header('Content-type: image/' . $this->_supported[$new_ext]);
-
-            // ==== Creating the image ==== //
-            switch($this->_supported[$new_ext])
+            // ==== Checking if the new image is a resource ==== //
+            if(is_resource($new))
             {
-                // == JPEG == //
-                case 'jpeg':
-                case 'jpg':
-                    imagejpeg($new);
-                break;
+                // ==== Setting page header and outputting image ===== //
+                header('Content-type: image/' . $this->_supported[$new_ext]);
 
-                // == PNG == //
-                case 'png':
-                    imagepng($new);
-                break;
+                // ==== Creating the image ==== //
+                switch($this->_supported[$new_ext])
+                {
+                    // == JPEG == //
+                    case 'jpeg':
+                    case 'jpg':
+                        imagejpeg($new);
+                    break;
 
-                // == Do nothing == //
-                default: break;
+                    // == PNG == //
+                    case 'png':
+                        imagepng($new);
+                    break;
+
+                    // == Do nothing == //
+                    default: break;
+                }
+            }
+            else
+            {
+                $isOk = false;
             }
         }
         else
@@ -136,11 +143,13 @@ class Image
      * @param string $image
      * @param string $new_ext
      * @return false if the operation was unsuccsessfull
-     * @return -1 on format not supported
-     * @return string on success
+     * @return false on failure or image name on success
      */
     public function write($image, $new_ext='')
     {
+        // ==== Result variable ==== //
+        $result = false;
+
         // ==== Getting the image extension ==== //
         $this->_ext = getFileExt($image);
 
@@ -212,22 +221,17 @@ class Image
                     // == Format not supported == //
                     default: break;
                 }
-            }
 
-            // ==== Checking if the image has been written to the hard drive ==== //
-            if(is_file($dir . '/' . $name . '.' . $this->_supported[$this->_ext]))
-            {
-                return $name;
-            }
-            else
-            {
-                return false;
+                // ==== Checking if the image has been written to the hard drive ==== //
+                if(is_file($dir . '/' . $name . '.' . $this->_supported[$this->_ext]))
+                {
+                    $result = &$name;
+                }
             }
         }
-        else
-        {
-            return -1;
-        }
+
+        // ==== Returning result ==== //
+        return $result;
     }
 
     /**
@@ -328,7 +332,7 @@ class Image
             imagecopyresized($new, $old, $sX, $sY, 0, 0, $width, $height, $dim['width'], $dim['height']);
 
             // ==== Referencing the image ==== //
-            $result = $new;
+            $result = &$new;
         }
 
         // ==== Returning result ==== //
