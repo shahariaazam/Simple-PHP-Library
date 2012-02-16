@@ -17,18 +17,18 @@
 
 class URL
 {
-	/**
-	 * Options array. This contains settings about how the class should act.
-	 *
-	 * @var array
-	 */
+    /**
+     * Options array. This contains settings about how the class should act.
+     *
+     * @var array
+     */
 	private $_options;
 
-	/**
-	 * Current url
-	 *
-	 * @var string
-	 */
+    /**
+     * Current url
+     *
+     * @var string
+     */
 	private $_url;
 
     /**
@@ -38,26 +38,26 @@ class URL
      */
     private $_page;
 
-	/**
-	 * Hold the pattern for the rewrite
-	 *
-	 * @var string
-	 */
+    /**
+     * Hold the pattern for the rewrite
+     *
+     * @var string
+     */
 	private $_pattern;
 
-	/**
-	 * Array of params that the object will automatically load
-	 *
-	 * @var array
-	 */
+    /**
+     * Array of params that the object will automatically load
+     *
+     * @var array
+     */
 	private $_params = array();
 
-	/**
-	 * Class constructor. It also validates the URL
-	 *
-	 * @param string $url
-	 * @return boolean
-	 */
+    /**
+     * Class constructor. It also validates the URL
+     *
+     * @param string $url
+     * @return boolean
+     */
 	public function __construct($options=array())
 	{
 		// ==== Getting URL ==== //
