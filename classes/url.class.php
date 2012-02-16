@@ -60,15 +60,6 @@ class URL
 	 */
 	public function __construct($options=array())
 	{
-		// ==== Initializing session if it doesn't exist ==== //
-		if(session_id() == '')
-		{
-			if(!session_start())
-			{
-				exit('Could not initialize session. The url class need and active session in order to work.');
-			}
-		}
-
 		// ==== Getting URL ==== //
 		$this->_url = getFullURL();
 
@@ -76,43 +67,45 @@ class URL
 		$is_valid = filter_var($this->_url, FILTER_VALIDATE_URL);
 
 		// == If valid == //
-		if($is_valid === false)
+		if($is_valid === true)
 		{
-			exit('Invalid URL.');
+            // ==== Default options ==== //
+            $this->_options['site_root']      = '';
+            $this->_options['page_token']     = 'goto';
+            $this->_options['get_params']     = array();
+            $this->_options['rewrite']        = false;
+
+            // ==== Replacing options with custom ones ==== //
+            if(is_array($options))
+            {
+                $this->_options = array_replace($this->_options, $options);
+            }
+
+            // ==== Setting rewrite property ==== //
+            $this->rewrite = $this->_options['rewrite'];
+
+            // ==== Correcting the site root ==== //
+            if(strlen($this->_options['site_root']) > (strrpos($this->_options['site_root'], '/')+1))
+            {
+                $this->_options['site_root'] .= '/';
+            }
+
+            // ==== Correcting the URL ==== //
+            if($this->rewrite && strlen($this->_url) > (strrpos($this->_url, '/')+1) && strpos($this->_url, '?'.$this->_options['page_token'].'=') === false)
+            {
+                $this->_url .= '/';
+            }
+
+            // ==== Getting the URL data ==== //
+            $this->getURLData();
+
+            // ==== Initializing the default params ==== //
+            $this->initParams();
 		}
-
-		// ==== Default options ==== //
-		$this->_options['site_root']      = '';
-		$this->_options['page_token']     = 'goto';
-		$this->_options['get_params']     = array();
-		$this->_options['rewrite']        = false;
-
-		// ==== Replacing options with custom ones ==== //
-		if(is_array($options))
-		{
-			$this->_options = array_replace($this->_options, $options);
-		}
-
-		// ==== Setting rewrite property ==== //
-		$this->rewrite = $this->_options['rewrite'];
-
-        // ==== Correcting the site root ==== //
-        if(strlen($this->_options['site_root']) > (strrpos($this->_options['site_root'], '/')+1))
+        else
         {
-            $this->_options['site_root'] .= '/';
+            trigger_error('Invalid URL. The URL class could not process the URL.', E_USER_WARNING);
         }
-
-        // ==== Correcting the URL ==== //
-        if($this->rewrite && strlen($this->_url) > (strrpos($this->_url, '/')+1) && strpos($this->_url, '?'.$this->_options['page_token'].'=') === false)
-        {
-            $this->_url .= '/';
-        }
-
-		// ==== Getting the URL data ==== //
-        $this->getURLData();
-
-        // ==== Initializing the default params ==== //
-        $this->initParams();
 	}
 
 	/**
