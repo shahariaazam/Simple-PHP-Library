@@ -45,7 +45,7 @@ class Cart
      * @param void
      * @return void
      */
-    public function __construct()
+    private function __construct()
     {
 
     }
