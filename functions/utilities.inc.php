@@ -68,7 +68,10 @@ function class_loader($class)
         $more .= '<b>$_SERVER:</b><pre>'.print_r($_SERVER, true).'</pre><br /><br />';
 
         // ==== Sending notification mail to webmaster ==== //
-        mail(__WEBMASTER__, '[FATAL ERROR] Site: '.$_SERVER['HTTP_HOST'], '<b>ERROR:</b> There is no file for class <u>'.$class.'</u>.<br /><br />'.$more, $headers);
+        if(defined('__WEBMASTER__'))
+        {
+            mail(__WEBMASTER__, '[FATAL ERROR] Site: '.$_SERVER['HTTP_HOST'], '<b>ERROR:</b> There is no file for class <u>'.$class.'</u>.<br /><br />'.$more, $headers);
+        }
 
         // ==== Showing message to users ==== //
         exit('<h1>An error has occured. Our team has been notified and is working right now to fix it. Please come back later...</h1>');
@@ -151,7 +154,10 @@ function error_handler()
             $message .= '<b>$_SERVER:</b><pre>'.print_r($_SERVER, true).'</pre><br /><br />';
 
             // ==== Sending notification mail to webmaster ==== //
-            mail(__WEBMASTER__, '['.$error_type.'] Site: '.$site_root, $message, $headers);
+            if(defined('__WEBMASTER__'))
+            {
+                mail(__WEBMASTER__, '['.$error_type.'] Site: '.$site_root, $message, $headers);
+            }
         }
     }
 }
