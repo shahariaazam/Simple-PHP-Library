@@ -58,7 +58,7 @@ class Cart
      */
     public static function init()
     {
-        // ==== Initializing session if it doesn't exist ==== //
+        // ==== Checking if a session exists ==== //
         if(session_id() == '')
         {
             trigger_error('The cart class needs and active session in order to work.', E_USER_WARNING);
