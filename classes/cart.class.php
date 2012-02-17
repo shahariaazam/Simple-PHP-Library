@@ -20,7 +20,7 @@ class Cart
      *
      * @var object
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      *
@@ -29,7 +29,7 @@ class Cart
      * @var array
      * @example $items[1] = 'Item title';
      */
-    private $items = array();
+    private $_items = array();
 
     /**
      *
@@ -37,7 +37,7 @@ class Cart
      *
      * @var boolean
      */
-    private $doEmpty = false;
+    private $_doEmpty = false;
 
     /**
      * The method is the constructor for this class
@@ -61,27 +61,24 @@ class Cart
         // ==== Initializing session if it doesn't exist ==== //
         if(session_id() == '')
         {
-            if(!session_start())
-            {
-                trigger_error('Could not initialize session. The cart class need and active session in order to work.', E_USER_WARNING);
-            }
+            trigger_error('The cart class needs and active session in order to work.', E_USER_WARNING);
         }
 
         // ==== Checking if we have a cart object ==== //
-        if(isset($_SESSION['cart']))
+        if(isset($_SESSION['cart']) && is_string($_SESSION['cart']))
         {
             return unserialize($_SESSION['cart']);
         }
         else
         {
             // ==== Creating cart instantce if none found ==== //
-            if(!isset(self::$instance))
+            if(!isset(self::$_instance))
             {
                 $class = __CLASS__;
-                self::$instance = new $class();
+                self::$_instance = new $class();
             }
 
-            return self::$instance;
+            return self::$_instance;
         }
     }
 
@@ -101,9 +98,9 @@ class Cart
         if(is_array($item_info) && isset($item_info['id']) && is_numeric($item_info['id']))
         {
             // ======== Initializing the cart item details ======== //
-            if(!isset($this->items[$item_info['id']]))
+            if(!isset($this->_items[$item_info['id']]))
             {
-                $this->items[$item_info['id']] = $item_info;
+                $this->_items[$item_info['id']] = $item_info;
 
                 $result = true;
             }
@@ -129,7 +126,7 @@ class Cart
         // ==== Checking if the id is numeric ==== //
         if(is_numeric($id))
         {
-            unset($this->items[$id]);
+            unset($this->_items[$id]);
 
             return true;
         }
@@ -149,10 +146,10 @@ class Cart
     public function updateItem($item_info)
     {
         // ==== Checking if the item_info is an array and if an id field is present ==== //
-        if(is_array($item_info) && isset($item_info['id']) && is_numeric($item_info['id']) && isset($this->items[$item_info['id']]))
+        if(is_array($item_info) && isset($item_info['id']) && is_numeric($item_info['id']) && isset($this->_items[$item_info['id']]))
         {
             // ==== Updating the item ==== //
-            $this->items[$item_info['id']] = $item_info;
+            $this->_items[$item_info['id']] = $item_info;
 
             // ==== Returning result ==== //
             return true;
@@ -180,9 +177,9 @@ class Cart
         if(is_numeric($id))
         {
             // ==== Checking if the item exists ==== //
-            if(isset($this->items[$id]))
+            if(isset($this->_items[$id]))
             {
-                $result = $this->items[$id];
+                $result = $this->_items[$id];
             }
         }
 
@@ -206,7 +203,7 @@ class Cart
         if(is_numeric($id))
         {
             // ==== Checking if the item exists ==== //
-            if(isset($this->items[$id]))
+            if(isset($this->_items[$id]))
             {
                 $result = true;
             }
@@ -225,11 +222,11 @@ class Cart
     public function stats()
     {
         // ==== Counting the items ==== //
-        $icount = count($this->items);
+        $icount = count($this->_items);
 
         // ====== Calculating total price ======== //
         $total_price = 0;
-        foreach ($this->items as $itemid => $item_info)
+        foreach ($this->_items as $itemid => $item_info)
         {
             $total_price += $item_info['price'] * $item_info['qty'];
         }
@@ -249,7 +246,7 @@ class Cart
      */
     public function myCart()
     {
-        return $this->items;
+        return $this->_items;
     }
 
 
@@ -268,7 +265,7 @@ class Cart
         if(!isset($_SESSION['cart']))
         {
             // ==== Triggering empty procedure === //
-            $this->doEmpty = true;
+            $this->_doEmpty = true;
 
             return true;
         }
@@ -286,7 +283,7 @@ class Cart
     public function __destruct()
     {
         // ==== Updating the cart session variable if the empty procedure was not triggered ==== //
-        if($this->doEmpty == false)
+        if($this->_doEmpty == false)
         {
             $_SESSION['cart'] = serialize($this);
         }
