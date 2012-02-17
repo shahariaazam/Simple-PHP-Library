@@ -84,13 +84,28 @@ class Language
 		$this->_mopt['headers']    = 'MIME-Version: 1.0' . "\r\n";
 		$this->_mopt['headers']   .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
+        // ==== Loading the language ==== //
+        $this->loadLanguage();
+
+        // ==== Loading the texts ==== //
+        $this->loadTexts();
+	}
+
+    /**
+     * The methods loads the language file
+     *
+     * @param void
+     * @return void
+     */
+    protected function loadLanguage()
+    {
 		// ==== Generating unique identifier ==== //
 		$salt = (defined('__SITE_ROOT__')?__SITE_ROOT__:dirname(__FILE__));
 
 		// ==== Hashing unique ID ==== //
 		$this->_uq = sha1($salt);
 
-		//Setting SESSION vars
+		// ==== Getting the language ==== //
 		if(isset($_GET['lang']))
         {
             $lang = $_GET['lang'];
@@ -127,10 +142,7 @@ class Language
 
         // ==== Assign language file path ==== //
         $this->_file = $lang_file;
-
-        // ==== Loading the texts ==== //
-        $this->loadTexts();
-	}
+    }
 
     /**
      * The method loads the texts in the class cache
