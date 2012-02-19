@@ -74,7 +74,7 @@ function class_loader($class)
         }
 
         // ==== Showing message to users ==== //
-        exit('<h1>An error has occured. Our team has been notified and is working right now to fix it. Please come back later...</h1>');
+        exit('<h1>An error has occured. Our team has been notified and is working right now to fix it.<br /><br />Please come back later...</h1>');
     }
 }
 
