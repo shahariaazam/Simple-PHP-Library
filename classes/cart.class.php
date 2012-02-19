@@ -6,7 +6,7 @@
  * 
  * @author Brian
  * @link http://brian.serveblog.net
- * @copyright 2011
+ * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Cart
