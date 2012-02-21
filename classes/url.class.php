@@ -155,11 +155,43 @@ class URL
         // ==== Processing the URL only if it's not the site root ==== //
         if($this->_options['site_root'] != $this->_url)
         {
+            // ==== Creating a local site root to be able to decode the URL ==== //
+            $site_root = $this->_options['site_root'];
+
+            // ==== Getting the actual protocol used to access the site ==== //
+            $protocol = isset($_SERVER['HTTPS'])?'https://':'http://';
+
+            // ==== matches array for the preg match ==== //
+            $matches = array();
+
+            // ==== Getting matches ==== //
+            preg_match('((http://)|(https://))', $this->_options['site_root'], $matches);
+
+            // ==== Getting the site root protocol ==== //
+            if(isset($matches[0]))
+            {
+                $sr_protocol = $matches[0];
+            }
+            else
+            {
+                $sr_protocol = '';
+            }
+
+            // ==== Replacing the site root protocol with the actual protocol ==== //
+            if(strpos($site_root, $sr_protocol) !== false)
+            {
+                $site_root = str_replace($sr_protocol, $protocol, $site_root);
+            }
+            else
+            {
+                $site_root = $protocol.$site_root;
+            }
+
             ////////////////////////////////////////////////////////////////
             //    PROCESSING THE URL - REWRITE ENABLED/FOUND
             ///////////////////////////////////////////////////////////////
             // ==== Removing the site root from the URL ==== //
-            $data = str_replace($this->_options['site_root'], '', $this->_url);
+            $data = str_replace($site_root, '', $this->_url);
 
             // ==== Breaking the URL into pieces ==== //
             $data = explode('/', $data);
