@@ -69,6 +69,7 @@ class URL
     {
         // ==== Default options ==== //
         $this->_options['site_root']      = '';
+        $this->_options['site_root_ssl']  = '';
         $this->_options['page_token']     = 'goto';
         $this->_options['get_params']     = array();
         $this->_options['rewrite']        = false;
@@ -267,6 +268,27 @@ class URL
 
         // ==== result ==== //
         return $array;
+    }
+
+    /**
+     * The method returns the HTTPS URL.
+     * It uses the get method to do this
+     *
+     * @param string $page Page to link to
+     * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
+     * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
+     * @return string
+     */
+    public function get_ssl($page='', array $params=array(), $merge_get=false)
+    {
+        // ==== Getting the URL ==== //
+        $url = $this->get($page, $params, $merge_get);
+
+        // ==== Replacing the site root with the SSL site root ==== //
+        $url = str_replace($this->_options['site_root'], $this->_options['site_root_ssl'], $url);
+
+        // ==== Returning the URL ==== //
+        return $url;
     }
 
     /**
