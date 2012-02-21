@@ -445,4 +445,43 @@ function secure_download($file)
         exit();
     }
 }
+
+/**
+ * The function checks the complexity of a password
+ *
+ * @param string $passwd
+ * @param boolean $overwrite
+ * @return boolean
+ */
+function ckPasswdComplexity($passwd, $options=array(), $overwrite=0)
+{
+    // ==== Result variable ==== //
+    $result = true;
+
+    if($overwrite == 0)
+    {
+        if(strlen(trim($data['passwd'])) < 8) $result = false;
+        else
+        {
+            //Character counters
+            $chr = 0;
+            $number = 0;
+            $upChr = 0;
+
+            //Checking each character in the password
+            for($i=0;$i<strlen($passwd); $i++)
+            {
+                if(is_numeric(substr($passwd, $i, 1))) $number++;
+                elseif(is_string(substr($passwd, $i, 1)) && preg_match('/[a-z]/', substr($passwd, $i, 1))) $chr++;
+                elseif(is_string(substr($passwd, $i, 1)) && preg_match('/[A-Z]/', substr($passwd, $i, 1))) $upChr++;
+            }
+
+            if($chr == 0 || $number == 0 || $upChr == 0) $result = false;
+        }
+    }
+
+
+    // ==== returning result ==== //
+    return $result;
+}
 ?>
