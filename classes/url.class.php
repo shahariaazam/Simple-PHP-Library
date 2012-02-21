@@ -161,7 +161,7 @@ class URL
             // ==== Getting the actual protocol used to access the site ==== //
             $protocol = isset($_SERVER['HTTPS'])?'https://':'http://';
 
-            // ==== matches array for the preg match ==== //
+            // ==== Matches array for the preg match ==== //
             $matches = array();
 
             // ==== Getting matches ==== //
@@ -170,22 +170,18 @@ class URL
             // ==== Getting the site root protocol ==== //
             if(isset($matches[0]))
             {
-                $sr_protocol = $matches[0];
+                // ==== Replacing the site root protocol with the actual protocol ==== //
+                $site_root = str_replace($matches[0], $protocol, $site_root);
             }
             else
             {
-                $sr_protocol = '';
-            }
-
-            // ==== Replacing the site root protocol with the actual protocol ==== //
-            if(strpos($site_root, $sr_protocol) !== false)
-            {
-                $site_root = str_replace($sr_protocol, $protocol, $site_root);
-            }
-            else
-            {
+                // ==== Creating the correct site root ==== //
                 $site_root = $protocol.$site_root;
+
+                // ==== Adjusting the site root ==== //
+                $this->_options['site_root'] = $site_root;
             }
+            
 
             ////////////////////////////////////////////////////////////////
             //    PROCESSING THE URL - REWRITE ENABLED/FOUND
