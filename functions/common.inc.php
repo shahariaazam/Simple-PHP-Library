@@ -453,7 +453,7 @@ function secure_download($file)
  * @param array $options
  * @return boolean
  */
-function ckPasswdComplexity($passwd, $options=array())
+function ckPasswdComplexity($passwd, array $options=array())
 {
     // ==== Result variable ==== //
     $result = true;
