@@ -483,7 +483,7 @@ function ckPasswdComplexity($passwd, array $options=array())
             $uChr = 0;
 
             // ==== Checking each character in the password ==== //
-            for($i=0;$i<strlen($passwd); $i++)
+            for($i=0; $i < strlen($passwd); $i++)
             {
                 // ==== Check variables ==== //
                 $checked = false;
