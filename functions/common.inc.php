@@ -459,7 +459,7 @@ function ckPasswdComplexity($passwd, array $options=array())
     $result = true;
 
     // ==== Checking if overwrite is in effect ==== //
-    if(isset($options['overwrite']) && $options['overwrite'] == true)
+    if((isset($options['overwrite']) && $options['overwrite'] == false) || !isset($options['overwrite']))
     {
         // ==== Check variable ==== //
         $failed_count = 0;
