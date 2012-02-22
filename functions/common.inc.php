@@ -450,33 +450,101 @@ function secure_download($file)
  * The function checks the complexity of a password
  *
  * @param string $passwd
- * @param boolean $overwrite
+ * @param array $options
  * @return boolean
  */
-function ckPasswdComplexity($passwd, $options=array(), $overwrite=0)
+function ckPasswdComplexity($passwd, $options=array())
 {
     // ==== Result variable ==== //
     $result = true;
 
-    if($overwrite == 0)
+    // ==== Checking if overwrite is in effect ==== //
+    if(isset($options['overwrite']) && $options['overwrite'] == true)
     {
-        if(strlen(trim($data['passwd'])) < 8) $result = false;
-        else
-        {
-            //Character counters
-            $chr = 0;
-            $number = 0;
-            $upChr = 0;
+        // ==== Check variable ==== //
+        $failed_count = 0;
 
-            //Checking each character in the password
+        // ==== Checking if the length check is enabled ==== //
+        if(isset($options['length']) && is_numeric($options['length']))
+        {
+            // ==== Checking the length ==== //
+            if(strlen(trim($passwd)) < $options['length'])
+            {
+                $failed_count++;
+            }
+        }
+
+        // ==== Checking if the number or lowercase or uppercase check is active ==== //
+        if(isset($options['number']) || isset($options['lcase']) || isset($options['ucase']))
+        {
+            // ==== Character counters ==== //
+            $lChr = 0;
+            $number = 0;
+            $uChr = 0;
+
+            // ==== Checking each character in the password ==== //
             for($i=0;$i<strlen($passwd); $i++)
             {
-                if(is_numeric(substr($passwd, $i, 1))) $number++;
-                elseif(is_string(substr($passwd, $i, 1)) && preg_match('/[a-z]/', substr($passwd, $i, 1))) $chr++;
-                elseif(is_string(substr($passwd, $i, 1)) && preg_match('/[A-Z]/', substr($passwd, $i, 1))) $upChr++;
+                // ==== Check variables ==== //
+                $checked = false;
+
+                // ==== Number check ==== //
+                if(isset($options['number']))
+                {
+                    if(is_numeric(substr($passwd, $i, 1)))
+                    {
+                        $number++;
+
+                        $checked = true;
+                    }
+                }
+
+                // ==== Lowercase check ==== //
+                if(isset($options['lcase']) && $checked == false)
+                {
+                    if(is_string(substr($passwd, $i, 1)) && preg_match('/[a-z]/', substr($passwd, $i, 1)))
+                    {
+                        $lChr++;
+
+                        $checked = true;
+                    }
+                }
+
+                // ==== Uppercase check ==== //
+                if(isset($options['ucase']) && $checked == false)
+                {
+                    if(is_string(substr($passwd, $i, 1)) && preg_match('/[A-Z]/', substr($passwd, $i, 1)))
+                    {
+                        $uChr++;
+
+                        $checked = true;
+                    }
+                }
             }
 
-            if($chr == 0 || $number == 0 || $upChr == 0) $result = false;
+            // ==== Checking number count ==== //
+            if(isset($options['number']) && $number == 0)
+            {
+                $failed_count++;
+            }
+
+            // ==== Checking lowercase count ==== //
+            if(isset($options['lcase']) && $lChr == 0)
+            {
+                $failed_count++;
+            }
+
+            // ==== Checking uppercase count ==== //
+            if(isset($options['ucase']) && $uChr == 0)
+            {
+                $failed_count++;
+            }
+        }
+
+        // ==== Checking the failed count ==== //
+        if($failed_count != 0)
+        {
+            $result = false;
         }
     }
 
