@@ -4,7 +4,7 @@
  * URL manager class.
  *
  * @author Brian
- * @link http://brian.serveblog.net
+ * @link http://brian.hopto.org/framework_wiki/
  * @copyright 2011
  * @license Creative Commons Attribution-ShareAlike 3.0
  *

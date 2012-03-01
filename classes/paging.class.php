@@ -4,14 +4,13 @@
  * Paging class
  * 
  * @author Brian
- * @link http://brian.serveblog.net
- * @copyright 2011
+ * @link http://brian.hopto.org/framework_wiki/
+ * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Paging
- * @version 2.2
+ * @version 2.3
  * 
- * @uses getFullURL function from functions/common.inc.php
  * @uses database object
  * 
  */
@@ -238,6 +237,10 @@ class Paging
             //If there is more the 1 page
             if($maxpages != 1)
             {
+                // ==== Identifiers ==== //
+                $margin = $pages - 1;
+                $middle = ceil($margin/2);
+
                 // ==== Default layout ==== //
                 if($default_layout)
                 {
@@ -245,28 +248,32 @@ class Paging
                 }
 
                 // ==== Getting minimum page number ==== //
-                if($pagenum - 2 <= 0 || $pagenum - 4 <= 0)
+                if($pagenum - $middle <= 0) // In range of the first page
                 {
                     $minpagenum = 1;
                 }
-                elseif($pagenum == $maxpages && $pagenum - 4 > 0)
+                elseif($maxpages - $pagenum - $middle < 0) // Max. pages shown is not reached
                 {
-                    $minpagenum = $maxpages - 4;
+                    $minpagenum = $maxpages - $pages + 1;
                 }
-                else
+                else // Reached magimum number of showed pages
                 {
-                    $minpagenum = $pagenum - 2;
+                    $minpagenum = $pagenum - $middle;
                 }
 
 
                 // ==== Getting maximum page number ==== //
-                if($pagenum + 4 > $maxpages || $pagenum + 2 > $maxpages)
+                if($pagenum + $middle >= $maxpages) // In range of the last page
                 {
                     $maxpagenum = $maxpages;
                 }
-                else
+                elseif($minpagenum + $pagenum + $middle <= $pages) // Max. pages shown is not reached
                 {
-                    $maxpagenum = $pagenum + 2;
+                    $maxpagenum = $pages;
+                }
+                else // Reached maximum number of showed pages
+                {
+                    $maxpagenum = $pagenum + $middle;
                 }
 
                 // ==== Getting first & previous page and printing links ==== //
@@ -274,11 +281,11 @@ class Paging
                 {
                     // == First page == //
                     $firstpage = $this->getURL(1);
-                    $firstpage_txt = 'first';
+                    $firstpage_txt = 'First';
                     
                     // == Previous page == //
                     $prevpage = $this->getURL($pagenum-1);
-                    $prevpage_txt = 'previous';
+                    $prevpage_txt = 'Previous';
 
                     // ==== Default layout ==== //
                     if($default_layout)
