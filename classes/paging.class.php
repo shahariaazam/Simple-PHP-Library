@@ -50,6 +50,7 @@ class Paging
     {
         // ==== Default options ==== //
         $this->_options['ipp'] = 10;
+        $this->_options['pages'] = 5;
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options))
@@ -222,20 +223,22 @@ class Paging
             $pagenum = 1;
         }
 
-        $minpagenum = 1;
-        $maxpagenum = 0;
+        $minpagenum = 1;                          // Default minimum page number
+        $maxpagenum = 0;                          // Default maximum page number
         $numrows    = &$this->_rows;              // Number of rows got from query
-        $rownr      = &$this->_options['ipp'];    // Items per page
+        $ipp        = &$this->_options['ipp'];    // Items per page
+        $pages      = &$this->_options['pages'];  // Pages displayed
 
         //If rows per page not 0
         if($numrows != 0)
         {
             // ==== Getting number of total pages ==== //
-            $maxpages = ceil($numrows/$rownr);
+            $maxpages = ceil($numrows/$ipp);
 
             //If there is more the 1 page
             if($maxpages != 1)
             {
+                // ==== Default layout ==== //
                 if($default_layout)
                 {
                     echo '<br /><center>';
@@ -277,12 +280,13 @@ class Paging
                     $prevpage = $this->getURL($pagenum-1);
                     $prevpage_txt = 'previous';
 
+                    // ==== Default layout ==== //
                     if($default_layout)
                     {
                         echo '<a href="'.$firstpage.'">'.$firstpage_txt.'</a>&nbsp;';
                         echo '&nbsp;&nbsp;<a href="'.$prevpage.'">'.$prevpage_txt.'</a>&nbsp;';
                     }
-                    else
+                    else // Array layout
                     {
                         $links[] = array($firstpage, $firstpage_txt, true);
                         $links[] = array($prevpage, $prevpage_txt, true);
@@ -294,11 +298,12 @@ class Paging
                 {
                         if($page == $pagenum)
                         {
+                            // ==== Default layout ==== //
                             if($default_layout)
                             {
                                 echo ''.$page.'&nbsp;';
                             }
-                            else
+                            else // Array layout
                             {
                                 $links[] = array(false, $page);
                             }
@@ -307,11 +312,12 @@ class Paging
                         {
                             $pageurl = $this->getURL($page);
 
+                            // ==== Default layout ==== //
                             if($default_layout)
                             {
                                 echo '<a href="'.$pageurl.'">'.$page.'</a>&nbsp;';
                             }
-                            else
+                            else // Array layout
                             {
                                 $links[] = array($pageurl, $page);
                             }
@@ -329,23 +335,26 @@ class Paging
                     $lastpage = $this->getURL($maxpages);
                     $lastpage_txt = 'last';
 
+                    // ==== Default layout ==== //
                     if($default_layout)
                     {
                         echo '<a href="'.$nextpage.'">Next</a>';
                         echo '&nbsp;&nbsp;<a href="'.$lastpage.'">Last</a>';
                     }
-                    else
+                    else // Array layout
                     {
                         $links[] = array($nextpage, $nextpage_txt, true);
                         $links[] = array($lastpage, $lastpage_txt, true);
                     }
                 }
 
+                // ==== Default layout ==== //
                 if($default_layout)
                 {
                     echo '</center>';
                 }
 
+                // ==== Array layout ==== //
                 if(!$default_layout)
                 {
                     return $links;
