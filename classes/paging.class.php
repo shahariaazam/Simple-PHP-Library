@@ -290,7 +290,7 @@ class Paging
                 }
 
                 // ==== Printing remaining pages ==== //
-                for($page = $minpagenum;$page <= $maxpagenum; $page++)
+                for($page = $minpagenum; $page <= $maxpagenum; $page++)
                 {
                         if($page == $pagenum)
                         {
