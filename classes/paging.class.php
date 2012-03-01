@@ -92,7 +92,7 @@ class Paging
      * @param boolean $complex
      * @return mixed boolean when $complex is set to true. If $complex is set to true, it returns 0 for no results, false for query failed or array of results.
      */
-    public function query(db_module $db, $query, $complex = false)
+    public function query(db_module &$db, $query, $complex = false)
     {
         // ==== Checking if the query was succesfull or not ==== //
         if(!$db->query($query))
