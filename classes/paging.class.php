@@ -239,7 +239,7 @@ class Paging
             {
                 // ==== Identifiers ==== //
                 $margin = $pages - 1;
-                $middle = ceil($margin/2);
+                $middle = floor($margin/2);
 
                 // ==== Default layout ==== //
                 if($default_layout)
