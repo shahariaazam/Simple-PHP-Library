@@ -109,8 +109,8 @@ class Benchmark
 
         // ==== Setting up mail options ==== //
         $this->mopt['to']               = $this->options['mail'];
-        $this->mopt['subject']          = '[DEBUG] Benchmark ' . $this->options['unique_mail'];
-        $this->mopt['subject_tests']    = '[RESULTS] Benchmark ' . $this->options['unique_mail'];
+        $this->mopt['subject']          = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
+        $this->mopt['subject_tests']    = '[RESULTS] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
         $this->mopt['msg']              = '';
         $this->mopt['headers']          = 'MIME-Version: 1.0' . "\r\n";
         $this->mopt['headers']         .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";

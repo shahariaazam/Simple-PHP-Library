@@ -140,7 +140,7 @@ class Uploader
 
         // ==== Setting up mail options ==== //
         $this->_mopt['to']       = $this->_options['mail'];
-        $this->_mopt['subject']  = '[DEBUG] Uploader Class '.$_SERVER['HTTP_HOST'];
+        $this->_mopt['subject']  = '[DEBUG] ' . __CLASS__ . ' Class '.$_SERVER['HTTP_HOST'];
         $this->_mopt['msg']      = '';
         $this->_mopt['headers']  = 'MIME-Version: 1.0' . "\r\n";
         $this->_mopt['headers'] .= 'Content-type: text/html; charset=UTF-8' . "\r\n";

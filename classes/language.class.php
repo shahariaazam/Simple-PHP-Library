@@ -79,7 +79,7 @@ class Language
 
         // ==== Setting up mail options ==== //
         $this->_mopt['to']         = $this->_options['mail'];
-        $this->_mopt['subject']    = '[DEBUG]'.$this->_options['mail_id'].' Language Class';
+        $this->_mopt['subject']    = '[DEBUG]'.$this->_options['mail_id'].' ' . __CLASS__ . ' Class';
         $this->_mopt['msg']        = '';
         $this->_mopt['headers']    = 'MIME-Version: 1.0' . "\r\n";
         $this->_mopt['headers']   .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
