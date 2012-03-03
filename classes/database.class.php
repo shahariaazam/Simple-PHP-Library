@@ -386,6 +386,9 @@ class Mysql implements db_module
         // ==== Returning result ==== //
         if(!$query)
         {
+            // ==== Resetting the resource ==== //
+            $this->resource = '';
+
             return false;
         }
         else
@@ -788,6 +791,9 @@ class Pgsql implements db_module
         // ==== Returning result ==== //
         if($query == false)
         {
+            // ==== Resetting the resource ==== //
+            $this->resource = '';
+
             return false;
         }
         else
@@ -1176,6 +1182,9 @@ class Mysql_i implements db_module
         // ==== Returning result ==== //
         if($query == false)
         {
+            // ==== Resetting the result ==== //
+            $this->result = '';
+
             return false;
         }
         else
