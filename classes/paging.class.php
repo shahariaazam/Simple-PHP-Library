@@ -234,6 +234,12 @@ class Paging
             // ==== Getting number of total pages ==== //
             $maxpages = ceil($numrows/$ipp);
 
+            // ==== Failsafe in case the requested page is out of range ==== //
+            if($pagenum > $maxpages)
+            {
+                $pagenum = 1;
+            }
+
             //If there is more the 1 page
             if($maxpages != 1)
             {
