@@ -40,7 +40,8 @@ class Cart
     private $_doEmpty = false;
 
     /**
-     * The method is the constructor for this class
+     * The method is the constructor for this class.
+     * The constructor is private because only the Singleton pattern should be used when creating the object
      *
      * @param void
      * @return void
@@ -256,7 +257,7 @@ class Cart
      * @param void
      * @return void
      */
-    private function emptyCart()
+    public function emptyCart()
     {
         // ==== Unsetting the cart session variable ==== //
         unset($_SESSION['cart']);
