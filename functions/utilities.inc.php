@@ -1,16 +1,15 @@
 <?php
 /**
  * Class autoloader
- * The function requires a __WEBMASTER__ constant.
+ * The function requires a WEBMASTER constant.
  *
- * @global array $classes_dirs
  * @param string $class
  * @return void
  */
 function class_loader($class)
 {
-    // ==== Getting some outside variables ===== //
-    global $classes_dirs;
+    // ==== Getting the include paths ==== //
+    $classes_dirs = explode(PATH_SEPARATOR, get_include_path());
 
     // ==== Check variable ==== //
     $found = false;
@@ -41,6 +40,24 @@ function class_loader($class)
                 // ==== Exiting the loop ==== //
                 break;
             }
+            else //Failsafe
+            {
+                // ==== Telling it from where to include the files ==== //
+                $file = $directory.$class.'.php';
+
+                // ==== Checking if file exists ==== //
+                if(is_file($file))
+                {
+                    // ==== Found the file ==== //
+                    $found = true;
+
+                    // ==== Getting the file ==== //
+                    $class_file = $file;
+
+                    // ==== Exiting the loop ==== //
+                    break;
+                }
+            }
         }
     }
     else
@@ -59,18 +76,21 @@ function class_loader($class)
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
 
+        // ==== Message ==== //
+        $message = '<b>ERROR:</b> There is no file for class <em>'.$class.'</em>.<br /><br />';
+
         // ==== More info ==== //
         $more = '';
         $more .= '<b>URL:</b> '.getFullURL().'<br /><br />';
-        $more .= '<b>List of class directories:</b><pre>'.print_r($classes_dirs, true).'</pre><br /><br />';
+        $more .= '<b>List of include paths:</b><pre>'.print_r($classes_dirs, true).'</pre><br /><br />';
         $more .= '<b>$_GET:</b><pre>'.print_r($_GET, true).'</pre><br /><br />';
         $more .= '<b>$_POST:</b><pre>'.print_r($_POST, true).'</pre><br /><br />';
         $more .= '<b>$_SERVER:</b><pre>'.print_r($_SERVER, true).'</pre><br /><br />';
 
         // ==== Sending notification mail to webmaster ==== //
-        if(defined('__WEBMASTER__'))
+        if(defined('WEBMASTER'))
         {
-            mail(__WEBMASTER__, '[FATAL ERROR] Site: '.$_SERVER['HTTP_HOST'], '<b>ERROR:</b> There is no file for class <u>'.$class.'</u>.<br /><br />'.$more, $headers);
+            mail(WEBMASTER, '[FILE NOT FOUND] Site: '.$_SERVER['HTTP_HOST'], $message . $more, $headers);
         }
 
         // ==== Showing message to users ==== //
@@ -80,8 +100,8 @@ function class_loader($class)
 
 /**
  * The function sends a debug mail in case a fatal error happens.
- * The function requires a __WEBMASTER__ constant.
- * The function can also use a __SITE_ROOT__ constant if defined.
+ * The function requires a WEBMASTER constant.
+ * The function can also use a SITE_ROOT constant if defined.
  *
  * @param void
  * @return void
@@ -129,9 +149,9 @@ function error_handler()
         if($error_type !== false)
         {
             // ==== Determining the site root ==== //
-            if(defined('__SITE_ROOT__'))
+            if(defined('SITE_ROOT'))
             {
-                $site_root = __SITE_ROOT__;
+                $site_root = SITE_ROOT;
             }
             else
             {
@@ -154,9 +174,9 @@ function error_handler()
             $message .= '<b>$_SERVER:</b><pre>'.print_r($_SERVER, true).'</pre><br /><br />';
 
             // ==== Sending notification mail to webmaster ==== //
-            if(defined('__WEBMASTER__'))
+            if(defined('WEBMASTER'))
             {
-                mail(__WEBMASTER__, '['.$error_type.'] Site: '.$site_root, $message, $headers);
+                mail(WEBMASTER, '['.$error_type.'] Site: '.$site_root, $message, $headers);
             }
         }
     }
