@@ -32,6 +32,13 @@ class URL
     private $_url;
 
     /**
+     * Temporary site root for SSL URL generation
+     *
+     * @var string
+     */
+    private $_site_root_tmp = false;
+
+    /**
      * What page is the user in
      *
      * @var string
@@ -74,43 +81,52 @@ class URL
         $this->_options['get_params']     = array();
         $this->_options['rewrite']        = false;
 
-        // ==== Replacing options with custom ones ==== //
-        if(is_array($options))
+        // ==== Checking if the site_root option has been set ==== //
+        if(!empty($options['site_root']))
         {
-            $this->_options = array_replace($this->_options, $options);
+            // ==== Replacing options with custom ones ==== //
+            if(is_array($options))
+            {
+                $this->_options = array_replace($this->_options, $options);
+            }
+
+            // ==== Setting rewrite property ==== //
+            $this->_rewrite = $this->_options['rewrite'];
+
+            // ==== Getting URL ==== //
+            $this->_url = getFullURL();
+
+            // ==== Correcting the site root ==== //
+            if(strlen($this->_options['site_root']) > (strrpos($this->_options['site_root'], '/')+1))
+            {
+                $this->_options['site_root'] .= '/';
+            }
+
+            // ==== Correcting the URL ==== //
+            if($this->_rewrite && strlen($this->_url) > (strrpos($this->_url, '/')+1) && strpos($this->_url, '?'.$this->_options['page_token'].'=') === false)
+            {
+                $this->_url .= '/';
+            }
+
+            // ==== Getting the URL data ==== //
+            $this->getURLData();
+
+            // ==== Initializing the default params ==== //
+            $this->initParams();
+
+            // ==== Determining if the URL is valid ==== //
+            $is_valid = filter_var($this->_url, FILTER_VALIDATE_URL);
+
+            // == If invalid == //
+            if($is_valid === false)
+            {
+                trigger_error('Invalid URL. The URL class could not process the URL. URL: '.$this->url, E_USER_WARNING);
+            }
         }
-
-        // ==== Setting rewrite property ==== //
-        $this->_rewrite = $this->_options['rewrite'];
-
-        // ==== Getting URL ==== //
-        $this->_url = getFullURL();
-
-        // ==== Correcting the site root ==== //
-        if(strlen($this->_options['site_root']) > (strrpos($this->_options['site_root'], '/')+1))
+        else
         {
-            $this->_options['site_root'] .= '/';
-        }
-
-        // ==== Correcting the URL ==== //
-        if($this->_rewrite && strlen($this->_url) > (strrpos($this->_url, '/')+1) && strpos($this->_url, '?'.$this->_options['page_token'].'=') === false)
-        {
-            $this->_url .= '/';
-        }
-
-        // ==== Getting the URL data ==== //
-        $this->getURLData();
-
-        // ==== Initializing the default params ==== //
-        $this->initParams();
-
-        // ==== Determining if the URL is valid ==== //
-        $is_valid = filter_var($this->_url, FILTER_VALIDATE_URL);
-
-        // == If invalid == //
-        if($is_valid === false)
-        {
-            trigger_error('Invalid URL. The URL class could not process the URL. URL: '.$this->url, E_USER_WARNING);
+            // ==== Triggering error ==== //
+            trigger_error('The option site_root is not set.', E_USER_ERROR);
         }
     }
 
@@ -281,11 +297,26 @@ class URL
      */
     public function get_ssl($page='', array $params=array(), $merge_get=false)
     {
-        // ==== Getting the URL ==== //
-        $url = $this->get($page, $params, $merge_get);
+        // ==== Checking if the SSL site root is even set ==== //
+        if(!empty($this->_options['site_root_ssl']))
+        {
+            // ==== Setting the temporary site root ==== //
+            $this->_site_root_tmp = $this->_options['site_root_ssl'];
 
-        // ==== Replacing the site root with the SSL site root ==== //
-        $url = str_replace($this->_options['site_root'], $this->_options['site_root_ssl'], $url);
+            // ==== Getting the URL ==== //
+            $url = $this->get($page, $params, $merge_get);
+
+            // ==== Resetting the temporary site root ==== //
+            $this->_site_root_tmp = false;
+        }
+        else
+        {
+            // ==== Dummy URL ==== //
+            $url = '#no_ssl_found';
+
+            // ==== Triggering an error ==== //
+            trigger_error('To generate an URL using the SSL site root you need to set the site_root_ssl option.', E_USER_WARNING);
+        }
 
         // ==== Returning the URL ==== //
         return $url;
@@ -301,8 +332,15 @@ class URL
      */
     public function get($page='', array $params=array(), $merge_get=false)
     {
-        // ==== Defaults ==== //
-        $url = $this->_options['site_root'];
+        // ==== Default URL (actually it's the site root) ==== //
+        if($this->_site_root_tmp !== false)
+        {
+            $url = $this->_site_root_tmp;
+        }
+        else
+        {
+            $url = $this->_options['site_root'];
+        }
 
         // ==== Checking if a page has actualy been requested ==== //
         if(empty($page)) // Base link to the same page without the given params
