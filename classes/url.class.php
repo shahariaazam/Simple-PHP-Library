@@ -198,61 +198,68 @@ class URL
                 // ==== Adjusting the site root ==== //
                 $this->_options['site_root'] = $site_root;
             }
+
+            // ==== Check variable to see if site root was found ==== //
+            $found_site_root = 0;
             
 
             ////////////////////////////////////////////////////////////////
             //    PROCESSING THE URL - REWRITE ENABLED/FOUND
             ///////////////////////////////////////////////////////////////
             // ==== Removing the site root from the URL ==== //
-            $data = str_replace($site_root, '', $this->_url);
+            $data = str_replace($site_root, '', $this->_url, $found_site_root);
 
-            // ==== Breaking the URL into pieces ==== //
-            $data = explode('/', $data);
-
-            // ==== Removing the last piece of the array ==== //
-            array_pop($data);
-
-            // ==== Checking if there is any data to process ==== //
-            if(count($data) > 0)
+            // ==== Checking if something was replaced ==== //
+            if($found_site_root != 0)
             {
-                // ==== Temporary get holder ==== //
-                $get = array();
+                // ==== Breaking the URL into pieces ==== //
+                $data = explode('/', $data);
 
-                // ==== Getting the page ==== //
-                $this->_page = $data[0];
+                // ==== Removing the last piece of the array ==== //
+                array_pop($data);
 
-                // ==== Putting the current page in $_GET ==== //
-                $_GET[$this->_options['page_token']] = $this->_page;
-
-                // ==== Removing the page from the data array ==== //
-                unset($data[0]);
-
-                // ==== The data should contain an even number of elements ==== //
-                if(count($data)%2 == 0)
+                // ==== Checking if there is any data to process ==== //
+                if(count($data) > 0)
                 {
-                    // ==== Going through the data ==== //
-                    foreach($data as $idx => $value)
+                    // ==== Temporary get holder ==== //
+                    $get = array();
+
+                    // ==== Getting the page ==== //
+                    $this->_page = $data[0];
+
+                    // ==== Putting the current page in $_GET ==== //
+                    $_GET[$this->_options['page_token']] = $this->_page;
+
+                    // ==== Removing the page from the data array ==== //
+                    unset($data[0]);
+
+                    // ==== The data should contain an even number of elements ==== //
+                    if(count($data)%2 == 0)
                     {
-                        // ==== Checking if this should be skipped ==== //
-                        if($idx%2 != 0)
+                        // ==== Going through the data ==== //
+                        foreach($data as $idx => $value)
                         {
-                            $get[$value] = $data[$idx+1];
+                            // ==== Checking if this should be skipped ==== //
+                            if($idx%2 != 0)
+                            {
+                                $get[$value] = $data[$idx+1];
+                            }
                         }
                     }
-                }
 
-                // ==== Merging the $_GET array with the $get array ==== //
-                $_GET = array_merge($_GET, $get);
-            }
-            else
-            {
-                ////////////////////////////////////////////////////////////////
-                //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
-                ///////////////////////////////////////////////////////////////
-                // ==== Getting the current page ==== //
-                if(isset($_GET[$this->_options['page_token']]))
+                    // ==== Merging the $_GET array with the $get array ==== //
+                    $_GET = array_merge($_GET, $get);
+                }
+                else
                 {
-                    $this->_page = $_GET[$this->_options['page_token']];
+                    ////////////////////////////////////////////////////////////////
+                    //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
+                    ///////////////////////////////////////////////////////////////
+                    // ==== Getting the current page ==== //
+                    if(isset($_GET[$this->_options['page_token']]))
+                    {
+                        $this->_page = $_GET[$this->_options['page_token']];
+                    }
                 }
             }
         }
