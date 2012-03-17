@@ -116,6 +116,15 @@ class URL
                 $this->_url .= '/';
             }
 
+            // ==== Getting the site URL ==== //
+            $this->_site_root = $this->_options['site_root'];
+
+            // ==== Changing to SSL if that's the case ==== //
+            if($this->_options['secure'] == true)
+            {
+                $this->enableSSL();
+            }
+
             // ==== Getting the URL data ==== //
             $this->getURLData();
 
@@ -129,15 +138,6 @@ class URL
             if($is_valid === false)
             {
                 trigger_error('Invalid URL. The URL class could not process the URL. URL: '.$this->url, E_USER_WARNING);
-            }
-
-            // ==== Getting the site URL ==== //
-            $this->_site_root = $this->_options['site_root'];
-
-            // ==== Changing to SSL if that's the case ==== //
-            if($this->_options['secure'] == true)
-            {
-                $this->enableSSL();
             }
         }
         else
@@ -187,10 +187,10 @@ class URL
     private function getURLData()
     {
         // ==== Processing the URL only if it's not the site root ==== //
-        if($this->_options['site_root'] != $this->_url)
+        if($this->_site_root != $this->_url)
         {
             // ==== Creating a local site root to be able to decode the URL ==== //
-            $site_root = $this->_options['site_root'];
+            $site_root = $this->_site_root;
 
             // ==== Getting the actual protocol used to access the site ==== //
             $protocol = isset($_SERVER['HTTPS'])?'https://':'http://';
@@ -199,7 +199,7 @@ class URL
             $matches = array();
 
             // ==== Getting matches ==== //
-            preg_match('((http://)|(https://))', $this->_options['site_root'], $matches);
+            preg_match('((http://)|(https://))', $site_root, $matches);
 
             // ==== Getting the site root protocol ==== //
             if(isset($matches[0]))
@@ -458,6 +458,12 @@ class URL
             // ==== Going through the params and building the URL ==== //
             foreach($params as $name => $value)
             {
+                // ==== Skipping the page token if present ==== //
+                if($name == $this->_options['page_token'])
+                {
+                    continue;
+                }
+
                 // ==== Adding the parameter to the URL ==== //
                 if(!empty($value))
                 {
@@ -476,6 +482,12 @@ class URL
             // ==== Going through the params and building the URL ==== //
             foreach($params as $param => $value)
             {
+                // ==== Skipping the page token if present ==== //
+                if($name == $this->_options['page_token'])
+                {
+                    continue;
+                }
+
                 // ==== Adding the parameter to the URL ==== //
                 if(!empty($value))
                 {

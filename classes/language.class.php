@@ -244,7 +244,6 @@ class Language
      * @param void
      * @return void
      */
-
     public function __destruct()
     {
         // ==== Sending debug if on ==== //
