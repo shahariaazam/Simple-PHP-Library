@@ -403,7 +403,7 @@ class URL
         }
         else
         {
-            $url = $this->_options['site_root'];
+            $url = $this->_site_root;
         }
 
         // ==== Checking if a page has actualy been requested ==== //
