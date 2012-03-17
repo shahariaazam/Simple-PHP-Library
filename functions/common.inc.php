@@ -552,4 +552,24 @@ function ckPasswdComplexity($passwd, array $options=array())
     // ==== returning result ==== //
     return $result;
 }
+
+/**
+ * The function properly prints an array
+ *
+ * @param array $array
+ * @return void
+ */
+function print_array(array $array, $return=false)
+{
+    $str = '<pre>'.print_r($array, 1).'</pre>';
+
+    if($return == true)
+    {
+        return $str;
+    }
+    else
+    {
+        echo $str;
+    }
+}
 ?>
