@@ -32,6 +32,13 @@ class URL
     private $_url;
 
     /**
+     * Site root
+     *
+     * @var string
+     */
+    private $site_root;
+    
+    /**
      * Temporary site root for SSL URL generation
      *
      * @var string
@@ -80,6 +87,7 @@ class URL
         $this->_options['page_token']     = 'goto';
         $this->_options['get_params']     = array();
         $this->_options['rewrite']        = false;
+        $this->_options['secure']         = false;
 
         // ==== Checking if the site_root option has been set ==== //
         if(!empty($options['site_root']))
@@ -121,6 +129,15 @@ class URL
             if($is_valid === false)
             {
                 trigger_error('Invalid URL. The URL class could not process the URL. URL: '.$this->url, E_USER_WARNING);
+            }
+
+            // ==== Getting the site URL ==== //
+            $this->_site_root = $this->_options['site_root'];
+
+            // ==== Changing to SSL if that's the case ==== //
+            if($this->_options['secure'] == true)
+            {
+                $this->enableSSL();
             }
         }
         else
@@ -291,6 +308,46 @@ class URL
 
         // ==== result ==== //
         return $array;
+    }
+
+    /**
+     * The method changes the site root to the SSL one
+     *
+     * @param void
+     * @return void
+     */
+    public function enableSSL()
+    {
+        // ==== Checking if the SSL site root is even set ==== //
+        if(!empty($this->_options['site_root_ssl']))
+        {
+            $this->_site_root = $this->_options['site_root_ssl'];
+        }
+        else
+        {
+            // ==== Triggering an error ==== //
+            trigger_error('To switch to SSL you need to set the site_root_ssl option.', E_USER_WARNING);
+        }        
+    }
+
+    /**
+     * The method changes the site root to the non-SSL one
+     *
+     * @param void
+     * @return void
+     */
+    public function disableSSL()
+    {
+        // ==== Checking if the SSL site root is even set ==== //
+        if(!empty($this->_options['site_root']))
+        {
+            $this->_site_root = $this->_options['site_root'];
+        }
+        else
+        {
+            // ==== Triggering an error ==== //
+            trigger_error('To switch to SSL you need to set the site_root_ssl option.', E_USER_WARNING);
+        }
     }
 
     /**
