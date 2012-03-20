@@ -213,7 +213,7 @@ class Paging
         $links = array();
 
         // ==== Getting page number ==== //
-        if(isset($_GET['page']) && $_GET['page'] != '')
+        if(isset($_GET['page']) && $_GET['page'] != '' && $_GET['page'] > 1)
         {
             $pagenum = $_GET['page'];
         }
@@ -233,6 +233,12 @@ class Paging
         {
             // ==== Getting number of total pages ==== //
             $maxpages = ceil($numrows/$ipp);
+
+            // ==== Failsafe for the number of pages to display ==== //
+            if($maxpages < $pages)
+            {
+                $pages = $maxpages;
+            }
 
             // ==== Failsafe in case the requested page is out of range ==== //
             if($pagenum > $maxpages)
