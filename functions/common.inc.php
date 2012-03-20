@@ -58,6 +58,7 @@ function redirect($url, $method='header', $settings=array())
     {
         default:
             header('Location: '.$url.'');
+            exit();
         break;
 
         case 'http_redirect':
@@ -75,6 +76,7 @@ function redirect($url, $method='header', $settings=array())
             if(function_exists('http_redirect'))
             {
                     http_redirect($url, $params['params'], $params['session'], $params['status']);
+                    exit();
             }
             else
             {
