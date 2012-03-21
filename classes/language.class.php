@@ -224,13 +224,28 @@ class Language
      * The method retrieves a text from the language file
      *
      * @param string $text
+     * @param array $data The given data is used to parse the text
      * @return mixed false on fail or string on success
      */
-    public function text($txt)
+    public function text($txt, array $data=array())
     {
+        // ==== Checking if the text exists ==== //
         if(isset($this->_texts[$txt]))
         {
-            return $this->_texts[$txt];
+            // ==== Getting the text into a variable ==== //
+            $text = $this->_texts[$txt];
+
+            // ==== Checking if we have any data to used for the parsing ==== //
+            if(count($data) > 0)
+            {
+                // ==== Going through the data and replacing stuff in the text ==== //
+                foreach($data as $token => $value)
+                {
+                    $text = str_replace('{'.$token.'}', $value, $text);
+                }
+            }
+
+            return $text;
         }
         else
         {
