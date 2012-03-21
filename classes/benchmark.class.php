@@ -89,7 +89,7 @@ class Benchmark
         $this->log = '';
 
         // ==== Default $options ==== //
-        $this->options['unique_mail']     = 'Class';
+        $this->options['unique_mail']     = '';
         $this->options['threshold']       = 3000;   // Milliseconds
         $this->options['results']         = 'manual'; //Available options: manual, show, false; the last one deactivates the benchmark
         $this->options['debug']           = false;
@@ -374,10 +374,6 @@ class Benchmark
                 // ==== Sending debug mail ==== //
                 mail($this->mopt['to'], $this->mopt['subject_tests'], $message, $this->mopt['headers']);
             }
-        }
-        else
-        {
-            $this->log .= '<b>Notice:</b> The benchmark is disabled.<br /><br />';
         }
 
         // ==== Sending debug if on ==== //
