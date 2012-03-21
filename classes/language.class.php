@@ -92,6 +92,32 @@ class Language
     }
 
     /**
+     * The method retrieves the current language
+     *
+     * @param void
+     * @return string
+     */
+    public function getLanguage()
+    {
+        // ==== Checking the possible locations for a language ==== //
+        if(isset($_GET['lang']))
+        {
+            $lang = $_GET['lang'];
+        }
+        elseif(isset($_SESSION['lang_'.$this->_uq]))
+        {
+            $lang = $_SESSION['lang_'.$this->_uq];
+        }
+        else
+        {
+            $lang = $this->_options['default_language'];
+        }
+
+        // ==== Returning the language ==== //
+        return $lang;
+    }
+
+    /**
      * The methods loads the language file
      *
      * @param void
@@ -106,18 +132,7 @@ class Language
         $this->_uq = sha1($salt);
 
         // ==== Getting the language ==== //
-        if(isset($_GET['lang']))
-        {
-            $lang = $_GET['lang'];
-        }
-        elseif(isset($_SESSION['lang_'.$this->_uq]))
-        {
-            $lang = $_SESSION['lang_'.$this->_uq];
-        }
-        else
-        {
-            $lang = $this->_options['default_language'];
-        }
+        $lang = $this->getLanguage();
 
         // ==== Building language file path for the requested language ==== //
         $lang_file = $this->_options['lang_dir'].$lang.$this->_options['lang_sufix'];
