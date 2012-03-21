@@ -119,7 +119,7 @@ function error_handler()
             E_ERROR             => 'E_ERROR',
             E_WARNING           => 'E_WARNING',
             E_PARSE             => 'E_PARSE',
-            E_NOTICE            => 'E_NOTICE',
+//            E_NOTICE            => 'E_NOTICE',
             E_CORE_ERROR        => 'E_CORE_ERROR',
             E_CORE_WARNING      => 'E_CORE_WARNING',
             E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
@@ -142,7 +142,7 @@ function error_handler()
         }
         else
         {
-            $error_type = 'UNKNOWN ERROR';
+            $error_type = false;
         }
 
         // ==== Checking if we have a message type ==== //
@@ -176,7 +176,7 @@ function error_handler()
             // ==== Sending notification mail to webmaster ==== //
             if(defined('WEBMASTER'))
             {
-                mail(WEBMASTER, '['.$error_type.'] Site: '.$site_root, $message, $headers);
+                mail(WEBMASTER, '[ERROR]['.$error_type.'] Site: '.$site_root, $message, $headers);
             }
         }
     }
