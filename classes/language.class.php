@@ -9,7 +9,7 @@
  *
  *
  * @name Language
- * @version 3.1
+ * @version 3.5
  */
 
 class Language
