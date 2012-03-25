@@ -591,7 +591,7 @@ function get_request_headers()
     {
         if(preg_match('/(HTTP_)/', $key))
         {
-            $headers[$key] = $value;
+            $headers[strtoupper($key)] = $value;
         }
     }
 
