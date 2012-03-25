@@ -574,4 +574,28 @@ function print_array(array $array, $return=false)
         echo $str;
     }
 }
+
+/**
+ * The function retrieves the request headers
+ *
+ * @param void
+ * @return array
+ */
+function get_request_headers()
+{
+    // ==== headers array ===== //
+    $headers = array();
+
+    // ==== Going through the $_SERVER array ===== //
+    foreach($_SERVER as $key => $value)
+    {
+        if(preg_match('/(HTTP_)/', $key))
+        {
+            $headers[$key] = $value;
+        }
+    }
+
+    // ==== result ==== //
+    return $headers;
+}
 ?>
