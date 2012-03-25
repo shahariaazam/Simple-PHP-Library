@@ -436,6 +436,12 @@ class URL
         }
         else // New page with params that must be automaticaly loaded
         {
+            // ===== Checking if we should merge the GET ==== //
+            if($merge_get === true)
+            {
+                $params = self::array_merge_v2($_GET, $params);
+            }
+
             // ==== Adding default params ==== //
             $params = self::array_merge_v2($this->_params, $params);
         }
