@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name URL
- * @version 2.2
+ * @version 2.5
  *
  * @uses getFullURL function from functions/common.inc.php
  *
@@ -346,7 +346,7 @@ class URL
         else
         {
             // ==== Triggering an error ==== //
-            trigger_error('To switch to SSL you need to set the site_root_ssl option.', E_USER_WARNING);
+            trigger_error('To switch to non-SSL you need to set the site_root option.', E_USER_WARNING);
         }
     }
 
