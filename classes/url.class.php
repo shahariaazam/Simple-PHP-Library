@@ -204,7 +204,7 @@ class URL
             // ==== Getting the site root protocol ==== //
             if(isset($matches[0]))
             {
-                // ==== Replacing the site root protocol with the actual protocol ==== //
+                // ==== Replacing the site root protocol with the actual protocol so that we can remove the site root from the URL ==== //
                 $site_root = str_replace($matches[0], $protocol, $site_root);
             }
             else
