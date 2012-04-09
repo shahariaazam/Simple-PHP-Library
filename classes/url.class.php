@@ -189,7 +189,7 @@ class URL
         // ==== Processing the URL only if it's not the site root ==== //
         if($this->_site_root != $this->_url)
         {
-            // ==== Creating a local site root to be able to decode the URL ==== //
+            // ==== Creating a local site root copy to be able to handle the decoding of the URL ==== //
             $site_root = $this->_site_root;
 
             // ==== Getting the actual protocol used to access the site ==== //
