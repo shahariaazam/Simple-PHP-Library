@@ -85,6 +85,7 @@ class URL
         $this->_options['site_root']      = '';
         $this->_options['site_root_ssl']  = '';
         $this->_options['page_token']     = 'goto';
+        $this->_options['action_token']   = 'action';
         $this->_options['get_params']     = array();
         $this->_options['rewrite']        = false;
         $this->_options['secure']         = false;
