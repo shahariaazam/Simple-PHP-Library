@@ -136,7 +136,7 @@ function deparse_url($comps)
 {
     $url = $comps['scheme'].'://'.                              // Protocol
            $comps['host'].                                      // Host
-           (isset($comps['port'])?$comps['port']:'').           // Port
+           (isset($comps['port'])?':'.$comps['port']:'').           // Port
            (isset($comps['path'])?$comps['path']:'').           // Path
            (isset($comps['query'])?'?'.$comps['query']:'').     // Query string
            (isset($comps['fragment'])?$comps['fragment']:'');   // Anchor
