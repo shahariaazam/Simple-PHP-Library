@@ -85,6 +85,7 @@ class URL
         $this->_options['site_root']      = '';
         $this->_options['site_root_ssl']  = '';
         $this->_options['page_token']     = 'goto';
+        $this->_options['index_page']     = 'index';
         $this->_options['get_params']     = array();
         $this->_options['rewrite']        = false;
         $this->_options['secure']         = false;
@@ -186,6 +187,12 @@ class URL
      */
     private function getURLData()
     {
+        // ==== Setting some default values ==== //
+        if(!isset($_GET[$this->_options['page_token']]))
+        {
+            $_GET[$this->_options['page_token']] = $this->_options['index_page'];
+        }
+
         // ==== Processing the URL only if it's not the site root ==== //
         if($this->_site_root != $this->_url)
         {
