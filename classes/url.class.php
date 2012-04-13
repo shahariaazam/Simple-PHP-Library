@@ -22,56 +22,56 @@ class URL
      *
      * @var array
      */
-    private $_options;
+    protected $_options;
 
     /**
      * Current url
      *
      * @var string
      */
-    private $_url;
+    protected $_url;
 
     /**
      * Site root
      *
      * @var string
      */
-    private $site_root;
+    protected $site_root;
     
     /**
      * Temporary site root for SSL URL generation
      *
      * @var string
      */
-    private $_site_root_tmp = false;
+    protected $_site_root_tmp = false;
 
     /**
      * What page is the user in
      *
      * @var string
      */
-    private $_page;
+    protected $_page;
 
     /**
      * Hold the pattern for the rewrite
      *
      * @var string
      */
-    private $_pattern;
+    protected $_pattern;
 
     /**
      * Array of params that the object will automatically load
      *
      * @var array
      */
-    private $_params = array();
+    protected $_params = array();
 
     /**
      * Rewrite active or not
      *
      * @var boolen
      */
-    private $_rewrite;
+    protected $_rewrite;
 
     /**
      * Class constructor. It also validates the URL
@@ -155,7 +155,7 @@ class URL
      * @param void
      * @return void
      */
-    private function initParams()
+    protected function initParams()
     {
         // ==== Checking if the get params option has some info in it ==== //
         if(count($this->_options['get_params']) > 0)
@@ -185,7 +185,7 @@ class URL
      * @param void
      * @return void
      */
-    private function getURLData()
+    protected function getURLData()
     {
         // ==== Setting some default values ==== //
         if(!isset($_GET[$this->_options['page_token']]))
@@ -297,7 +297,7 @@ class URL
      * @param array $array2
      * @return array
      */
-    private static function array_merge_v2($array1, $array2)
+    protected static function array_merge_v2($array1, $array2)
     {
         // ==== Going through the first array ==== //
         foreach($array1 as $idx => $value)
@@ -513,4 +513,3 @@ class URL
         return $url;
     }
 }
-?>
