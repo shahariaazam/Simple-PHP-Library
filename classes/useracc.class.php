@@ -212,9 +212,9 @@ class UserAcc
     protected function sqlSalt(array $data)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          * 
          */
     }
@@ -315,9 +315,9 @@ class UserAcc
     protected function sqlLogin(array $data)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          *
          */
     }
@@ -492,9 +492,9 @@ class UserAcc
     protected function doesUsenameExist($username)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          *
          */
     }
@@ -508,9 +508,9 @@ class UserAcc
     protected function doesEmailExist($email)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          *
          */
     }
@@ -608,9 +608,9 @@ class UserAcc
     protected function sqlRegister(array $data)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          *
          */
     }

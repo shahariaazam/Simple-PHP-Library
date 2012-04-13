@@ -153,9 +153,9 @@ class UserAuth
     protected function sqlLogin(array $data)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          *
          */
     }
@@ -332,9 +332,9 @@ class UserAuth
     protected function sqlAuth(array $data)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          *
          */
     }
@@ -554,9 +554,9 @@ class UserAuth
     protected function sqlLogout(array $data)
     {
         /**
-         * ------------------
-         * INSERT LOGIC HERE
-         * ------------------
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
          *
          */
     }
