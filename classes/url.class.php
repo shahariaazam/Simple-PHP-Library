@@ -144,7 +144,7 @@ class URL
         else
         {
             // ==== Triggering error ==== //
-            trigger_error('The option site_root is not set.', E_USER_ERROR);
+            exit('The site root is not set.');
         }
     }
 
