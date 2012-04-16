@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Image
- * @version 3.0
+ * @version 3.1
  *
  * 
  */
@@ -37,16 +37,22 @@ class Image
     private $_ext;
 
     /**
+     *
+     * Image file
+     */
+    private $_image = '';
+
+    /**
      * Class constructor
      * 
      * @param array $options
-     * @return void
+     * @return object
      */
-    public function __construct($options=array())
+    public function __construct($image, $options=array())
     {
         // ==== Default options ==== //
-        $this->_options['width']     = '100';       // Width of the new image
-        $this->_options['height']    = '100';       // Height of the new image
+        $this->_options['width']     = '150';       // Width of the new image
+        $this->_options['height']    = '150';       // Height of the new image
         $this->_options['mode']      = 'box';       // Can take the following values: box, fixed, auto
         $this->_options['dir']       = 'images/';   // Directory where to put the images
 
@@ -55,20 +61,15 @@ class Image
         {
             $this->_options = array_replace($this->_options, $options);
         }
-    }
 
-    /**
-     * Method used to set options after object creationg
-     * 
-     * @param array $options
-     * @return void
-     */
-    public function setOpt($options=array())
-    {
-        // ==== Replacing the options ==== //
-        if(is_array($options))
+        // ==== Checking if the image file exists ==== //
+        if(is_file($image))
         {
-            $this->_options = array_replace($this->_options, $options);
+            $this->_image = $image;
+        }
+        else
+        {
+            throw new Exception('Image file is invalid');
         }
     }
 
@@ -90,16 +91,15 @@ class Image
     /**
      * This method shows the given image but the resized version
      * 
-     * @param string $image Image location
      * @param string $new_ext The type of image to output
      * @return boolean
      */
-    public function show($image, $new_ext='')
+    public function show($new_ext='')
     {
         // ==== Check variable ==== //
         $isOk = true;
 
-        $this->_ext = self::getFileExt($image);
+        $this->_ext = self::getFileExt($this->_image);
 
         // ==== Setting new image extension ===== //
         if($new_ext === '')
@@ -111,7 +111,7 @@ class Image
         if(key_exists($new_ext, $this->_supported))
         {
             // ==== Resizing image ==== //
-            $new = $this->resizeImg($image);
+            $new = $this->resizeImg($this->_image);
 
             // ==== Checking if the new image is a resource ==== //
             if(is_resource($new))
@@ -154,17 +154,16 @@ class Image
     /**
      * The method writes the given image to the hard drive using a random name. If the name exists it retries 3 times to generate an unique one.
      *
-     * @param string $image
      * @param string $new_ext
      * @return false on failure or image name on success
      */
-    public function write($image, $new_ext='')
+    public function write($new_ext='')
     {
         // ==== Result variable ==== //
         $result = false;
 
         // ==== Getting the image extension ==== //
-        $this->_ext = self::getFileExt($image);
+        $this->_ext = self::getFileExt($this->_image);
 
         // ==== Setting new image extension ===== //
         if($new_ext === '')
@@ -185,7 +184,7 @@ class Image
             }
 
             // ==== Resizing image ==== //
-            $new = $this->resizeImg($image);
+            $new = $this->resizeImg($this->_image);
 
             // ==== Generating random name ==== //
             $name = sha1($image . time());
@@ -200,7 +199,7 @@ class Image
                 while ($retry > 0)
                 {
                     // ==== Generating random name ==== //
-                    $name = sha1($image . time());
+                    $name = sha1($this->_image . time());
 
                     // ==== Checking if the file exists or not ==== //
                     if(is_file($dir . '/' . $name . '.' . $this->_supported[$this->_ext]))
@@ -322,7 +321,7 @@ class Image
 
                     // ==== Generating new image ==== //
                     $new = imagecreatetruecolor(max($width, $height), max($width, $height));
-                break;
+                    break;
 
                 case 'fixed':
                     // ==== Getting new image start coordinates and dimensions ==== //
@@ -333,7 +332,7 @@ class Image
 
                     // ==== Generating new image ==== //
                     $new = imagecreatetruecolor($width, $height);
-                break;
+                    break;
             }
 
             // ==== Checking if a new image was created ==== //
@@ -356,5 +355,3 @@ class Image
         return $result;
     }
 }
-
-?>
