@@ -1,17 +1,16 @@
 <?php
 /**
  * 
- * The image class allows you to resize images on the go or save them to the file sistem.
+ * The image class allows you to resize images on the go or save them to the file system.
  * 
  * @author Brian
  * @link http://brian.hopto.org/framework_wiki/
- * @copyright 2011
+ * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Image
  * @version 3.0
  *
- * @uses getFileExt function from functions/common.inc.php
  * 
  */
 class Image
@@ -74,6 +73,21 @@ class Image
     }
 
     /**
+     *
+     * The method gets the extension of a given filename
+     *
+     * @param string $file
+     * @return string
+     */
+    private static function getFileExt($file)
+    {
+        $array = explode(".", $file);
+        $ext = $array[sizeof($array)-1];
+
+        return $ext;
+    }
+
+    /**
      * This method shows the given image but the resized version
      * 
      * @param string $image Image location
@@ -85,7 +99,7 @@ class Image
         // ==== Check variable ==== //
         $isOk = true;
 
-        $this->_ext = getFileExt($image);
+        $this->_ext = self::getFileExt($image);
 
         // ==== Setting new image extension ===== //
         if($new_ext === '')
@@ -151,7 +165,7 @@ class Image
         $result = false;
 
         // ==== Getting the image extension ==== //
-        $this->_ext = getFileExt($image);
+        $this->_ext = self::getFileExt($image);
 
         // ==== Setting new image extension ===== //
         if($new_ext === '')
