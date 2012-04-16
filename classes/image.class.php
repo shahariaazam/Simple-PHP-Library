@@ -333,6 +333,14 @@ class Image
                     // ==== Generating new image ==== //
                     $new = imagecreatetruecolor($width, $height);
                     break;
+
+                case 'auto':
+                    /**
+                     *
+                     * @todo Implement auto resize based on dimensions
+                     *
+                     */
+                    break;
             }
 
             // ==== Checking if a new image was created ==== //
