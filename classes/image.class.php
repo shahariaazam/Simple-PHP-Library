@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- * The image class allows you to resize images on the go or save them to the file system.
+ * The class allows you to resize images an view them on the fly or save them to the file system.
  * 
  * @author Brian
  * @link http://brian.hopto.org/framework_wiki/
@@ -47,7 +47,7 @@ class Image
         // ==== Default options ==== //
         $this->_options['width']     = '100';       // Width of the new image
         $this->_options['height']    = '100';       // Height of the new image
-        $this->_options['mode']      = 'box';       // Can take the following values: box, fixed
+        $this->_options['mode']      = 'box';       // Can take the following values: box, fixed, auto
         $this->_options['dir']       = 'images/';   // Directory where to put the images
 
         // ==== Replacing options with custom ones ==== //
@@ -156,7 +156,6 @@ class Image
      *
      * @param string $image
      * @param string $new_ext
-     * @return false if the operation was unsuccsessfull
      * @return false on failure or image name on success
      */
     public function write($image, $new_ext='')
