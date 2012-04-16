@@ -228,7 +228,7 @@ class Image
 
                     // == PNG == //
                     case 'png':
-                        imagepng($new, $dir.'/'.$name.'.'.$this->_supported[$new_ext], 100);
+                        imagepng($new, $dir.'/'.$name.'.'.$this->_supported[$new_ext], 9);
                     break;
 
                     // == Format not supported == //
