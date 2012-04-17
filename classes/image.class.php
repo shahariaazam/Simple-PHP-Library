@@ -40,8 +40,18 @@ class Image
     /**
      *
      * Image file
+     *
+     * @var string
      */
     private $_image = '';
+
+    /**
+     *
+     * Object status
+     *
+     * @var boolean
+     */
+    private $_enabled = true;
 
     /**
      * Class constructor
@@ -67,10 +77,16 @@ class Image
         if(is_file($image))
         {
             $this->_image = $image;
+
+            // ==== Getting the image properties ==== //
+            $this->getImageProperties();
         }
         else
         {
             throw new Exception('Image file is invalid');
+
+            // ==== Disabling the object ==== //
+            $this->_enabled = false;
         }
     }
 
@@ -116,6 +132,13 @@ class Image
      */
     public function __get($name)
     {
+        // ==== If the object is disabled just return the failed value ==== //
+        if($this->_enabled == false)
+        {
+            return '';
+        }
+
+        // ==== Checking if the property exists ==== //
         if(isset($this->_properties[$name]))
         {
             return $this->_properties[$name];
@@ -134,6 +157,12 @@ class Image
      */
     public function show($new_ext='')
     {
+        // ==== If the object is disabled just return the failed value ==== //
+        if($this->_enabled == false)
+        {
+            return false;
+        }
+
         // ==== Check variable ==== //
         $isOk = true;
 
@@ -198,6 +227,12 @@ class Image
      */
     public function write($new_ext='')
     {
+        // ==== If the object is disabled just return the failed value ==== //
+        if($this->_enabled == false)
+        {
+            return false;
+        }
+
         // ==== Result variable ==== //
         $result = false;
 
@@ -300,7 +335,7 @@ class Image
         // CREATING THE IMAGE FROM THE FILE
         /////////////////////////////////////////////////////
         // ==== Getting picture from image ==== //
-        switch($this->_supported[$this->_ext])
+        switch($this->_supported[$this->extension])
         {
             // == JPEG == //
             case 'jpeg':
@@ -326,8 +361,8 @@ class Image
         if(is_resource($old))
         {
             // ==== Determining width, height and ratio of the old image ==== //
-            $dim['width']   = imagesx($old);
-            $dim['height']  = imagesy($old);
+            $dim['width']   = $this->width;
+            $dim['height']  = $this->height;
             $ratio          = $dim['width'] / $dim['height'];
 
             // ==== Creating new image with requested dimensions ==== //
