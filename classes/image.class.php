@@ -107,19 +107,19 @@ class Image
         $extension  = $img_data[sizeof($array)-1];
 
         // ==== Getting the image short name (the one without extension) ==== //
-        $short_name = substr($name, 0, strrpos($name, '.'));
+        $real_name = substr($name, 0, strrpos($name, '.'));
 
         // ==== Getting image dimensions ==== //
         list($width, $height) = getimagesize($this->_image);
 
         // ==== Adding the image data to the object ==== //
         $this->_properties = array(
-            'name'       => $name,
-            'path'       => $this->_image,
-            'short_name' => $short_name,
-            'extension'  => $extension,
-            'width'      => $width,
-            'height'     => $height
+            'name'      => $name,
+            'path'      => $this->_image,
+            'real_name' => $real_name,
+            'extension' => $extension,
+            'width'     => $width,
+            'height'    => $height
         );
     }
 
