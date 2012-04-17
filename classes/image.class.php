@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Image
- * @version 3.1.2
+ * @version 3.1.4
  *
  * 
  */
@@ -65,7 +65,7 @@ class Image
         $this->_options['width']     = '150';       // Width of the new image
         $this->_options['height']    = '150';       // Height of the new image
         $this->_options['mode']      = 'box';       // Can take the following values: box, fixed, auto
-        $this->_options['dir']       = 'images/';   // Directory where to put the images
+        $this->_options['dir']       = 'images/';   // Directory where to put the image
 
         // ==== Replacing options with custom ones ==== //
         if(is_array($options))
