@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Image
- * @version 3.1.4
+ * @version 3.2.0
  *
  * 
  */
@@ -223,9 +223,10 @@ class Image
      * The method writes the given image to the hard drive using a random name. If the name exists it retries 3 times to generate an unique one.
      *
      * @param string $new_ext
+     * @param boolean $random Flag that determins if the image name is random or not
      * @return false on failure or image name on success
      */
-    public function write($new_ext='')
+    public function write($new_ext='', $random=false)
     {
         // ==== If the object is disabled just return the failed value ==== //
         if($this->_enabled == false)
@@ -260,31 +261,40 @@ class Image
             // ==== Resizing image ==== //
             $new = $this->resizeImg($this->_image);
 
-            // ==== Generating random name ==== //
-            $name = sha1($image . time());
-
-            // ==== Checking if the file exists or not ==== //
-            if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
+            // ==== Checking if we should generate a random image name ==== //
+            if($random === true)
             {
-                // == Retry count == //
-                $retry = 3;
+                // ==== Generating random name ==== //
+                $name = sha1($image . time());
 
-                // ==== Retrying ==== //
-                while ($retry > 0)
+                // ==== Checking if the file exists or not ==== //
+                if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
                 {
-                    // ==== Generating random name ==== //
-                    $name = sha1($this->_image . time());
+                    // == Retry count == //
+                    $retry = 3;
 
-                    // ==== Checking if the file exists or not ==== //
-                    if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
+                    // ==== Retrying ==== //
+                    while ($retry > 0)
                     {
-                        $retry--;
-                    }
-                    else
-                    {
-                        break;
+                        // ==== Generating random name ==== //
+                        $name = sha1($this->_image . time());
+
+                        // ==== Checking if the file exists or not ==== //
+                        if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
+                        {
+                            $retry--;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
+            }
+            else
+            {
+                // ==== Generating the image name ==== //
+                $name = ''.$this->name.'_thumb_'.$this->_options['width'].'x'.$this->_options['height'];
             }
 
             // ==== Checking if we have a resource ==== //
