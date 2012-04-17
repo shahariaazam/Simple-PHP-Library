@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Image
- * @version 3.1
+ * @version 3.1.2
  *
  * 
  */
@@ -30,11 +30,12 @@ class Image
     private $_supported = array('jpg' => 'jpeg', 'jpeg' => 'jpeg', 'png' => 'png');
 
     /**
-     * Image file extension
      *
-     * @var string
+     * Image properties
+     *
+     * @var array
      */
-    private $_ext;
+    private $_properties;
 
     /**
      *
@@ -75,17 +76,54 @@ class Image
 
     /**
      *
-     * The method gets the extension of a given filename
+     * The method retrieves the properties about the image
      *
-     * @param string $file
-     * @return string
+     * @param void
+     * @return void
      */
-    private static function getFileExt($file)
+    private function getImageProperties()
     {
-        $array = explode(".", $file);
-        $ext = $array[sizeof($array)-1];
+        // ==== Getting the image name ==== //
+        $name = basename($this->_image);
 
-        return $ext;
+        // === Getting image extension ==== //
+        $img_data   = explode('.', $name);
+        $extension  = $img_data[sizeof($array)-1];
+
+        // ==== Getting the image short name (the one without extension) ==== //
+        $short_name = substr($name, 0, strrpos($name, '.'));
+
+        // ==== Getting image dimensions ==== //
+        list($width, $height) = getimagesize($this->_image);
+
+        // ==== Adding the image data to the object ==== //
+        $this->_properties = array(
+            'name'       => $name,
+            'path'       => $this->_image,
+            'short_name' => $short_name,
+            'extension'  => $extension,
+            'width'      => $width,
+            'height'     => $height
+        );
+    }
+
+    /**
+     *
+     * The method retrieves a property about the image
+     *
+     * @var string $name
+     * @return string The string will be empty if the property is not found
+     */
+    public function __get($name)
+    {
+        if(isset($this->_properties[$name]))
+        {
+            return $this->_properties[$name];
+        }
+        else
+        {
+            return '';
+        }
     }
 
     /**
@@ -99,16 +137,17 @@ class Image
         // ==== Check variable ==== //
         $isOk = true;
 
-        $this->_ext = self::getFileExt($this->_image);
+        // ==== Storing the extension into a local variable ==== //
+        $ext = $this->extension;
 
         // ==== Setting new image extension ===== //
-        if($new_ext === '')
+        if($new_ext !== '')
         {
-            $new_ext = $this->_ext;
+            $ext = &$new_ext;
         }
 
         // ==== Checking if the image provided is supported
-        if(key_exists($new_ext, $this->_supported))
+        if(key_exists($ext, $this->_supported))
         {
             // ==== Resizing image ==== //
             $new = $this->resizeImg($this->_image);
@@ -117,10 +156,10 @@ class Image
             if(is_resource($new))
             {
                 // ==== Setting page header and outputting image ===== //
-                header('Content-type: image/' . $this->_supported[$new_ext]);
+                header('Content-type: image/' . $this->_supported[$ext]);
 
                 // ==== Creating the image ==== //
-                switch($this->_supported[$new_ext])
+                switch($this->_supported[$ext])
                 {
                     // == JPEG == //
                     case 'jpeg':
@@ -162,17 +201,17 @@ class Image
         // ==== Result variable ==== //
         $result = false;
 
-        // ==== Getting the image extension ==== //
-        $this->_ext = self::getFileExt($this->_image);
+        // ==== Storing the extension into a local variable ==== //
+        $ext = $this->extension;
 
         // ==== Setting new image extension ===== //
-        if($new_ext === '')
+        if($new_ext !== '')
         {
-            $new_ext = $this->_ext;
+            $ext = &$new_ext;
         }
 
         // ==== Checking if the image extension is supported ==== //
-        if(key_exists($new_ext, $this->_supported))
+        if(key_exists($ext, $this->_supported))
         {
             // ==== Getting the directory where the image will be stored ==== //
             $dir = $this->_options['dir'];
@@ -190,7 +229,7 @@ class Image
             $name = sha1($image . time());
 
             // ==== Checking if the file exists or not ==== //
-            if(is_file($dir . '/' . $name . '.' . $this->_supported[$this->_ext]))
+            if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
             {
                 // == Retry count == //
                 $retry = 3;
@@ -202,7 +241,7 @@ class Image
                     $name = sha1($this->_image . time());
 
                     // ==== Checking if the file exists or not ==== //
-                    if(is_file($dir . '/' . $name . '.' . $this->_supported[$this->_ext]))
+                    if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
                     {
                         $retry--;
                     }
@@ -217,17 +256,17 @@ class Image
             if(is_resource($new))
             {
                 // ==== Writing image to HDD ==== //
-                switch($this->_supported[$new_ext])
+                switch($this->_supported[$ext])
                 {
                     // == JPEG == //
                     case 'jpeg':
                     case 'jpg':
-                        imagejpeg($new, $dir.'/'.$name.'.'.$this->_supported[$new_ext], 100);
+                        imagejpeg($new, $dir.'/'.$name.'.'.$this->_supported[$ext], 100);
                     break;
 
                     // == PNG == //
                     case 'png':
-                        imagepng($new, $dir.'/'.$name.'.'.$this->_supported[$new_ext], 9);
+                        imagepng($new, $dir.'/'.$name.'.'.$this->_supported[$ext], 9);
                     break;
 
                     // == Format not supported == //
@@ -235,7 +274,7 @@ class Image
                 }
 
                 // ==== Checking if the image has been written to the hard drive ==== //
-                if(is_file($dir . '/' . $name . '.' . $this->_supported[$this->_ext]))
+                if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
                 {
                     $result = &$name;
                 }
