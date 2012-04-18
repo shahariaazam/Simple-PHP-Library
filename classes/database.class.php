@@ -1531,7 +1531,7 @@ class Dbase implements db_module
             $this->options = array_replace($this->options, $options);
         }
 
-        // ==== Failsafe in case access is set to 1 ==== //
+        // ==== Failsafe in case mode is set to 1 ==== //
         if($this->options['mode'] === 1)
         {
             $this->options['mode'] = 0;
