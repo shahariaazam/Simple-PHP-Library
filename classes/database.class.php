@@ -1599,6 +1599,45 @@ class Dbase implements db_module
         // ==== Check variable ==== //
         $isOk = true;
 
+        // ==== Breaking the query into pieces based on the command ==== //
+        if(strpos($query, 'SELECT') === 0) // SELECT
+        {
+            // ==== Getting the position of the FROM word ==== //
+            $from_pos = strpos($query, 'FROM');
+
+            // ==== Getting the position of the WHERE word ==== //
+            $where_pos = strpos($query, 'WHERE');
+
+            // ==== Getting the fields that are to be retrieved ==== //
+            $fields = trim(str_replace('SELECT', '', substr($query, 0, $from_pos)));
+
+            // ==== Checking if the * (all) sign is present in the fields ==== //
+            if(strpos($query, '*') !== false)
+            {
+                $fields = 'all';
+            }
+            else // Only a couple of fields must be selected
+            {
+                // ==== Splitting the fields and creating an array ==== //
+                $fields = explode(',', $fields);
+
+                // ==== Removing the white spaces from the fields and retrieving only the field names ==== //
+                foreach($fields as $field)
+                {
+
+                }
+            }
+
+        }
+        else if(strpos($query, 'INSERT') === 0) // INSERT
+        {
+
+        }
+        else if(strpos($query, 'DELETE') === 0) // DELETE
+        {
+
+        }
+
         // ==== Returning result ==== //
         return $isOk;
     }
