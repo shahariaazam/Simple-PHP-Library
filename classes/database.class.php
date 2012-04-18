@@ -71,7 +71,7 @@ interface db_module
     public function num_rows();
 
     /**
-     * The method counts the number of affected rows in the current query
+     * The method counts the number of affected rows by the current query
      *
      * @param void
      * @return mixed false on fail or number of affected rows if successfull
@@ -470,7 +470,7 @@ class Mysql implements db_module
     }
 
     /**
-     * The method counts the number of affected rows in the current query
+     * The method counts the number of affected rows by the current query
      *
      * @param void
      * @return mixed false on fail or number of affected rows if successfull
@@ -882,7 +882,7 @@ class Pgsql implements db_module
     }
 
     /**
-     * The method counts the number of affected rows in the current query
+     * The method counts the number of affected rows by the current query
      *
      * @param void
      * @return mixed false on fail or number of affected rows if successfull
@@ -1285,7 +1285,7 @@ class Mysql_i implements db_module
     }
 
     /**
-     * The method counts the number of affected rows in the current query
+     * The method counts the number of affected rows by the current query
      *
      * @param void
      * @return mixed false on fail or number of affected rows if successfull
@@ -1747,11 +1747,12 @@ class Dbase implements db_module
      */
     public function num_rows()
     {
-
+        // ==== Returning the count of results in the results array ==== //
+        return count($this->result);
     }
 
     /**
-     * The method counts the number of affected rows in the current query
+     * The method counts the number of affected rows by the current query
      *
      * @param void
      * @return mixed false on fail or number of affected rows if successfull
