@@ -1523,7 +1523,7 @@ class Dbase implements db_module
         $this->options['user']   = 'root';
         $this->options['passwd'] = '';
         $this->options['path']   = '/';
-        $this->options['mode'] = 0; // Can take 0 for read-only or 2 for read-write
+        $this->options['mode']   = 0; // Can take 0 for read-only or 2 for read-write
 
         // ==== Replacing options with custom ones ==== //
         if(is_array($options))
