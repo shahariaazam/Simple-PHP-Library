@@ -1505,6 +1505,14 @@ class Dbase implements db_module
      * @var boolean
      */
     private $conn_trigger = false;
+
+    /**
+     *
+     * Array that will hold all the entries that were retrieved by the query
+     *
+     * @param array
+     */
+    private $results = array();
     
 
     /**
@@ -1586,7 +1594,14 @@ class Dbase implements db_module
      * @param string $query
      * @return boolean
      */
-    public function query($query);
+    public function query($query)
+    {
+        // ==== Check variable ==== //
+        $isOk = true;
+
+        // ==== Returning result ==== //
+        return $isOk;
+    }
 
     /**
      * The method returns a single row and/or field from the query
@@ -1595,7 +1610,10 @@ class Dbase implements db_module
      * @param integer $field
      * @return mixed false if unsuccessfull or if $row/$field is not numeric and result on success
      */
-    public function result($row=0, $field=0);
+    public function result($row=0, $field=0)
+    {
+        
+    }
 
     /**
      * The method counts the number of rows in the current query
@@ -1603,7 +1621,10 @@ class Dbase implements db_module
      * @param void
      * @return mixed false on fail or number of rows on success
      */
-    public function num_rows();
+    public function num_rows()
+    {
+
+    }
 
     /**
      * The method counts the number of affected rows in the current query
@@ -1611,7 +1632,10 @@ class Dbase implements db_module
      * @param void
      * @return mixed false on fail or number of affected rows if successfull
      */
-    public function affected_rows();
+    public function affected_rows()
+    {
+
+    }
 
     /**
      * The method is returns an associative array from the current query
@@ -1619,7 +1643,10 @@ class Dbase implements db_module
      * @param void
      * @return mixed false on fail or array on success
      */
-    public function fetch_assoc();
+    public function fetch_assoc()
+    {
+
+    }
 
     /**
      * The method is returns an associative array, a numeric array, or both from the current query
@@ -1627,7 +1654,10 @@ class Dbase implements db_module
      * @param void
      * @return mixed false on fail or array on success
      */
-    public function fetch_array();
+    public function fetch_array()
+    {
+
+    }
 
     /**
      * The method returns a single row from the query
@@ -1635,7 +1665,10 @@ class Dbase implements db_module
      * @param integer
      * @return mixed false on fail or string on success
      */
-    public function fetch_row($row=0);
+    public function fetch_row($row=0)
+    {
+
+    }
 
     /**
      * Escapes special characters in a string for use in a SQL statement
@@ -1643,7 +1676,10 @@ class Dbase implements db_module
      * @param string $string
      * @return mixed false on fail or escaped string on success
      */
-    public function escape_string($string);
+    public function escape_string($string)
+    {
+
+    }
 
     /**
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
@@ -1652,7 +1688,10 @@ class Dbase implements db_module
      * @param string $autoincrementField //This is important for compatibility with PostgreSQL
      * @return mixed false on fail or integer on success
      */
-    public function last_id($query, $autoIncrementField);
+    public function last_id($query, $autoIncrementField)
+    {
+
+    }
 
     /**
      * The method returns the last error mysql threw
@@ -1660,6 +1699,9 @@ class Dbase implements db_module
      * @param void
      * @return string Returns the last error text or '' (empty string) if no error occurred or no resource found
      */
-    public function error();
+    public function error()
+    {
+        
+    }
 }
 ?>
