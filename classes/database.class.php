@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Database
- * @version 3.4
+ * @version 3.5
  *
  */
 
@@ -89,10 +89,10 @@ interface db_module
     /**
      * The method is returns an associative array, a numeric array, or both from the current query
      *
-     * @param void
+     * @param string $result_type
      * @return mixed false on fail or array on success
      */
-    public function fetch_array();
+    public function fetch_array($result_type);
 
     /**
      * The method returns a single row from the query
@@ -526,14 +526,22 @@ class Mysql implements db_module
     /**
      * The method is returns an associative array, a numeric array, or both from the current query
      *
-     * @param void
+     * @param string $result_type
      * @return mixed false on fail or array on success
      */
-    public function fetch_array()
+    public function fetch_array($result_type='both')
     {
+        // ==== Checking if we have a resource ==== //
         if(is_resource($this->link_id))
         {
-            $result = mysql_fetch_array($this->resource);
+            // ==== Types array ==== //
+            $types = array(
+                'both'  => MYSQL_BOTH,
+                'assoc' => MYSQL_ASSOC,
+                'num'   => MYSQL_NUM
+            );
+
+            $result = mysql_fetch_array($this->resource, $types[$result_type]);
 
             if(!$result)
             {
@@ -938,14 +946,22 @@ class Pgsql implements db_module
     /**
      * The method is returns an associative array, a numeric array, or both from the current query
      *
-     * @param void
+     * @param string $result_type
      * @return mixed false on fail or array on success
      */
-    public function fetch_array()
+    public function fetch_array($result_type='both')
     {
+        // ==== Checking if we have a resource ==== //
         if(is_resource($this->resource))
         {
-            $result = pg_fetch_array($this->resource);
+            // ==== Types array ==== //
+            $types = array(
+                'both'  => PGSQL_BOTH,
+                'assoc' => PGSQL_ASSOC,
+                'num'   => PGSQL_NUM
+            );
+
+            $result = pg_fetch_array($this->resource, null, $types[$result_type]);
 
             if(!$result)
             {
@@ -1343,10 +1359,10 @@ class Mysql_i implements db_module
     /**
      * The method is returns an associative array, a numeric array, or both from the current query
      *
-     * @param void
+     * @param string $result_type
      * @return mixed false on fail or array on success
      */
-    public function fetch_array()
+    public function fetch_array($result_type='both')
     {
         // ==== Check variable for success/failure ==== //
         $failed = false;
@@ -1354,7 +1370,14 @@ class Mysql_i implements db_module
         // ==== Checking to see if $this->result is an MySQLi_result object ==== //
         if(is_object($this->result))
         {
-            $array = $this->result->fetch_array();
+            // ==== Types array ==== //
+            $types = array(
+                'both'  => MYSQLI_BOTH,
+                'assoc' => MYSQLI_ASSOC,
+                'num'   => MYSQLI_NUM
+            );
+
+            $array = $this->result->fetch_array($types[$result_type]);
 
             if($array === NULL)
             {
@@ -1702,6 +1725,19 @@ class Dbase implements db_module
                 // ==== Checking if the condition is met ==== //
                 if($where)
                 {
+                    // ==== Creating a numeric array using the associative array ==== //
+                    $numeric_arr = array();
+
+                    // ==== Going through the array ==== //
+                    foreach($row as $n => $value)
+                    {
+                        $numeric_arr[] = $value;
+                    }
+
+                    // ==== Merging the numeric array with the associative one ==== //
+                    $row = array_merge($row, $numeric_arr);
+
+                    // ==== Adding the row to the result ==== //
                     $result[] = $row;
                 }
             }
@@ -1776,10 +1812,10 @@ class Dbase implements db_module
     /**
      * The method is returns an associative array, a numeric array, or both from the current query
      *
-     * @param void
+     * @param string $result_type
      * @return mixed false on fail or array on success
      */
-    public function fetch_array()
+    public function fetch_array($result_type='both')
     {
 
     }
