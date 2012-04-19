@@ -1644,6 +1644,9 @@ class Dbase implements db_module
         // ==== Breaking the query into pieces based on the command ==== //
         if(strpos($query, 'SELECT') === 0) // SELECT
         {
+            // ==== Updating the query type ==== //
+            $this->query_type = 'SELECT';
+
             // ==== Getting the position of the FROM word ==== //
             $from_pos = strpos($query, 'FROM');
 
@@ -1764,15 +1767,18 @@ class Dbase implements db_module
         }
         else if(strpos($query, 'INSERT') === 0) // INSERT
         {
-
+            // ==== Updating the query type ==== //
+            $this->query_type = 'INSERT';
         }
         else if(strpos($query, 'UPDATE') === 0) // UPDATE
         {
-
+            // ==== Updating the query type ==== //
+            $this->query_type = 'UPDATE';
         }
         else if(strpos($query, 'DELETE') === 0) // DELETE
         {
-
+            // ==== Updating the query type ==== //
+            $this->query_type = 'DELETE';
         }
 
         // ==== Returning result ==== //
