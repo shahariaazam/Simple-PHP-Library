@@ -1764,6 +1764,44 @@ class Dbase implements db_module
     }
 
     /**
+     *
+     * This is a special method for the dbase module only. It retrieves all the data in the given database
+     *
+     * @param void
+     * @return void
+     */
+    public function queryAll()
+    {
+        // ==== Getting the numer of rows in the database ==== //
+        $num_rows = dbase_numrecords();
+
+        // ==== Getting the records ==== //
+        for($i = 1; $i < $num_rows; $i++)
+        {
+            // ==== Getting the row data ==== //
+            $assoc = dbase_get_record_with_names($this->link_id, $i);
+            
+            // ==== Creating a numeric array using the associative array ==== //
+            $num = array();
+
+            // ==== Going through the array ==== //
+            foreach($row as $n => $value)
+            {
+                $num[] = $value;
+            }
+
+            // ==== Adding the row to the result ==== //
+            $result[] = array(
+                'assoc' => $assoc,
+                'num'   => $num,
+            );
+        }
+
+        // ==== Adding the result to the class result ==== //
+        $this->results = $result;
+    }
+
+    /**
      * The method returns a single row and/or field from the query
      *
      * @param integer $row
@@ -1772,7 +1810,15 @@ class Dbase implements db_module
      */
     public function result($row=0, $field=0)
     {
-
+        // ==== Returning the requested row if it's set ==== //
+        if(isset($this->results[$row]['num'][$field]) && is_numeric($row) && is_numeric($field))
+        {
+            return $this->results[$row]['num'][$field];
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /**
