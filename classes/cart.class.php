@@ -150,7 +150,7 @@ class Cart
         if(is_array($item_info) && isset($item_info['id']) && is_numeric($item_info['id']) && isset($this->_items[$item_info['id']]))
         {
             // ==== Updating the item ==== //
-            $this->_items[$item_info['id']] = array_replace($this->_items[$item_info['id']], $item_info);
+            $this->_items[$item_info['id']] = $item_info;
 
             // ==== Returning result ==== //
             return true;
