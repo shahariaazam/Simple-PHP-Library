@@ -1714,7 +1714,7 @@ class Dbase implements db_module
             }
 
             // ==== Getting the numer of rows in the database ==== //
-            $num_rows = dbase_numrecords();
+            $num_rows = dbase_numrecords($this->link_id);
 
             // ==== Getting the records ==== //
             for($i = 1; $i < $num_rows; $i++)
@@ -1773,7 +1773,7 @@ class Dbase implements db_module
     public function queryAll()
     {
         // ==== Getting the numer of rows in the database ==== //
-        $num_rows = dbase_numrecords();
+        $num_rows = dbase_numrecords($this->link_id);
 
         // ==== Getting the records ==== //
         for($i = 1; $i < $num_rows; $i++)
