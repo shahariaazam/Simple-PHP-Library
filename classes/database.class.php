@@ -1537,6 +1537,22 @@ class Dbase implements db_module
      */
     private $results = array();
 
+    /**
+     *
+     * Counters array. The array contains counters for some types of database opperations
+     *
+     * @var array
+     */
+    private $counters = array();
+
+    /**
+     *
+     * Holds the last query type
+     *
+     * @var string
+     */
+    private $query_type = '';
+
 
     /**
      *
