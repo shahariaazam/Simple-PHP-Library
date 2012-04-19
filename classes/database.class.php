@@ -1717,7 +1717,7 @@ class Dbase implements db_module
             $num_rows = dbase_numrecords($this->link_id);
 
             // ==== Getting the records ==== //
-            for($i = 1; $i < $num_rows; $i++)
+            for($i = 1; $i <= $num_rows; $i++)
             {
                 // ==== Getting the row data ==== //
                 $assoc = dbase_get_record_with_names($this->link_id, $i);
@@ -1776,7 +1776,7 @@ class Dbase implements db_module
         $num_rows = dbase_numrecords($this->link_id);
 
         // ==== Getting the records ==== //
-        for($i = 1; $i < $num_rows; $i++)
+        for($i = 1; $i <= $num_rows; $i++)
         {
             // ==== Getting the row data ==== //
             $assoc = dbase_get_record_with_names($this->link_id, $i);
