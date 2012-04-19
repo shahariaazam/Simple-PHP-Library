@@ -258,7 +258,7 @@ class Mysql implements db_module
      * @var boolean
      */
     private $conn_trigger = false;
-    
+
 
     /**
      * Class constructor
@@ -674,7 +674,7 @@ class Pgsql implements db_module
      * @var boolean
      */
     private $conn_trigger = false;
-    
+
 
     /**
      * Class constructor
@@ -1083,7 +1083,7 @@ class Mysql_i implements db_module
      * @var boolean
      */
     private $conn_trigger = false;
-    
+
 
     /**
      * Class constructor
@@ -1536,10 +1536,10 @@ class Dbase implements db_module
      * @param array
      */
     private $results = array();
-    
+
 
     /**
-     * 
+     *
      * Class constructor
      *
      * @param array $options
@@ -1589,7 +1589,7 @@ class Dbase implements db_module
         {
             return true;
         }
-        
+
     }
 
     /**
@@ -1720,30 +1720,30 @@ class Dbase implements db_module
             for($i = 1; $i < $num_rows; $i++)
             {
                 // ==== Getting the row data ==== //
-                $row = dbase_get_record_with_names($this->link_id, $i);
+                $assoc = dbase_get_record_with_names($this->link_id, $i);
 
                 // ==== Checking if the condition is met ==== //
                 if($where)
                 {
                     // ==== Creating a numeric array using the associative array ==== //
-                    $numeric_arr = array();
+                    $num = array();
 
                     // ==== Going through the array ==== //
                     foreach($row as $n => $value)
                     {
-                        $numeric_arr[] = $value;
+                        $num[] = $value;
                     }
 
-                    // ==== Merging the numeric array with the associative one ==== //
-                    $row = array_merge($row, $numeric_arr);
-
                     // ==== Adding the row to the result ==== //
-                    $result[] = $row;
+                    $result[] = array(
+                        'assoc' => $assoc,
+                        'num'   => $num,
+                    );
                 }
             }
 
             // ==== Adding the result to the class result ==== //
-            $this->result = $result;
+            $this->results = $result;
 
         }
         else if(strpos($query, 'INSERT') === 0) // INSERT
@@ -1772,7 +1772,7 @@ class Dbase implements db_module
      */
     public function result($row=0, $field=0)
     {
-        
+
     }
 
     /**
@@ -1795,7 +1795,13 @@ class Dbase implements db_module
      */
     public function affected_rows()
     {
-
+        /**
+         *
+         * ------------------------
+         * PENDING IMPLEMENTATION
+         * ------------------------
+         *
+         */
     }
 
     /**
@@ -1806,7 +1812,27 @@ class Dbase implements db_module
      */
     public function fetch_assoc()
     {
+        // ==== Counter for the number of calls ==== //
+        static $calls = 0;
 
+        // ==== Checking the counter ==== //
+        if($calls == 0)
+        {
+            $row = current($this->results);
+
+            // ==== Incrementing the calls variable ==== //
+            $calls++;
+        }
+        else
+        {
+            $row = next($this->results);
+        }
+
+        // ==== Getting the associative array ==== //
+        $row = $row['assoc'];
+
+        // ==== Returning the result ==== //
+        return $row;
     }
 
     /**
@@ -1817,7 +1843,42 @@ class Dbase implements db_module
      */
     public function fetch_array($result_type='both')
     {
+        // ==== Counter for the number of calls ==== //
+        static $calls = 0;
 
+        // ==== Checking the counter ==== //
+        if($calls == 0)
+        {
+            // ==== Getting the current element ==== //
+            $row = current($this->results);
+
+            // ==== Incrementing the calls variable ==== //
+            $calls++;
+        }
+        else
+        {
+            // ==== Getting the next element ==== //
+            $row = next($this->results);
+        }
+
+        // ==== Getting the data depending on the result type ==== //
+        switch($result_type)
+        {
+            case 'assoc':
+                $row = $row['assoc'];
+                break;
+
+            case 'num':
+                $row = $row['num'];
+                break;
+
+            default:
+                $row = array_merge($row['assoc'], $row['num']);
+                break;
+        }
+
+        // ==== Returning the result ==== //
+        return $row;
     }
 
     /**
@@ -1828,7 +1889,15 @@ class Dbase implements db_module
      */
     public function fetch_row($row=0)
     {
-
+        // ==== Returning the requested row if it's set ==== //
+        if(isset($this->results[$row]))
+        {
+            return $this->results[$row]['num'];
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /**
@@ -1839,7 +1908,8 @@ class Dbase implements db_module
      */
     public function escape_string($string)
     {
-
+        // ==== For now we return the string as is ==== //
+        return $string;
     }
 
     /**
@@ -1851,7 +1921,13 @@ class Dbase implements db_module
      */
     public function last_id($query, $autoIncrementField)
     {
-
+        /**
+         *
+         * ------------------------
+         * PENDING IMPLEMENTATION
+         * ------------------------
+         * 
+         */
     }
 
     /**
@@ -1862,7 +1938,13 @@ class Dbase implements db_module
      */
     public function error()
     {
-        
+        /**
+         *
+         * ------------------------
+         * PENDING IMPLEMENTATION
+         * ------------------------
+         *
+         */
     }
 }
 ?>
