@@ -1976,7 +1976,7 @@ class Dbase implements db_module
      */
     public function escape_string($string)
     {
-        // ==== For now we return the string as is ==== //
+        // ==== For dbase we do nothing because no query is involved ==== //
         return $string;
     }
 
