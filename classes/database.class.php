@@ -114,7 +114,7 @@ interface db_module
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query
-     * @param string $autoincrementField //This is important for compatibility with PostgreSQL
+     * @param string $autoincrementField //This is important for compatibility with PostgreSQL and dbase
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField);
@@ -1617,7 +1617,7 @@ class Dbase implements db_module
     public function disconnect()
     {
         // ==== Disconnecting from the database ==== //
-        if(is_resource($this->link_id))
+        if($this->link_id != false)
         {
             return dbase_close($this->link_id);
         }
@@ -1641,144 +1641,153 @@ class Dbase implements db_module
         // ==== Local result variable ==== //
         $result = array();
 
-        // ==== Breaking the query into pieces based on the command ==== //
-        if(strpos($query, 'SELECT') === 0) // SELECT
+        // ==== Checking if we have a connection to the database ==== //
+        if($this->link_id != false)
         {
-            // ==== Updating the query type ==== //
-            $this->query_type = 'SELECT';
-
-            // ==== Getting the position of the FROM word ==== //
-            $from_pos = strpos($query, 'FROM');
-
-            // ==== Getting the position of the WHERE word ==== //
-            $where_pos = strpos($query, 'WHERE');
-
-            // ==== Getting the fields that are to be retrieved ==== //
-            $fields = trim(str_replace('SELECT', '', substr($query, 0, $from_pos)));
-
-            // ==== Checking if the * (all) sign is present in the fields ==== //
-            if(strpos($query, '*') !== false)
+            // ==== Breaking the query into pieces based on the command ==== //
+            if(strpos($query, 'SELECT') === 0) // SELECT
             {
-                $fields = 'all';
-            }
-            else // Only a couple of fields must be selected
-            {
-                // ==== Splitting the fields and creating an array ==== //
-                $fields = explode(',', $fields);
+                // ==== Updating the query type ==== //
+                $this->query_type = 'SELECT';
 
-                // ==== Removing the white spaces from the fields and retrieving only the field names ==== //
-                foreach($fields as $key => $field)
+                // ==== Getting the position of the FROM word ==== //
+                $from_pos = strpos($query, 'FROM');
+
+                // ==== Getting the position of the WHERE word ==== //
+                $where_pos = strpos($query, 'WHERE');
+
+                // ==== Getting the fields that are to be retrieved ==== //
+                $fields = trim(str_replace('SELECT', '', substr($query, 0, $from_pos)));
+
+                // ==== Checking if the * (all) sign is present in the fields ==== //
+                if(strpos($query, '*') !== false)
                 {
-                    // ==== Checking if there is a dot in the name ==== //
-                    if(strpos($field, '.') !== false)
-                    {
-                        $field_data = explode('.', $field);
-
-                        // ==== Getting the actual field name ==== //
-                        $field = $field_data[count($field_data) -1];
-                    }
-
-                    // ==== Updating the fields array ==== //
-                    $fields[$key] = trim($field);
+                    $fields = 'all';
                 }
-            }
-
-            // ==== Getting the rest of the query ==== //
-            $where = substr($query, ($where_pos+5), (strlen($query) - ($where_pos+5)));
-
-            // ==== Translating the statement into a PHP statement ==== //
-            $where = str_replace('AND', '&&', $where);
-            $where = str_replace('OR', '||', $where);
-
-            // ==== Getting the table name ==== //
-            $table = trim(substr($query, ($from_pos+5), (($where_pos) - ($from_pos+5))));
-
-            // ==== Removing the table name from the where statement ==== //
-            $where = str_replace($table.'.', '', $where);
-
-            // ==== Replacing some stuff so we can later get the field names ==== //
-            $where_tmp = str_replace(array('(', ')'), '', $where);
-            $where_tmp = str_replace(array('&&', '||'), '|', $where_tmp);
-
-            // ==== Splitting the string ==== //
-            $where_tmp = explode('|', $where_tmp);
-
-            // ==== Going through the array ==== //
-            foreach($where_tmp as $key => $field_stat)
-            {
-                // ==== Splitting by the = (equal sign) ==== //
-                $info = explode('=', $field_stat);
-
-                // ==== Getting the field name ==== //
-                $name = ltrim($info[0]);
-
-                // ==== Getting the field value ==== //
-                $value = substr($field_stat, (strpos($field_stat, '=')+1), strlen($field_stat)-1);
-
-                // ==== Generating the new name ==== //
-                $new_name = '$row[' . "'" . trim($name) . "'" . ']';
-
-                // ==== Replacing the name in the where condition ==== //
-                $where = str_replace($name . '=', $new_name . '=', $where);
-
-                // ==== Generating the code failsafe ==== //
-                $failsafe = '(isset(' . $new_name . ') && ' . $new_name . '=' . trim($value) . ')';
-
-                // ==== Adding the failsafe to the condition ==== //
-                $where = str_replace($new_name . '=' . $value, $failsafe, $where);
-
-                // ==== Arranging he code ==== //
-                $where = str_replace(')&&', ') &&', $where);
-                $where = str_replace(')||', ') ||', $where);
-            }
-
-            // ==== Getting the numer of rows in the database ==== //
-            $num_rows = dbase_numrecords($this->link_id);
-
-            // ==== Getting the records ==== //
-            for($i = 1; $i <= $num_rows; $i++)
-            {
-                // ==== Getting the row data ==== //
-                $assoc = dbase_get_record_with_names($this->link_id, $i);
-
-                // ==== Checking if the condition is met ==== //
-                if($where)
+                else // Only a couple of fields must be selected
                 {
-                    // ==== Creating a numeric array using the associative array ==== //
-                    $num = array();
+                    // ==== Splitting the fields and creating an array ==== //
+                    $fields = explode(',', $fields);
 
-                    // ==== Going through the array ==== //
-                    foreach($row as $n => $value)
+                    // ==== Removing the white spaces from the fields and retrieving only the field names ==== //
+                    foreach($fields as $key => $field)
                     {
-                        $num[] = $value;
+                        // ==== Checking if there is a dot in the name ==== //
+                        if(strpos($field, '.') !== false)
+                        {
+                            $field_data = explode('.', $field);
+
+                            // ==== Getting the actual field name ==== //
+                            $field = $field_data[count($field_data) -1];
+                        }
+
+                        // ==== Updating the fields array ==== //
+                        $fields[$key] = trim($field);
                     }
-
-                    // ==== Adding the row to the result ==== //
-                    $result[] = array(
-                        'assoc' => $assoc,
-                        'num'   => $num,
-                    );
                 }
+
+                // ==== Getting the rest of the query ==== //
+                $where = substr($query, ($where_pos+5), (strlen($query) - ($where_pos+5)));
+
+                // ==== Translating the statement into a PHP statement ==== //
+                $where = str_replace('AND', '&&', $where);
+                $where = str_replace('OR', '||', $where);
+
+                // ==== Getting the table name ==== //
+                $table = trim(substr($query, ($from_pos+5), (($where_pos) - ($from_pos+5))));
+
+                // ==== Removing the table name from the where statement ==== //
+                $where = str_replace($table.'.', '', $where);
+
+                // ==== Replacing some stuff so we can later get the field names ==== //
+                $where_tmp = str_replace(array('(', ')'), '', $where);
+                $where_tmp = str_replace(array('&&', '||'), '|', $where_tmp);
+
+                // ==== Splitting the string ==== //
+                $where_tmp = explode('|', $where_tmp);
+
+                // ==== Going through the array ==== //
+                foreach($where_tmp as $key => $field_stat)
+                {
+                    // ==== Splitting by the = (equal sign) ==== //
+                    $info = explode('=', $field_stat);
+
+                    // ==== Getting the field name ==== //
+                    $name = ltrim($info[0]);
+
+                    // ==== Getting the field value ==== //
+                    $value = substr($field_stat, (strpos($field_stat, '=')+1), strlen($field_stat)-1);
+
+                    // ==== Generating the new name ==== //
+                    $new_name = '$row[' . "'" . trim($name) . "'" . ']';
+
+                    // ==== Replacing the name in the where condition ==== //
+                    $where = str_replace($name . '=', $new_name . '=', $where);
+
+                    // ==== Generating the code failsafe ==== //
+                    $failsafe = '(isset(' . $new_name . ') && ' . $new_name . '=' . trim($value) . ')';
+
+                    // ==== Adding the failsafe to the condition ==== //
+                    $where = str_replace($new_name . '=' . $value, $failsafe, $where);
+
+                    // ==== Arranging he code ==== //
+                    $where = str_replace(')&&', ') &&', $where);
+                    $where = str_replace(')||', ') ||', $where);
+                }
+
+                // ==== Getting the numer of rows in the database ==== //
+                $num_rows = dbase_numrecords($this->link_id);
+
+                // ==== Getting the records ==== //
+                for($i = 1; $i <= $num_rows; $i++)
+                {
+                    // ==== Getting the row data ==== //
+                    $assoc = dbase_get_record_with_names($this->link_id, $i);
+
+                    // ==== Checking if the condition is met ==== //
+                    if($where)
+                    {
+                        // ==== Creating a numeric array using the associative array ==== //
+                        $num = array();
+
+                        // ==== Going through the array ==== //
+                        foreach($row as $n => $value)
+                        {
+                            $num[] = $value;
+                        }
+
+                        // ==== Adding the row to the result ==== //
+                        $result[] = array(
+                            'assoc' => $assoc,
+                            'num'   => $num,
+                        );
+                    }
+                }
+
+                // ==== Adding the result to the class result ==== //
+                $this->results = $result;
+
             }
-
-            // ==== Adding the result to the class result ==== //
-            $this->results = $result;
-
+            else if(strpos($query, 'INSERT') === 0) // INSERT
+            {
+                // ==== Updating the query type ==== //
+                $this->query_type = 'INSERT';
+            }
+            else if(strpos($query, 'UPDATE') === 0) // UPDATE
+            {
+                // ==== Updating the query type ==== //
+                $this->query_type = 'UPDATE';
+            }
+            else if(strpos($query, 'DELETE') === 0) // DELETE
+            {
+                // ==== Updating the query type ==== //
+                $this->query_type = 'DELETE';
+            }
         }
-        else if(strpos($query, 'INSERT') === 0) // INSERT
+        else
         {
-            // ==== Updating the query type ==== //
-            $this->query_type = 'INSERT';
-        }
-        else if(strpos($query, 'UPDATE') === 0) // UPDATE
-        {
-            // ==== Updating the query type ==== //
-            $this->query_type = 'UPDATE';
-        }
-        else if(strpos($query, 'DELETE') === 0) // DELETE
-        {
-            // ==== Updating the query type ==== //
-            $this->query_type = 'DELETE';
+            // ==== Failed ==== //
+            $isOk = false;
         }
 
         // ==== Returning result ==== //
@@ -1794,33 +1803,37 @@ class Dbase implements db_module
      */
     public function queryAll()
     {
-        // ==== Getting the numer of rows in the database ==== //
-        $num_rows = dbase_numrecords($this->link_id);
-
-        // ==== Getting the records ==== //
-        for($i = 1; $i <= $num_rows; $i++)
+        // ==== Checking if we have a connection to the database ==== //
+        if($this->link_id != false)
         {
-            // ==== Getting the row data ==== //
-            $assoc = dbase_get_record_with_names($this->link_id, $i);
-            
-            // ==== Creating a numeric array using the associative array ==== //
-            $num = array();
+            // ==== Getting the numer of rows in the database ==== //
+            $num_rows = dbase_numrecords($this->link_id);
 
-            // ==== Going through the array ==== //
-            foreach($row as $n => $value)
+            // ==== Getting the records ==== //
+            for($i = 1; $i <= $num_rows; $i++)
             {
-                $num[] = $value;
+                // ==== Getting the row data ==== //
+                $assoc = dbase_get_record_with_names($this->link_id, $i);
+
+                // ==== Creating a numeric array using the associative array ==== //
+                $num = array();
+
+                // ==== Going through the array ==== //
+                foreach($row as $n => $value)
+                {
+                    $num[] = $value;
+                }
+
+                // ==== Adding the row to the result ==== //
+                $result[] = array(
+                    'assoc' => $assoc,
+                    'num'   => $num,
+                );
             }
 
-            // ==== Adding the row to the result ==== //
-            $result[] = array(
-                'assoc' => $assoc,
-                'num'   => $num,
-            );
+            // ==== Adding the result to the class result ==== //
+            $this->results = $result;
         }
-
-        // ==== Adding the result to the class result ==== //
-        $this->results = $result;
     }
 
     /**
@@ -1984,18 +1997,33 @@ class Dbase implements db_module
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query
-     * @param string $autoincrementField //This is important for compatibility with PostgreSQL
+     * @param string $autoincrementField
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField)
     {
-        /**
-         *
-         * ------------------------
-         * PENDING IMPLEMENTATION
-         * ------------------------
-         * 
-         */
+        // ==== Result var ==== //
+        $result = false;
+
+        // ==== Checking if we have a connection to the database ==== //
+        if($this->link_id != false)
+        {
+            // ==== Getting the number of elements from the current result set ==== //
+            $results = count($this->results);
+
+            // ==== Getting the result from the database ==== //
+            $result_set = dbase_get_record_with_names($this->link_id, $results);
+
+            // ==== Checking if the field is found ==== //
+            if(isset($result_set[$autoIncrementField]))
+            {
+                $result = $result_set[$autoIncrementField];
+            }
+        }
+
+
+        // ==== Returning result ==== //
+        return $result;
     }
 
     /**
@@ -2006,13 +2034,8 @@ class Dbase implements db_module
      */
     public function error()
     {
-        /**
-         *
-         * ------------------------
-         * PENDING IMPLEMENTATION
-         * ------------------------
-         *
-         */
+        // ==== No error retrieval available for dbase ==== //
+        return '';
     }
 }
 ?>
