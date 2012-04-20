@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Database
- * @version 3.5
+ * @version 3.6
  *
  */
 
@@ -2038,4 +2038,3 @@ class Dbase implements db_module
         return '';
     }
 }
-?>
