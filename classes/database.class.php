@@ -2021,7 +2021,6 @@ class Dbase implements db_module
             }
         }
 
-
         // ==== Returning result ==== //
         return $result;
     }
