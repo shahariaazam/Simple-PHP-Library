@@ -1703,10 +1703,20 @@ class Dbase implements db_module
      */
     public function result($row=0, $field=0)
     {
-        // ==== Returning the requested row if it's set ==== //
-        if(isset($this->results[$row]['num'][$field]) && is_numeric($row) && is_numeric($field))
+        // ==== Determining the array to look in ==== //
+        if(is_numeric($field))
         {
-            return $this->results[$row]['num'][$field];
+            $type = 'num';
+        }
+        else
+        {
+            $type = 'assoc';
+        }
+
+        // ==== Returning the requested row if it's set ==== //
+        if(isset($this->results[$row][$type][$field]) && is_numeric($row))
+        {
+            return $this->results[$row][$type][$field];
         }
         else
         {
