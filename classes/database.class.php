@@ -1564,12 +1564,12 @@ class Dbase implements db_module
     public function __construct($options)
     {
         // ==== Default options ==== //
-        $this->options['db']     = 'default.dbf';
+        $this->options['db']     = '';
         $this->options['host']   = 'localhost';
         $this->options['port']   = '0';
         $this->options['user']   = 'root';
         $this->options['passwd'] = '';
-        $this->options['path']   = '/';
+        $this->options['path']   = '';
         $this->options['mode']   = 0; // Can take 0 for read-only or 2 for read-write
 
         // ==== Replacing options with custom ones ==== //
