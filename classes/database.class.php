@@ -1733,7 +1733,7 @@ class Dbase implements db_module
     public function num_rows()
     {
         // ==== Returning the count of results in the results array ==== //
-        return count($this->result);
+        return count($this->results);
     }
 
     /**
