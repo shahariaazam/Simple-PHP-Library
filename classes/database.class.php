@@ -57,7 +57,7 @@ interface db_module
      * The method returns a single row and/or field from the query
      *
      * @param integer $row
-     * @param integer $field
+     * @param mixed $field
      * @return mixed false if unsuccessfull or if $row/$field is not numeric and result on success
      */
     public function result($row=0, $field=0);
@@ -425,8 +425,8 @@ class Mysql implements db_module
      */
     public function result($row=0, $field=0)
     {
-        // ==== Checking if we have a resource and that the $row and $field vars are numeric ==== //
-        if(is_resource($this->resource) && is_numeric($row) && is_numeric($field))
+        // ==== Checking if we have a resource and that the $row vars are numeric ==== //
+        if(is_resource($this->resource) && is_numeric($row))
         {
             $result = mysql_result($this->resource, $row, $field);
 
@@ -845,8 +845,8 @@ class Pgsql implements db_module
      */
     public function result($row=0, $field=0)
     {
-        // ==== Checking if we have a resource and that the $row and $field vars are numeric ==== //
-        if(is_resource($this->resource) && is_numeric($row) && is_numeric($field))
+        // ==== Checking if we have a resource and that the $row vars are numeric ==== //
+        if(is_resource($this->resource) && is_numeric($row))
         {
             $result = pg_fetch_result($this->resource, $row, $field);
 
@@ -1125,7 +1125,7 @@ class Mysql_i implements db_module
         $this->link = new mysqli($this->options['host'], $this->options['user'], $this->options['passwd'], $this->options['db'], $this->options['port']);
 
         // ==== Checking if connection was successfull ==== //
-        if($this->link->connect_error)
+        if($this->link->connect_error != NULL)
         {
             return false;
         }
@@ -1175,7 +1175,7 @@ class Mysql_i implements db_module
         $lazy_connect = false;
 
         // ==== Checking if the connection was successful ==== //
-        if($this->conn_trigger == true && !is_object($this->link))
+        if($this->conn_trigger == true && is_object($this->link))
         {
             $connect_ok = true;
         }
@@ -1242,8 +1242,8 @@ class Mysql_i implements db_module
      * The method returns a single row and/or field from the query
      *
      * @param integer $row
-     * @param integer $field
-     * @return mixed false if unsuccessfull or if $row/$field is not numeric and result on success
+     * @param mixed $field
+     * @return mixed false if unsuccessfull or if $row is not numeric and result on success
      */
     public function result($row=0, $field=0)
     {
@@ -1251,7 +1251,7 @@ class Mysql_i implements db_module
         $failed = false;
 
         // ==== Checking to see if $this->result is an MySQLi_result object and that the $row and $field vars are numeric ==== //
-        if(is_object($this->result) && is_numeric($row) && is_numeric($field))
+        if(is_object($this->result) && is_numeric($row))
         {
             // ==== Moving pointer to the desired row ==== //
             $seek = $this->result->data_seek($row);
@@ -1260,10 +1260,27 @@ class Mysql_i implements db_module
             if($seek == true)
             {
                 // ==== Getting row from pointer ==== //
-                $row = $this->result->fetch_row();
+                $row_num = $this->result->fetch_row();
 
-                // ==== Checking existance of field in row === //
-                if(!isset($row[$field]))
+                // ==== Moving pointer to the desired row ==== //
+                $seek = $this->result->data_seek($row);
+
+                // ==== Checking if seek was succesfull === //
+                if($seek == true)
+                {
+                    // ==== Getting row from pointer ==== //
+                    $row_assoc = $this->result->fetch_assoc();
+
+                    // ==== Merging the row results ==== //
+                    $row = array_merge($row_num, $row_assoc);
+
+                    // ==== Checking existance of field in row === //
+                    if(!isset($row[$field]))
+                    {
+                        $failed = true;
+                    }
+                }
+                else
                 {
                     $failed = true;
                 }
@@ -1486,15 +1503,25 @@ class Mysql_i implements db_module
      */
     public function error()
     {
+        // ==== Default error ==== //
+        $error = '';
+
         // ==== Checking to see if $this->result is an MySQLi_result object ==== //
         if(is_object($this->link))
         {
-            return $this->link->error;
+            // ==== Checking for errors ==== //
+            if($this->link->connect_error != NULL)
+            {
+                $error = $this->link->connect_error;
+            }
+            elseif($this->link->error  != NULL)
+            {
+                $error = $this->link->error;
+            }
         }
-        else
-        {
-            return '';
-        }
+
+        // ==== Returning the error ==== //
+        return $error;
     }
 }
 
@@ -1671,7 +1698,7 @@ class Dbase implements db_module
      * The method returns a single row and/or field from the query
      *
      * @param integer $row
-     * @param integer $field
+     * @param mixed $field
      * @return mixed false if unsuccessfull or if $row/$field is not numeric and result on success
      */
     public function result($row=0, $field=0)
