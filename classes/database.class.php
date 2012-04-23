@@ -1479,9 +1479,11 @@ class Mysql_i implements db_module
             // ==== Executing Query ==== //
             $this->query($query);
 
-            $id = $this->link->last_id;
+            // ==== Getting the last ID ==== //
+            $id = $this->link->insert_id;
 
-            if($id !== 0)
+            // ==== Checking if we have a proper last ID ==== //
+            if(is_numeric($id) && $id > 0)
             {
                 return $id;
             }
