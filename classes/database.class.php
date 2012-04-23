@@ -1647,7 +1647,7 @@ class Dbase implements db_module
     public function disconnect()
     {
         // ==== Disconnecting from the database ==== //
-        if(is_resource($this->link_id))
+        if($this->link_id != false)
         {
             return dbase_close($this->link_id);
         }
@@ -1857,7 +1857,7 @@ class Dbase implements db_module
      */
     public function escape_string($string)
     {
-        // ==== For now we return the string as is ==== //
+        // ==== For dbase we do nothing because no query is involved ==== //
         return $string;
     }
 
@@ -1865,18 +1865,33 @@ class Dbase implements db_module
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query
-     * @param string $autoincrementField //This is important for compatibility with PostgreSQL
+     * @param string $autoincrementField
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField)
     {
-        /**
-         *
-         * ------------------------
-         * PENDING IMPLEMENTATION
-         * ------------------------
-         * 
-         */
+        // ==== Result var ==== //
+        $result = false;
+
+        // ==== Checking if we have a connection to the database ==== //
+        if($this->link_id != false)
+        {
+            // ==== Getting the number of elements from the current result set ==== //
+            $results = count($this->results);
+
+            // ==== Getting the result from the database ==== //
+            $result_set = dbase_get_record_with_names($this->link_id, $results);
+
+            // ==== Checking if the field is found ==== //
+            if(isset($result_set[$autoIncrementField]))
+            {
+                $result = $result_set[$autoIncrementField];
+    }
+        }
+
+
+        // ==== Returning result ==== //
+        return $result;
     }
 
     /**
@@ -1887,13 +1902,7 @@ class Dbase implements db_module
      */
     public function error()
     {
-        /**
-         *
-         * ------------------------
-         * PENDING IMPLEMENTATION
-         * ------------------------
-         *
-         */
+        // ==== No error retrieval available for dbase ==== //
+        return '';
     }
 }
-?>
