@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Database
- * @version 3.6
+ * @version 3.5.3
  *
  */
 
@@ -57,7 +57,7 @@ interface db_module
      * The method returns a single row and/or field from the query
      *
      * @param integer $row
-     * @param integer $field
+     * @param mixed $field
      * @return mixed false if unsuccessfull or if $row/$field is not numeric and result on success
      */
     public function result($row=0, $field=0);
@@ -114,7 +114,7 @@ interface db_module
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query
-     * @param string $autoincrementField //This is important for compatibility with PostgreSQL and dbase
+     * @param string $autoincrementField //This is important for compatibility with PostgreSQL
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField);
@@ -163,6 +163,9 @@ abstract class Database
         if(isset($options['type']))
         {
             $type = $options['type'];
+
+            // ==== Removing the option ==== //
+            unset($options['type']);
         }
         else
         {
@@ -422,8 +425,8 @@ class Mysql implements db_module
      */
     public function result($row=0, $field=0)
     {
-        // ==== Checking if we have a resource and that the $row and $field vars are numeric ==== //
-        if(is_resource($this->resource) && is_numeric($row) && is_numeric($field))
+        // ==== Checking if we have a resource and that the $row vars are numeric ==== //
+        if(is_resource($this->resource) && is_numeric($row))
         {
             $result = mysql_result($this->resource, $row, $field);
 
@@ -842,8 +845,8 @@ class Pgsql implements db_module
      */
     public function result($row=0, $field=0)
     {
-        // ==== Checking if we have a resource and that the $row and $field vars are numeric ==== //
-        if(is_resource($this->resource) && is_numeric($row) && is_numeric($field))
+        // ==== Checking if we have a resource and that the $row vars are numeric ==== //
+        if(is_resource($this->resource) && is_numeric($row))
         {
             $result = pg_fetch_result($this->resource, $row, $field);
 
@@ -1122,7 +1125,7 @@ class Mysql_i implements db_module
         $this->link = new mysqli($this->options['host'], $this->options['user'], $this->options['passwd'], $this->options['db'], $this->options['port']);
 
         // ==== Checking if connection was successfull ==== //
-        if($this->link->connect_error)
+        if($this->link->connect_error != NULL)
         {
             return false;
         }
@@ -1172,7 +1175,7 @@ class Mysql_i implements db_module
         $lazy_connect = false;
 
         // ==== Checking if the connection was successful ==== //
-        if($this->conn_trigger == true && !is_object($this->link))
+        if($this->conn_trigger == true && is_object($this->link))
         {
             $connect_ok = true;
         }
@@ -1239,8 +1242,8 @@ class Mysql_i implements db_module
      * The method returns a single row and/or field from the query
      *
      * @param integer $row
-     * @param integer $field
-     * @return mixed false if unsuccessfull or if $row/$field is not numeric and result on success
+     * @param mixed $field
+     * @return mixed false if unsuccessfull or if $row is not numeric and result on success
      */
     public function result($row=0, $field=0)
     {
@@ -1248,7 +1251,7 @@ class Mysql_i implements db_module
         $failed = false;
 
         // ==== Checking to see if $this->result is an MySQLi_result object and that the $row and $field vars are numeric ==== //
-        if(is_object($this->result) && is_numeric($row) && is_numeric($field))
+        if(is_object($this->result) && is_numeric($row))
         {
             // ==== Moving pointer to the desired row ==== //
             $seek = $this->result->data_seek($row);
@@ -1257,10 +1260,27 @@ class Mysql_i implements db_module
             if($seek == true)
             {
                 // ==== Getting row from pointer ==== //
-                $row = $this->result->fetch_row();
+                $row_num = $this->result->fetch_row();
 
-                // ==== Checking existance of field in row === //
-                if(!isset($row[$field]))
+                // ==== Moving pointer to the desired row ==== //
+                $seek = $this->result->data_seek($row);
+
+                // ==== Checking if seek was succesfull === //
+                if($seek == true)
+                {
+                    // ==== Getting row from pointer ==== //
+                    $row_assoc = $this->result->fetch_assoc();
+
+                    // ==== Merging the row results ==== //
+                    $row = array_merge($row_num, $row_assoc);
+
+                    // ==== Checking existance of field in row === //
+                    if(!isset($row[$field]))
+                    {
+                        $failed = true;
+                    }
+                }
+                else
                 {
                     $failed = true;
                 }
@@ -1483,15 +1503,25 @@ class Mysql_i implements db_module
      */
     public function error()
     {
+        // ==== Default error ==== //
+        $error = '';
+
         // ==== Checking to see if $this->result is an MySQLi_result object ==== //
         if(is_object($this->link))
         {
-            return $this->link->error;
+            // ==== Checking for errors ==== //
+            if($this->link->connect_error != NULL)
+            {
+                $error = $this->link->connect_error;
+            }
+            elseif($this->link->error  != NULL)
+            {
+                $error = $this->link->error;
+            }
         }
-        else
-        {
-            return '';
-        }
+
+        // ==== Returning the error ==== //
+        return $error;
     }
 }
 
@@ -1564,12 +1594,12 @@ class Dbase implements db_module
     public function __construct($options)
     {
         // ==== Default options ==== //
-        $this->options['db']     = 'default.dbf';
+        $this->options['db']     = '';
         $this->options['host']   = 'localhost';
         $this->options['port']   = '0';
         $this->options['user']   = 'root';
         $this->options['passwd'] = '';
-        $this->options['path']   = '/';
+        $this->options['path']   = '';
         $this->options['mode']   = 0; // Can take 0 for read-only or 2 for read-write
 
         // ==== Replacing options with custom ones ==== //
@@ -1617,7 +1647,7 @@ class Dbase implements db_module
     public function disconnect()
     {
         // ==== Disconnecting from the database ==== //
-        if($this->link_id != false)
+        if(is_resource($this->link_id))
         {
             return dbase_close($this->link_id);
         }
@@ -1633,222 +1663,60 @@ class Dbase implements db_module
      * @param string $query
      * @return boolean
      */
-    public function query($query)
+    public function query($q='')
     {
-        // ==== Check variable ==== //
-        $isOk = true;
+        // ==== Getting the numer of rows in the database ==== //
+        $num_rows = dbase_numrecords($this->link_id);
 
-        // ==== Local result variable ==== //
-        $result = array();
-
-        // ==== Checking if we have a connection to the database ==== //
-        if($this->link_id != false)
+        // ==== Getting the records ==== //
+        for($i = 1; $i <= $num_rows; $i++)
         {
-            // ==== Breaking the query into pieces based on the command ==== //
-            if(strpos($query, 'SELECT') === 0) // SELECT
+            // ==== Getting the row data ==== //
+            $assoc = dbase_get_record_with_names($this->link_id, $i);
+
+            // ==== Creating a numeric array using the associative array ==== //
+            $num = array();
+
+            // ==== Going through the array ==== //
+            foreach($assoc as $value)
             {
-                // ==== Updating the query type ==== //
-                $this->query_type = 'SELECT';
-
-                // ==== Getting the position of the FROM word ==== //
-                $from_pos = strpos($query, 'FROM');
-
-                // ==== Getting the position of the WHERE word ==== //
-                $where_pos = strpos($query, 'WHERE');
-
-                // ==== Getting the fields that are to be retrieved ==== //
-                $fields = trim(str_replace('SELECT', '', substr($query, 0, $from_pos)));
-
-                // ==== Checking if the * (all) sign is present in the fields ==== //
-                if(strpos($query, '*') !== false)
-                {
-                    $fields = 'all';
-                }
-                else // Only a couple of fields must be selected
-                {
-                    // ==== Splitting the fields and creating an array ==== //
-                    $fields = explode(',', $fields);
-
-                    // ==== Removing the white spaces from the fields and retrieving only the field names ==== //
-                    foreach($fields as $key => $field)
-                    {
-                        // ==== Checking if there is a dot in the name ==== //
-                        if(strpos($field, '.') !== false)
-                        {
-                            $field_data = explode('.', $field);
-
-                            // ==== Getting the actual field name ==== //
-                            $field = $field_data[count($field_data) -1];
-                        }
-
-                        // ==== Updating the fields array ==== //
-                        $fields[$key] = trim($field);
-                    }
-                }
-
-                // ==== Getting the rest of the query ==== //
-                $where = substr($query, ($where_pos+5), (strlen($query) - ($where_pos+5)));
-
-                // ==== Translating the statement into a PHP statement ==== //
-                $where = str_replace('AND', '&&', $where);
-                $where = str_replace('OR', '||', $where);
-
-                // ==== Getting the table name ==== //
-                $table = trim(substr($query, ($from_pos+5), (($where_pos) - ($from_pos+5))));
-
-                // ==== Removing the table name from the where statement ==== //
-                $where = str_replace($table.'.', '', $where);
-
-                // ==== Replacing some stuff so we can later get the field names ==== //
-                $where_tmp = str_replace(array('(', ')'), '', $where);
-                $where_tmp = str_replace(array('&&', '||'), '|', $where_tmp);
-
-                // ==== Splitting the string ==== //
-                $where_tmp = explode('|', $where_tmp);
-
-                // ==== Going through the array ==== //
-                foreach($where_tmp as $key => $field_stat)
-                {
-                    // ==== Splitting by the = (equal sign) ==== //
-                    $info = explode('=', $field_stat);
-
-                    // ==== Getting the field name ==== //
-                    $name = ltrim($info[0]);
-
-                    // ==== Getting the field value ==== //
-                    $value = substr($field_stat, (strpos($field_stat, '=')+1), strlen($field_stat)-1);
-
-                    // ==== Generating the new name ==== //
-                    $new_name = '$row[' . "'" . trim($name) . "'" . ']';
-
-                    // ==== Replacing the name in the where condition ==== //
-                    $where = str_replace($name . '=', $new_name . '=', $where);
-
-                    // ==== Generating the code failsafe ==== //
-                    $failsafe = '(isset(' . $new_name . ') && ' . $new_name . '=' . trim($value) . ')';
-
-                    // ==== Adding the failsafe to the condition ==== //
-                    $where = str_replace($new_name . '=' . $value, $failsafe, $where);
-
-                    // ==== Arranging he code ==== //
-                    $where = str_replace(')&&', ') &&', $where);
-                    $where = str_replace(')||', ') ||', $where);
-                }
-
-                // ==== Getting the numer of rows in the database ==== //
-                $num_rows = dbase_numrecords($this->link_id);
-
-                // ==== Getting the records ==== //
-                for($i = 1; $i <= $num_rows; $i++)
-                {
-                    // ==== Getting the row data ==== //
-                    $assoc = dbase_get_record_with_names($this->link_id, $i);
-
-                    // ==== Checking if the condition is met ==== //
-                    if($where)
-                    {
-                        // ==== Creating a numeric array using the associative array ==== //
-                        $num = array();
-
-                        // ==== Going through the array ==== //
-                        foreach($row as $n => $value)
-                        {
-                            $num[] = $value;
-                        }
-
-                        // ==== Adding the row to the result ==== //
-                        $result[] = array(
-                            'assoc' => $assoc,
-                            'num'   => $num,
-                        );
-                    }
-                }
-
-                // ==== Adding the result to the class result ==== //
-                $this->results = $result;
-
+                $num[] = $value;
             }
-            else if(strpos($query, 'INSERT') === 0) // INSERT
-            {
-                // ==== Updating the query type ==== //
-                $this->query_type = 'INSERT';
-            }
-            else if(strpos($query, 'UPDATE') === 0) // UPDATE
-            {
-                // ==== Updating the query type ==== //
-                $this->query_type = 'UPDATE';
-            }
-            else if(strpos($query, 'DELETE') === 0) // DELETE
-            {
-                // ==== Updating the query type ==== //
-                $this->query_type = 'DELETE';
-            }
-        }
-        else
-        {
-            // ==== Failed ==== //
-            $isOk = false;
+
+            // ==== Adding the row to the result ==== //
+            $result[] = array(
+                'assoc' => $assoc,
+                'num'   => $num,
+            );
         }
 
-        // ==== Returning result ==== //
-        return $isOk;
-    }
-
-    /**
-     *
-     * This is a special method for the dbase module only. It retrieves all the data in the given database
-     *
-     * @param void
-     * @return void
-     */
-    public function queryAll()
-    {
-        // ==== Checking if we have a connection to the database ==== //
-        if($this->link_id != false)
-        {
-            // ==== Getting the numer of rows in the database ==== //
-            $num_rows = dbase_numrecords($this->link_id);
-
-            // ==== Getting the records ==== //
-            for($i = 1; $i <= $num_rows; $i++)
-            {
-                // ==== Getting the row data ==== //
-                $assoc = dbase_get_record_with_names($this->link_id, $i);
-
-                // ==== Creating a numeric array using the associative array ==== //
-                $num = array();
-
-                // ==== Going through the array ==== //
-                foreach($row as $n => $value)
-                {
-                    $num[] = $value;
-                }
-
-                // ==== Adding the row to the result ==== //
-                $result[] = array(
-                    'assoc' => $assoc,
-                    'num'   => $num,
-                );
-            }
-
-            // ==== Adding the result to the class result ==== //
-            $this->results = $result;
-        }
+        // ==== Adding the result to the class result ==== //
+        $this->results = $result;
     }
 
     /**
      * The method returns a single row and/or field from the query
      *
      * @param integer $row
-     * @param integer $field
+     * @param mixed $field
      * @return mixed false if unsuccessfull or if $row/$field is not numeric and result on success
      */
     public function result($row=0, $field=0)
     {
-        // ==== Returning the requested row if it's set ==== //
-        if(isset($this->results[$row]['num'][$field]) && is_numeric($row) && is_numeric($field))
+        // ==== Determining the array to look in ==== //
+        if(is_numeric($field))
         {
-            return $this->results[$row]['num'][$field];
+            $type = 'num';
+        }
+        else
+        {
+            $type = 'assoc';
+        }
+
+        // ==== Returning the requested row if it's set ==== //
+        if(isset($this->results[$row][$type][$field]) && is_numeric($row))
+        {
+            return $this->results[$row][$type][$field];
         }
         else
         {
@@ -1865,7 +1733,7 @@ class Dbase implements db_module
     public function num_rows()
     {
         // ==== Returning the count of results in the results array ==== //
-        return count($this->result);
+        return count($this->results);
     }
 
     /**
@@ -1989,7 +1857,7 @@ class Dbase implements db_module
      */
     public function escape_string($string)
     {
-        // ==== For dbase we do nothing because no query is involved ==== //
+        // ==== For now we return the string as is ==== //
         return $string;
     }
 
@@ -1997,32 +1865,18 @@ class Dbase implements db_module
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query
-     * @param string $autoincrementField
+     * @param string $autoincrementField //This is important for compatibility with PostgreSQL
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField)
     {
-        // ==== Result var ==== //
-        $result = false;
-
-        // ==== Checking if we have a connection to the database ==== //
-        if($this->link_id != false)
-        {
-            // ==== Getting the number of elements from the current result set ==== //
-            $results = count($this->results);
-
-            // ==== Getting the result from the database ==== //
-            $result_set = dbase_get_record_with_names($this->link_id, $results);
-
-            // ==== Checking if the field is found ==== //
-            if(isset($result_set[$autoIncrementField]))
-            {
-                $result = $result_set[$autoIncrementField];
-            }
-        }
-
-        // ==== Returning result ==== //
-        return $result;
+        /**
+         *
+         * ------------------------
+         * PENDING IMPLEMENTATION
+         * ------------------------
+         * 
+         */
     }
 
     /**
@@ -2033,7 +1887,13 @@ class Dbase implements db_module
      */
     public function error()
     {
-        // ==== No error retrieval available for dbase ==== //
-        return '';
+        /**
+         *
+         * ------------------------
+         * PENDING IMPLEMENTATION
+         * ------------------------
+         *
+         */
     }
 }
+?>
