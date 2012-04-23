@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Database
- * @version 3.5.3
+ * @version 3.6
  *
  */
 
@@ -1291,6 +1291,7 @@ class Mysql_i implements db_module
             }
         }
 
+        // ==== Checking the status ==== //
         if($failed === false)
         {
             return $row[$field];
