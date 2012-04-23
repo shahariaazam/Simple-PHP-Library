@@ -1663,7 +1663,7 @@ class Dbase implements db_module
      * @param string $query
      * @return boolean
      */
-    public function query($q='')
+    public function query($query='')
     {
         // ==== Getting the numer of rows in the database ==== //
         $num_rows = dbase_numrecords($this->link_id);
