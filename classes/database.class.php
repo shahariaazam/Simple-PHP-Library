@@ -1886,7 +1886,7 @@ class Dbase implements db_module
             if(isset($result_set[$autoIncrementField]))
             {
                 $result = $result_set[$autoIncrementField];
-    }
+            }
         }
 
 
