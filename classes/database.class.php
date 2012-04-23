@@ -1584,6 +1584,14 @@ class Dbase implements db_module
      */
     private $query_type = '';
 
+    /**
+     *
+     * Affected rows
+     *
+     * @var integer
+     */
+    private $_affected_rows = 0;
+
 
     /**
      *
@@ -1745,13 +1753,14 @@ class Dbase implements db_module
      */
     public function affected_rows()
     {
-        /**
-         *
-         * ------------------------
-         * PENDING IMPLEMENTATION
-         * ------------------------
-         *
-         */
+        // ==== Getting the affected rows count ==== //
+        $count = $this->_affected_rows;
+
+        // ==== Resetting the affected rows ==== //
+        $this->_affected_rows = 0;
+
+        // ==== Result ==== //
+        return $count;
     }
 
     /**
