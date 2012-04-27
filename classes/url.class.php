@@ -297,7 +297,7 @@ class URL
      * @param array $array2
      * @return array
      */
-    protected static function array_merge_v2($array1, $array2)
+    protected static function array_append($array1, $array2)
     {
         // ==== Going through the first array ==== //
         foreach($array1 as $idx => $value)
@@ -439,18 +439,18 @@ class URL
         elseif($page == $this->_page && $merge_get === true) // Link to the same page but with different params (this includes the $_GET params)
         {
             // ==== If the page is exactly the same as the one the user is on then take all the $_GET parameters ==== //
-            $params = self::array_merge_v2($_GET, $params);
+            $params = self::array_append($_GET, $params);
         }
         else // New page with params that must be automaticaly loaded
         {
             // ===== Checking if we should merge the GET ==== //
             if($merge_get === true)
             {
-                $params = self::array_merge_v2($_GET, $params);
+                $params = self::array_append($_GET, $params);
             }
 
             // ==== Adding default params ==== //
-            $params = self::array_merge_v2($this->_params, $params);
+            $params = self::array_append($params, $this->_params);
         }
 
         // ==== Removing the page token from the params ==== //
