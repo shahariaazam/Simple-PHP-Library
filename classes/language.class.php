@@ -227,7 +227,7 @@ class Language
      * @param array $data The given data is used to parse the text
      * @return mixed false on fail or string on success
      */
-    public function text($txt, array $data=array())
+    public function _($txt, array $data=array())
     {
         // ==== Checking if the text exists ==== //
         if(isset($this->_texts[$txt]))
