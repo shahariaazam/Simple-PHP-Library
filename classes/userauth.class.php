@@ -368,6 +368,15 @@ class UserAuth
             // ==== Getting the headers ==== //
             $data['headers'] = base64_encode(serialize($headers['HTTP_USER_AGENT']));
 
+            //////////////////////////////////////////////////
+            // BEGIN INPUT SANITIZATION
+            /////////////////////////////////////////////////
+            // == cookie == //
+            $data['cookie'] = $this->_db->escape_string($data['cookie']);
+            //////////////////////////////////////////////////
+            // END INPUT SANITIZATION
+            /////////////////////////////////////////////////
+
             // ==== Adding log data ==== //
             if($this->_options['debug'])
             {

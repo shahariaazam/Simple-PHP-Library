@@ -187,20 +187,37 @@ class UserAcc
      */
     protected function allowSalt(array $data)
     {
-        // ==== Default state ==== //
-        $allow = true;
+        // ==== Result variable ==== //
+        $result = true;
 
+        //////////////////////////////////////////////////
+        // BEGIN INPUT SANITIZATION
+        /////////////////////////////////////////////////
+        // == username == //
+        if(!empty($data['username']))
+        {
+            $data['username'] = $this->_db->escape_string($data['username']);
+        }
+        //////////////////////////////////////////////////
+        // END INPUT SANITIZATION
+        /////////////////////////////////////////////////
+
+        //////////////////////////////////////////////////
+        // BEGIN REQUIRED FIELDS CHECKS
+        /////////////////////////////////////////////////
         // == Username == //
         if(!isset($data['username']))
         {
             // ===== Errors ==== //
             $this->_errors[] = 150;
-
-            $allow = false;
+            $result = false;
         }
+        //////////////////////////////////////////////////
+        // END REQUIRED FIELDS CHECKS
+        /////////////////////////////////////////////////
 
         // ==== Result ==== //
-        return $allow;
+        return $result;
     }
 
     /**
@@ -279,11 +296,29 @@ class UserAcc
      */
     protected function allowLogin(array $data)
     {
-        // ==== result variable ==== //
+        // ==== Result variable ==== //
         $result = true;
 
         //////////////////////////////////////////////////
-        // START REQUIRED FIELD CHECKS
+        // BEGIN INPUT SANITIZATION
+        /////////////////////////////////////////////////
+        // == Username == //
+        if(!empty($data['username']))
+        {
+            $data['username'] = $this->_db->escape_string($data['username']);
+        }
+
+        // == Password == //
+        if(!empty($data['passwd']))
+        {
+            $data['passwd'] = $this->_db->escape_string($data['passwd']);
+        }
+        //////////////////////////////////////////////////
+        // END INPUT SANITIZATION
+        /////////////////////////////////////////////////
+
+        //////////////////////////////////////////////////
+        // BEGIN REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
         // == username == //
         if(empty($data['username']))
@@ -299,7 +334,7 @@ class UserAcc
             $result = false;
         }
         //////////////////////////////////////////////////
-        // END REQUIRED FIELD CHECKS
+        // END REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
 
         // ==== result ==== //
@@ -527,7 +562,31 @@ class UserAcc
         $result = true;
 
         //////////////////////////////////////////////////
-        // START REQUIRED FIELD CHECKS
+        // BEGIN INPUT SANITIZATION
+        /////////////////////////////////////////////////
+        // == username == //
+        if(!empty($data['username']))
+        {
+            $data['username'] = $this->_db->escape_string($data['username']);
+        }
+
+        // == password == //
+        if(!empty($data['passwd']))
+        {
+            $data['passwd'] = $this->_db->escape_string($data['passwd']);
+        }
+
+        // == email == //
+        if(!empty($data['email']))
+        {
+            $data['email'] = $this->_db->escape_string($data['email']);
+        }
+        //////////////////////////////////////////////////
+        // END INPUT SANITIZATION
+        /////////////////////////////////////////////////
+
+        //////////////////////////////////////////////////
+        // BEGIN REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
         // == username == //
         if(empty($data['username']))
@@ -592,7 +651,7 @@ class UserAcc
             }
         }
         //////////////////////////////////////////////////
-        // END REQUIRED FIELD CHECKS
+        // END REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
 
         // ==== result ==== //
@@ -712,18 +771,37 @@ class UserAcc
      */
     protected function allowRecovery(array $data)
     {
-        // ==== Checking ==== //
-        if(isset($data['email']) && !empty($data['email']))
+        // ==== Result variable ==== //
+        $result = true;
+
+        //////////////////////////////////////////////////
+        // BEGIN INPUT SANITIZATION
+        /////////////////////////////////////////////////
+        // == Email == //
+        if(!empty($data['email']))
         {
-            return true;
+            $data['email'] = $this->_db->escape_string($data['email']);
         }
-        else
+        //////////////////////////////////////////////////
+        // END INPUT SANITIZATION
+        /////////////////////////////////////////////////
+
+        //////////////////////////////////////////////////
+        // BEGIN REQUIRED FIELDS CHECKS
+        /////////////////////////////////////////////////
+        // ==== Email ==== //
+        if(empty($data['email']))
         {
             // ==== Errors ==== //
             $this->_errors[] = 160;
-
-            return false;
+            $result = false;
         }
+        //////////////////////////////////////////////////
+        // END REQUIRED FIELDS CHECKS
+        /////////////////////////////////////////////////
+
+        // ==== Result ==== //
+        return $result;
     }
 
     /**
