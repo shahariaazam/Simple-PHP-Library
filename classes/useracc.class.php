@@ -180,6 +180,26 @@ class UserAcc
     }
 
     /**
+     *
+     * The method tries to retrieve a certain information about the users account
+     *
+     * @param string $field
+     * @return mixed It returns false if the information is not found or the information as found in the database
+     */
+    public function __get($field)
+    {
+        // ==== Checking if the field exists ==== //
+        if(!empty($this->_userinfo[$field]))
+        {
+            return $this->_userinfo[$field];
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
      * Conditions to allow the salt to be extracted
      *
      * @param array $data

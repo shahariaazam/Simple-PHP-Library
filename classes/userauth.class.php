@@ -58,6 +58,13 @@ class UserAuth
     protected $_db;
 
     /**
+     * Vault object
+     *
+     * @var object
+     */
+    protected $_vault;
+
+    /**
      * This property is only set when the login is triggered from inside the class
      *
      * @var boolean
@@ -78,6 +85,13 @@ class UserAuth
      */
     protected $_authenticated = false;
 
+    /**
+     * Array with the userinfo
+     *
+     * @var array
+     */
+    protected $_userinfo = array();
+
 
     /**
      * Class constructor
@@ -86,7 +100,7 @@ class UserAuth
      * @param array $options
      * @return void
      */
-    public function __construct(db_module $db, array $options=array())
+    public function __construct(db_module $db, Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
         $this->_options['unique_mail']     = '';
@@ -115,11 +129,18 @@ class UserAuth
         // ==== Initializing the database object ==== //
         $this->_db = $db;
 
+        // ==== Initializing the vault object ==== //
+        $this->_vault = $vault;
+
         // ==== Hidding the cookie ==== //
         $this->hideCookie();
 
         // ==== Triggering the auto-authentication ==== //
-        $this->authenticate();
+        if($this->authenticate())
+        {
+            // ==== Getting the user information ==== //
+            $this->_userinfo = $this->_vault->decrypt(unserialize($_SESSION['userinfo']));
+        }
     }
 
     /**
@@ -131,6 +152,26 @@ class UserAuth
     public function getErrors()
     {
         return $this->_errors;
+    }
+
+    /**
+     *
+     * The method tries to retrieve a certain information about the users account
+     *
+     * @param string $field
+     * @return mixed It returns false if the information is not found or the information as found in the database
+     */
+    public function __get($field)
+    {
+        // ==== Checking if the field exists ==== //
+        if(!empty($this->_userinfo[$field]))
+        {
+            return $this->_userinfo[$field];
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /**
@@ -473,9 +514,6 @@ class UserAuth
                             // ==== Getting the row info ==== //
                             $row = $this->_db->fetch_assoc();
 
-                            // ==== Getting the account ID ==== //
-                            $account_id = $row['account_id'];
-
                             // ==== Adding log data ==== //
                             if($this->_options['debug'])
                             {
@@ -518,11 +556,11 @@ class UserAuth
                 // ==== Setting the account ID ==== //
                 if($check_db === false) // Using data provided by the UserAcc class
                 {
-                    $_SESSION['userid'] = $data['account_id'];
+                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($data));
                 }
                 else // Using data from the database
                 {
-                    $_SESSION['userid'] = $account_id;
+                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($row));
                 }
             }
             else
@@ -548,6 +586,10 @@ class UserAuth
         if($_SESSION['auth'] == true)
         {
             $this->_authenticated = true;
+        }
+        else
+        {
+            $isOk = false;
         }
 
         // ===== Result ==== //
