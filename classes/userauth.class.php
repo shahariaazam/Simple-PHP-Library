@@ -139,7 +139,7 @@ class UserAuth
         if($this->authenticate())
         {
             // ==== Getting the user information ==== //
-            $this->_userinfo = $this->_vault->decrypt(unserialize($_SESSION['userinfo']));
+            $this->_userinfo = unserialize($this->_vault->decrypt($_SESSION['userinfo']));
         }
     }
 
@@ -556,11 +556,19 @@ class UserAuth
                 // ==== Setting the account ID ==== //
                 if($check_db === false) // Using data provided by the UserAcc class
                 {
-                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($data));
+                    // ==== Getting the userinfo ==== //
+                    $this->_userinfo = array('account_id' => $data['account_id']);
+
+                    // ==== Adding the userinfo to the session ==== //
+                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($this->_userinfo));
                 }
                 else // Using data from the database
                 {
-                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($row));
+                    // ==== Getting the userinfo ==== //
+                    $this->_userinfo = array('account_id' => $row['account_id']);
+
+                    // ==== Adding the userinfo to the session ==== //
+                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($this->_userinfo));
                 }
             }
             else
