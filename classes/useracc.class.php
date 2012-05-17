@@ -113,6 +113,13 @@ class UserAcc
      */
     protected $vault;
 
+    /**
+     * Array with the userinfo
+     *
+     * @var array
+     */
+    protected $userinfo = array();
+
 
     /**
      * Class constructor.
@@ -184,7 +191,7 @@ class UserAcc
      * The method tries to retrieve a certain information about the users account
      *
      * @param string $field
-     * @return mixed It returns false if the information is not found or the information as found in the database
+     * @return mixed It returns NULL if the information is not found or it returns the information as found in the database
      */
     public function __get($field)
     {
@@ -195,7 +202,7 @@ class UserAcc
         }
         else
         {
-            return false;
+            return NULL;
         }
     }
 
@@ -455,6 +462,9 @@ class UserAcc
                         // ==== Checking if the account is active ==== //
                         if($row['active'] == 1)
                         {
+                            // ==== Getting the user info ==== //
+                            $this->userinfo = $row;
+
                             // ==== Getting the account ID ==== //
                             $data['account_id'] = $row['account_id'];
 

@@ -92,6 +92,14 @@ class UserAuth
      */
     protected $userinfo = array();
 
+    /**
+     *
+     * UserAccount object
+     *
+     * @var object
+     */
+    protected $userAcc;
+
 
     /**
      * Class constructor
