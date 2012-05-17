@@ -525,19 +525,6 @@ class UserAcc
         return $result;
     }
 
-
-    /**
-     * The method does the logout process. Mostly wrapper function.
-     *
-     * @param void
-     * @return boolean
-     */
-    public function doLogout()
-    {
-        // ==== Logging out ==== //
-        $this->auth->logout();
-    }
-
     /**
      * The method checks if the username exits
      *

@@ -625,7 +625,7 @@ class UserAuth
      * @param void
      * @return void
      */
-    public function logout()
+    public function doLogout()
     {
         // ==== Deleting the cookie ==== //
         setcookie($this->options['cookie_name'], '', -10);
