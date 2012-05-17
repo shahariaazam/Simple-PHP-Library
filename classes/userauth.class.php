@@ -136,11 +136,7 @@ class UserAuth
         $this->hideCookie();
 
         // ==== Triggering the auto-authentication ==== //
-        if($this->authenticate())
-        {
-            // ==== Getting the user information ==== //
-            $this->userinfo = unserialize($this->vault->decrypt($_SESSION['userinfo']));
-        }
+        $this->authenticate();
     }
 
     /**
@@ -467,7 +463,6 @@ class UserAuth
 
                 // ==== Untrusting ==== //
                 $this->trusted = false;
-
             }
 
             ////////////////////////////////////////////////
@@ -578,6 +573,9 @@ class UserAuth
         }
         else
         {
+            // ==== Getting the info from the session if already authenticated ==== //
+            $this->userinfo = unserialize($this->vault->decrypt($_SESSION['userinfo']));
+
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
@@ -586,6 +584,7 @@ class UserAuth
                 $this->log .= 'Skipped authentication<br /><br />';
                 $this->log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
                 $this->log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
+                $this->log .= 'User info: '.print_array($this->userinfo, 1).'<br />';
                 $this->log .= '<br /><br />';
             }
         }
