@@ -262,13 +262,13 @@ class UserAcc
      * @param array $data
      * @return string or false on failure
      */
-    protected function getSalt(array $data, $fromdb = true)
+    protected function getSalt(array $data, $from_db = true)
     {
         // ==== Result var ==== //
         $result = false;
 
         // ==== Checking if we should get the salt from the database ==== //
-        if($fromdb === true)
+        if($from_db === true)
         {
             // ==== Checking if the username is set ==== //
             if($this->allowSalt($data))
