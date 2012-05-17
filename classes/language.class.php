@@ -138,7 +138,7 @@ class Language
         $langfile = $this->options['lang_dir'].$lang.$this->options['lang_sufix'];
 
         // ==== Checking if the file exists == falling back to default if not ==== //
-        if(!isfile($langfile))
+        if(!is_file($langfile))
         {
             $lang = $this->options['default_language'];
 
@@ -177,7 +177,7 @@ class Language
         if(!is_array($this->texts))
         {
             // ==== Second file check == First was in constructor ==== //
-            if(!isfile($this->file))
+            if(!is_file($this->file))
             {
                 // ==== Adding debug data ==== //
                 if($this->options['debug'])
