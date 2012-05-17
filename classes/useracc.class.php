@@ -459,7 +459,7 @@ class UserAcc
                             $data['account_id'] = $row['account_id'];
 
                             // ==== Checking if persistent login was requested ==== //
-                            if(isset($data['rememberlogin']) && $data['rememberlogin'] == true)
+                            if(isset($data['remember_login']) && $data['remember_login'] == true)
                             {
                                 $persistent = true;
                             }
