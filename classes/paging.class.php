@@ -105,7 +105,7 @@ class Paging
             // ==== Is this a complex search ==== //
             if(!$complex)
             {
-                $this->rows = $db->numrows();
+                $this->rows = $db->num_rows();
 
                 // ==== Getting offset ==== //
                 $offset = $this->getOffset();
@@ -131,7 +131,7 @@ class Paging
                     while($data[] = $db->fetch_assoc());
 
                     // == Getting number of rows == //
-                    $this->rows = $db->numrows();
+                    $this->rows = $db->num_rows();
 
                     // ==== Getting offset ==== //
                     $offset = $this->getOffset();
