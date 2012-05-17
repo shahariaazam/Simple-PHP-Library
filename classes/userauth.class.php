@@ -27,70 +27,70 @@ class UserAuth
      *
      * @var array
      */
-    protected $_options;
+    protected $options;
 
     /**
      * Errors array
      *
      * @var array
      */
-    protected $_errors = array();
+    protected $errors = array();
 
     /**
      * Log holder
      *
      * @var string
      */
-    protected $_log;
+    protected $log;
 
     /**
      * Mail options
      *
      * @var array
      */
-    protected $_mopt;
+    protected $mopt;
 
     /**
      * Database object
      *
      * @var object
      */
-    protected $_db;
+    protected $db;
 
     /**
      * Vault object
      *
      * @var object
      */
-    protected $_vault;
+    protected $vault;
 
     /**
      * This property is only set when the login is triggered from inside the class
      *
      * @var boolean
      */
-    protected $_trusted = false;
+    protected $trusted = false;
 
     /**
      * Cookie container
      *
      * @var string
      */
-    protected $_cookie;
+    protected $cookie;
 
     /**
      * Authenticated trigger to avoid multiple cookie generations
      *
      * @var boolean
      */
-    protected $_authenticated = false;
+    protected $authenticated = false;
 
     /**
      * Array with the userinfo
      *
      * @var array
      */
-    protected $_userinfo = array();
+    protected $userinfo = array();
 
 
     /**
@@ -103,34 +103,34 @@ class UserAuth
     public function __construct(db_module $db, Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
-        $this->_options['unique_mail']     = '';
-        $this->_options['debug']           = false;
-        $this->_options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
-        $this->_options['cookie_name']     = 'auth';
-        $this->_options['cookie_expire']   = 2592000;
-        $this->_options['cookie_path']     = '/';
-        $this->_options['cookie_domain']   = '';
+        $this->options['unique_mail']     = '';
+        $this->options['debug']           = false;
+        $this->options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
+        $this->options['cookie_name']     = 'auth';
+        $this->options['cookie_expire']   = 2592000;
+        $this->options['cookie_path']     = '/';
+        $this->options['cookie_domain']   = '';
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options))
         {
-            $this->_options = array_merge($this->_options, $options);
+            $this->options = array_merge($this->options, $options);
         }
 
         // ==== Setting up mail options ==== //
-        $this->_mopt['to']        = $this->_options['mail'];
-        $this->_mopt['subject']   = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->_options['unique_mail'];
-        $this->_mopt['headers']   = 'MIME-Version: 1.0' . "\r\n";
-        $this->_mopt['headers']  .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        $this->mopt['to']        = $this->options['mail'];
+        $this->mopt['subject']   = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
+        $this->mopt['headers']   = 'MIME-Version: 1.0' . "\r\n";
+        $this->mopt['headers']  .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
         // ==== Initializing default values ==== //
-        $this->_log = '';
+        $this->log = '';
 
         // ==== Initializing the database object ==== //
-        $this->_db = $db;
+        $this->db = $db;
 
         // ==== Initializing the vault object ==== //
-        $this->_vault = $vault;
+        $this->vault = $vault;
 
         // ==== Hidding the cookie ==== //
         $this->hideCookie();
@@ -139,7 +139,7 @@ class UserAuth
         if($this->authenticate())
         {
             // ==== Getting the user information ==== //
-            $this->_userinfo = unserialize($this->_vault->decrypt($_SESSION['userinfo']));
+            $this->userinfo = unserialize($this->vault->decrypt($_SESSION['userinfo']));
         }
     }
 
@@ -151,7 +151,7 @@ class UserAuth
      */
     public function getErrors()
     {
-        return $this->_errors;
+        return $this->errors;
     }
 
     /**
@@ -164,9 +164,9 @@ class UserAuth
     public function __get($field)
     {
         // ==== Checking if the field exists ==== //
-        if(!empty($this->_userinfo[$field]))
+        if(!empty($this->userinfo[$field]))
         {
-            return $this->_userinfo[$field];
+            return $this->userinfo[$field];
         }
         else
         {
@@ -182,7 +182,7 @@ class UserAuth
      */
     protected function hideCookie()
     {
-        $this->_options['cookie_name'] = substr(hash('sha512', $this->_options['cookie_name']), 0, 10);
+        $this->options['cookie_name'] = substr(hash('sha512', $this->options['cookie_name']), 0, 10);
     }
 
     /**
@@ -210,8 +210,8 @@ class UserAuth
     protected function generateCookie(array $data)
     {
         // ==== The cookie ==== //
-        $cookie         = sha1(uniqid().$data['username']);
-        $this->_cookie  = $cookie;
+        $cookie         = sha1(uniqid() . $data['username']);
+        $this->cookie  = $cookie;
     }
 
     /**
@@ -222,7 +222,7 @@ class UserAuth
      */
     protected function createCookie()
     {
-        setcookie($this->_options['cookie_name'], $this->_cookie, time()+$this->_options['cookie_expire'], $this->_options['cookie_path'], $this->_options['cookie_domain']);
+        setcookie($this->options['cookie_name'], $this->cookie, time()+$this->options['cookie_expire'], $this->options['cookie_path'], $this->options['cookie_domain']);
     }
 
     /**
@@ -233,7 +233,7 @@ class UserAuth
      */
     protected function deleteCookie()
     {
-        setcookie($this->_options['cookie_name'], $this->_cookie, time()-$this->_options['cookie_expire'], $this->_options['cookie_path'], $this->_options['cookie_domain']);
+        setcookie($this->options['cookie_name'], $this->cookie, time()-$this->options['cookie_expire'], $this->options['cookie_path'], $this->options['cookie_domain']);
     }
 
     /**
@@ -248,7 +248,7 @@ class UserAuth
         $data['ip_addr'] = $_SERVER['REMOTE_ADDR'];
 
         // ==== The cookie ==== //
-        $data['cookie'] = $this->_cookie;
+        $data['cookie'] = $this->cookie;
 
         // ==== Getting all the headers ==== //
         $headers = get_request_headers();
@@ -257,13 +257,13 @@ class UserAuth
         $data['headers'] = base64_encode(serialize($headers['HTTP_USER_AGENT']));
 
         // ==== Adding log data ==== //
-        if($this->_options['debug'])
+        if($this->options['debug'])
         {
-            $this->_log .= '<hr><hr><strong>prepareLogin</strong><hr><br />';
-            $this->_log .= '<strong>Info:</strong><br />';
-            $this->_log .= 'Cookie name: '.$this->_options['cookie_name'].'<br />';
-            $this->_log .= 'Data: '.print_array($data, 1).'<br />';
-            $this->_log .= '<br /><br />';
+            $this->log .= '<hr><hr><strong>prepareLogin</strong><hr><br />';
+            $this->log .= '<strong>Info:</strong><br />';
+            $this->log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
+            $this->log .= 'Data: '.print_array($data, 1).'<br />';
+            $this->log .= '<br /><br />';
         }
 
         // ==== Result ==== //
@@ -283,7 +283,7 @@ class UserAuth
         $result = false;
 
         // ==== Checking if the user is not already authenticated ==== //
-        if(!$this->_authenticated)
+        if(!$this->authenticated)
         {
             // ==== Checking if persistent login is enabled ==== //
             if($persistent === true)
@@ -304,13 +304,13 @@ class UserAuth
                 if($sql != '')
                 {
                     // ==== Executing the SQL ==== //
-                    $result = $this->_db->query($sql);
+                    $result = $this->db->query($sql);
 
                     // ==== Checking the result ==== //
                     if($result == true)
                     {
                         // ==== Trusted ==== //
-                        $this->_trusted = true;
+                        $this->trusted = true;
 
                         // ==== Creating the cookie ==== //
                         $this->createCookie();
@@ -321,13 +321,13 @@ class UserAuth
                     else
                     {
                         // ==== Errors ==== //
-                        $this->_errors[] = 201;
+                        $this->errors[] = 201;
                     }
                 }
                 else
                 {
                     // ==== Errors ==== //
-                    $this->_errors[] = 200;
+                    $this->errors[] = 200;
                 }
             }
             else
@@ -336,7 +336,7 @@ class UserAuth
                 // NON-PERSISTENT LOGIN
                 ///////////////////////////////////////////////////////////////
                 // ==== Trusted ==== //
-                $this->_trusted = true;
+                $this->trusted = true;
 
                 // ==== Authenticating ==== //
                 $success = $this->authenticate($data);
@@ -353,10 +353,10 @@ class UserAuth
             $result = true;
 
             // ==== Adding log data ==== //
-            if($this->_options['debug'])
+            if($this->options['debug'])
             {
-                $this->_log .= '<hr><hr><strong>login</strong><hr><br />';
-                $this->_log .= '<strong>NOTICE:</strong> User already logged in.<br /><br />';
+                $this->log .= '<hr><hr><strong>login</strong><hr><br />';
+                $this->log .= '<strong>NOTICE:</strong> User already logged in.<br /><br />';
             }
         }
 
@@ -392,7 +392,7 @@ class UserAuth
         $data = false;
 
         // ===== Checking if the cookie exists ===== //
-        if(isset($_COOKIE[$this->_options['cookie_name']]))
+        if(isset($_COOKIE[$this->options['cookie_name']]))
         {
             // ==== Converting the data type of data ==== //
             $data = array();
@@ -401,7 +401,7 @@ class UserAuth
             $data['ip_addr'] = $_SERVER['REMOTE_ADDR'];
 
             // ==== Getting the cookie ==== //
-            $data['cookie']  = $_COOKIE[$this->_options['cookie_name']];
+            $data['cookie']  = $_COOKIE[$this->options['cookie_name']];
 
             // ==== Getting all the headers ==== //
             $headers = get_request_headers();
@@ -413,28 +413,28 @@ class UserAuth
             // BEGIN INPUT SANITIZATION
             /////////////////////////////////////////////////
             // == cookie == //
-            $data['cookie'] = $this->_db->escape_string($data['cookie']);
+            $data['cookie'] = $this->db->escape_string($data['cookie']);
             //////////////////////////////////////////////////
             // END INPUT SANITIZATION
             /////////////////////////////////////////////////
 
             // ==== Adding log data ==== //
-            if($this->_options['debug'])
+            if($this->options['debug'])
             {
-                $this->_log .= '<hr><hr><strong>prepareAuth</strong><hr><br />';
-                $this->_log .= '<strong>Info:</strong><br />';
-                $this->_log .= 'Cookie name: '.$this->_options['cookie_name'].'<br />';
-                $this->_log .= 'Data: '.print_array($data, 1).'<br />';
-                $this->_log .= '<br /><br />';
+                $this->log .= '<hr><hr><strong>prepareAuth</strong><hr><br />';
+                $this->log .= '<strong>Info:</strong><br />';
+                $this->log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
+                $this->log .= 'Data: '.print_array($data, 1).'<br />';
+                $this->log .= '<br /><br />';
             }
         }
         else
         {
             // ==== Adding log data ==== //
-            if($this->_options['debug'])
+            if($this->options['debug'])
             {
-                $this->_log .= '<hr><hr><strong>prepareAuth</strong><hr><br />';
-                $this->_log .= '<strong>ERROR:</strong> The required data for the prepareAuth method is not present. Required: authentication cookie.<br /><br />';
+                $this->log .= '<hr><hr><strong>prepareAuth</strong><hr><br />';
+                $this->log .= '<strong>ERROR:</strong> The required data for the prepareAuth method is not present. Required: authentication cookie.<br /><br />';
             }
         }
 
@@ -454,26 +454,26 @@ class UserAuth
         $isOk = true;
 
         // ==== Skipping if already authenticated ==== //
-        if((isset($_SESSION['auth']) && $_SESSION['auth'] === false && ($this->_trusted === true || isset($_COOKIE[$this->_options['cookie_name']]))) || !isset($_SESSION['auth']))
+        if((isset($_SESSION['auth']) && $_SESSION['auth'] === false && ($this->trusted === true || isset($_COOKIE[$this->options['cookie_name']]))) || !isset($_SESSION['auth']))
         {
             // ==== Search database flag ===== //
-            $check_db = true;
+            $checkdb = true;
 
             // ==== Checking if this was triggered from inside the class ==== //
-            if($this->_trusted === true)
+            if($this->trusted === true)
             {
                 // ==== Avoiding the db check ==== //
-                $check_db = false;
+                $checkdb = false;
 
                 // ==== Untrusting ==== //
-                $this->_trusted = false;
+                $this->trusted = false;
 
             }
 
             ////////////////////////////////////////////////
             // START DB CHECK ONLY AT FIRST ACCESS
             ///////////////////////////////////////////////
-            if($check_db)
+            if($checkdb)
             {
                 // ==== Preparing the auth data ==== //
                 $data = $this->prepareAuth();
@@ -488,20 +488,20 @@ class UserAuth
                     if($sql != '')
                     {
                         // ==== Executing the SQL ==== //
-                        $success = $this->_db->query($sql);
+                        $success = $this->db->query($sql);
 
                         // ==== Checking if something found ==== //
-                        if($success == false || $this->_db->num_rows() != 1)
+                        if($success == false || $this->db->num_rows() != 1)
                         {
                             // ==== Adding log data ==== //
-                            if($this->_options['debug'])
+                            if($this->options['debug'])
                             {
-                                $this->_log .= '<hr><hr><strong>authenticate</strong><hr><br />';
-                                $this->_log .= '<strong>Info:</strong><br />';
-                                $this->_log .= 'Authentication falied.<br /><br />';
-                                $this->_log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
-                                $this->_log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
-                                $this->_log .= '<br /><br />';
+                                $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                                $this->log .= '<strong>Info:</strong><br />';
+                                $this->log .= 'Authentication falied.<br /><br />';
+                                $this->log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
+                                $this->log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
+                                $this->log .= '<br /><br />';
                             }
 
                             // ==== Removing the cookie ==== //
@@ -512,13 +512,13 @@ class UserAuth
                         else
                         {
                             // ==== Getting the row info ==== //
-                            $row = $this->_db->fetch_assoc();
+                            $row = $this->db->fetch_assoc();
 
                             // ==== Adding log data ==== //
-                            if($this->_options['debug'])
+                            if($this->options['debug'])
                             {
-                                $this->_log .= '<hr><hr><strong>authenticate</strong><hr><br />';
-                                $this->_log .= '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
+                                $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                                $this->log .= '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
                             }
                         }
                     }
@@ -535,10 +535,10 @@ class UserAuth
             else
             {
                 // ==== Adding log data ==== //
-                if($this->_options['debug'])
+                if($this->options['debug'])
                 {
-                    $this->_log .= '<hr><hr><strong>authenticate</strong><hr><br />';
-                    $this->_log .= '<strong>Info:</strong> Skipped db check.<br /><br />';
+                    $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                    $this->log .= '<strong>Info:</strong> Skipped db check.<br /><br />';
                 }
             }
             ////////////////////////////////////////////////
@@ -554,21 +554,21 @@ class UserAuth
                 $_SESSION['auth'] = true;
 
                 // ==== Setting the account ID ==== //
-                if($check_db === false) // Using data provided by the UserAcc class
+                if($checkdb === false) // Using data provided by the UserAcc class
                 {
                     // ==== Getting the userinfo ==== //
-                    $this->_userinfo = array('account_id' => $data['account_id']);
+                    $this->userinfo = array('account_id' => $data['account_id']);
 
                     // ==== Adding the userinfo to the session ==== //
-                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($this->_userinfo));
+                    $_SESSION['userinfo'] = $this->vault->encrypt(serialize($this->userinfo));
                 }
                 else // Using data from the database
                 {
                     // ==== Getting the userinfo ==== //
-                    $this->_userinfo = array('account_id' => $row['account_id']);
+                    $this->userinfo = array('account_id' => $row['account_id']);
 
                     // ==== Adding the userinfo to the session ==== //
-                    $_SESSION['userinfo'] = $this->_vault->encrypt(serialize($this->_userinfo));
+                    $_SESSION['userinfo'] = $this->vault->encrypt(serialize($this->userinfo));
                 }
             }
             else
@@ -579,21 +579,21 @@ class UserAuth
         else
         {
             // ==== Adding log data ==== //
-            if($this->_options['debug'])
+            if($this->options['debug'])
             {
-                $this->_log .= '<hr><hr><strong>authenticate</strong><hr><br />';
-                $this->_log .= '<strong>Info:</strong><br />';
-                $this->_log .= 'Skipped authentication<br /><br />';
-                $this->_log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
-                $this->_log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
-                $this->_log .= '<br /><br />';
+                $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                $this->log .= '<strong>Info:</strong><br />';
+                $this->log .= 'Skipped authentication<br /><br />';
+                $this->log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
+                $this->log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
+                $this->log .= '<br /><br />';
             }
         }
 
         // ==== Checking if authenticated ==== //
         if($_SESSION['auth'] == true)
         {
-            $this->_authenticated = true;
+            $this->authenticated = true;
         }
         else
         {
@@ -629,7 +629,7 @@ class UserAuth
     public function logout()
     {
         // ==== Deleting the cookie ==== //
-        setcookie($this->_options['cookie_name'], '', -10);
+        setcookie($this->options['cookie_name'], '', -10);
 
         // ==== Preparing the data ==== //
         $data = $this->prepareAuth();
@@ -641,7 +641,7 @@ class UserAuth
             $sql = $this->sqlLogout($data);
 
             // ==== Executing the SQL ==== //
-            $this->_db->query($sql);
+            $this->db->query($sql);
         }
 
         // ==== Destroying the session ===== //
@@ -680,18 +680,18 @@ class UserAuth
     public function __destruct()
     {
         // ==== Debug ==== //
-        if($this->_options['debug'] && $this->_log != '')
+        if($this->options['debug'] && $this->log != '')
         {
             // ==== Adding some more data to the log ==== //
-            $this->_log .= '<hr><hr><strong>Other info</strong><hr>';
-            $this->_log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
-            $this->_log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
-            $this->_log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
-            $this->_log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
-            $this->_log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
+            $this->log .= '<hr><hr><strong>Other info</strong><hr>';
+            $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
+            $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
+            $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
+            $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
+            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
 
             // ==== Sending debug mail ==== //
-            mail($this->_mopt['to'], $this->_mopt['subject'], $this->_log, $this->_mopt['headers']);
+            mail($this->mopt['to'], $this->mopt['subject'], $this->log, $this->mopt['headers']);
         }
     }
 }

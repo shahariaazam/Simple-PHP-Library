@@ -19,35 +19,35 @@ class Language
      *
      * @var array
      */
-    private $_options;
+    private $options;
 
     /**
      * Unique identifier
      *
      * @var string
      */
-    private $_uq;
+    private $uq;
 
     /**
      * Language file location
      *
      * @var string
      */
-    private $_file;
+    private $file;
 
     /**
      * Array with all the texts
      *
      * @var array
      */
-    private $_texts;
+    private $texts;
 
     /**
      * Variable that holds the options for the debug mail
      *
      * @var array
      */
-    private $_mopt;
+    private $mopt;
 
     /**
      * Class constructor
@@ -64,25 +64,25 @@ class Language
         }
 
         // ==== Default options ==== //
-        $this->_options['default_language']  = 'en';
-        $this->_options['lang_dir']          = 'lang/';
-        $this->_options['lang_sufix']        = '.lang.php';
-        $this->_options['debug']             = false;
-        $this->_options['mail_id']           = '[GENERIC]';
-        $this->_options['mail']              = 'webmaster@'.$_SERVER['HTTP_HOST'];
+        $this->options['default_language']  = 'en';
+        $this->options['lang_dir']          = 'lang/';
+        $this->options['lang_sufix']        = '.lang.php';
+        $this->options['debug']             = false;
+        $this->options['mail_id']           = '[GENERIC]';
+        $this->options['mail']              = 'webmaster@'.$_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options))
         {
-            $this->_options = array_merge($this->_options, $options);
+            $this->options = array_merge($this->options, $options);
         }
 
         // ==== Setting up mail options ==== //
-        $this->_mopt['to']         = $this->_options['mail'];
-        $this->_mopt['subject']    = '[DEBUG]'.$this->_options['mail_id'].' ' . __CLASS__ . ' Class';
-        $this->_mopt['msg']        = '';
-        $this->_mopt['headers']    = 'MIME-Version: 1.0' . "\r\n";
-        $this->_mopt['headers']   .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        $this->mopt['to']         = $this->options['mail'];
+        $this->mopt['subject']    = '[DEBUG]'.$this->options['mail_id'].' ' . __CLASS__ . ' Class';
+        $this->mopt['msg']        = '';
+        $this->mopt['headers']    = 'MIME-Version: 1.0' . "\r\n";
+        $this->mopt['headers']   .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
         // ==== Loading the language ==== //
         $this->loadLanguage();
@@ -104,13 +104,13 @@ class Language
         {
             $lang = $_GET['lang'];
         }
-        elseif(isset($_SESSION['lang_'.$this->_uq]))
+        elseif(isset($_SESSION['lang_'.$this->uq]))
         {
-            $lang = $_SESSION['lang_'.$this->_uq];
+            $lang = $_SESSION['lang_'.$this->uq];
         }
         else
         {
-            $lang = $this->_options['default_language'];
+            $lang = $this->options['default_language'];
         }
 
         // ==== Returning the language ==== //
@@ -129,34 +129,34 @@ class Language
         $salt = (defined('__SITE_ROOT__')?__SITE_ROOT__:dirname(__FILE__));
 
         // ==== Hashing unique ID ==== //
-        $this->_uq = sha1($salt);
+        $this->uq = sha1($salt);
 
         // ==== Getting the language ==== //
         $lang = $this->getLanguage();
 
         // ==== Building language file path for the requested language ==== //
-        $lang_file = $this->_options['lang_dir'].$lang.$this->_options['lang_sufix'];
+        $langfile = $this->options['lang_dir'].$lang.$this->options['lang_sufix'];
 
         // ==== Checking if the file exists == falling back to default if not ==== //
-        if(!is_file($lang_file))
+        if(!isfile($langfile))
         {
-            $lang = $this->_options['default_language'];
+            $lang = $this->options['default_language'];
 
             // ==== Building language file path for the default language ==== //
-            $lang_file = $this->_options['lang_dir'].$lang.$this->_options['lang_sufix'];
+            $langfile = $this->options['lang_dir'].$lang.$this->options['lang_sufix'];
 
             // ==== Adding debug data ==== //
-            if($this->_options['debug'])
+            if($this->options['debug'])
             {
-                $this->_mopt['msg'] .= '<b>Notice:</b> File <i><u>'.$this->_file.'</u></i> not found. Falling back to default language.<br /><br />';
+                $this->mopt['msg'] .= '<b>Notice:</b> File <i><u>'.$this->file.'</u></i> not found. Falling back to default language.<br /><br />';
             }
         }
 
         // ==== Intializing or overwriting the session variable ===== //
-        $_SESSION['lang_'.$this->_uq] = $lang;
+        $_SESSION['lang_'.$this->uq] = $lang;
 
         // ==== Assign language file path ==== //
-        $this->_file = $lang_file;
+        $this->file = $langfile;
     }
 
     /**
@@ -174,15 +174,15 @@ class Language
         $isOk = true;
 
         // ==== Checking if the texts have already been loaded ==== //
-        if(!is_array($this->_texts))
+        if(!is_array($this->texts))
         {
             // ==== Second file check == First was in constructor ==== //
-            if(!is_file($this->_file))
+            if(!isfile($this->file))
             {
                 // ==== Adding debug data ==== //
-                if($this->_options['debug'])
+                if($this->options['debug'])
                 {
-                    $log .= '<b>ERROR:</b> File <i><u>'.$this->_file.'</u></i> not found.<br /><br />';
+                    $log .= '<b>ERROR:</b> File <i><u>'.$this->file.'</u></i> not found.<br /><br />';
                 }
 
                 $isOk = false;
@@ -190,30 +190,30 @@ class Language
             else
             {
                 // ==== Getting required file ==== //
-                require_once $this->_file;
+                require_once $this->file;
 
                 // ==== Getting texts ==== //
                 if(!is_array($text))
                 {
                     // ==== Adding debug data ==== //
-                    if($this->_options['debug'])
+                    if($this->options['debug'])
                     {
-                        $log .= '<b>ERROR:</b> File <i><u>'.$this->_file.'</u></i> not found.<br /><br />';
+                        $log .= '<b>ERROR:</b> File <i><u>'.$this->file.'</u></i> not found.<br /><br />';
                     }
 
                     $isOk = false;
                 }
                 else
                 {
-                    $this->_texts = $text;
+                    $this->texts = $text;
                 }
             }
         }     
 
         // ==== Adding debug data ==== //
-        if($this->_options['debug'] && $isOk === false)
+        if($this->options['debug'] && $isOk === false)
         {
-            $this->_mopt['msg'] .= $log;
+            $this->mopt['msg'] .= $log;
         }
 
         // ==== Returning result ==== //
@@ -230,10 +230,10 @@ class Language
     public function _($txt, array $data=array())
     {
         // ==== Checking if the text exists ==== //
-        if(isset($this->_texts[$txt]))
+        if(isset($this->texts[$txt]))
         {
             // ==== Getting the text into a variable ==== //
-            $text = $this->_texts[$txt];
+            $text = $this->texts[$txt];
 
             // ==== Checking if we have any data to used for the parsing ==== //
             if(count($data) > 0)
@@ -250,7 +250,7 @@ class Language
         else
         {
             // ==== Adding debug data ==== //
-            if($this->_options['debug'])
+            if($this->options['debug'])
             {
                 $log .= '<b>Notice:</b> Text <i><u>'.$txt.'</u></i> does not exist.<br /><br />';
 
@@ -261,7 +261,7 @@ class Language
                 $line = $backtrace[0]['line'];
                 $file = $backtrace[0]['file'];
 
-                $this->_mopt['msg'] .= '<br /><b>Info:</b><br />Line: '.$line.'<br />File: '.$file.'<br /><br />'.$log;
+                $this->mopt['msg'] .= '<br /><b>Info:</b><br />Line: '.$line.'<br />File: '.$file.'<br /><br />'.$log;
             }
 
             return false;
@@ -277,10 +277,10 @@ class Language
     public function __destruct()
     {
         // ==== Sending debug if on ==== //
-        if($this->_options['debug'] && $this->_mopt['msg'] != '')
+        if($this->options['debug'] && $this->mopt['msg'] != '')
         {
             // ==== Sending debug mail ==== //
-            mail($this->_mopt['to'], $this->_mopt['subject'], $this->_mopt['msg'], $this->_mopt['headers']);
+            mail($this->mopt['to'], $this->mopt['subject'], $this->mopt['msg'], $this->mopt['headers']);
         }
     }
 }

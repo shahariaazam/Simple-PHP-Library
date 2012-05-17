@@ -69,49 +69,49 @@ class UserAcc
      *
      * @var array
      */
-    protected $_options;
+    protected $options;
 
     /**
      * Errors array
      *
      * @var array
      */
-    protected $_errors = array();
+    protected $errors = array();
 
     /**
      * Log holder
      *
      * @var string
      */
-    protected $_log;
+    protected $log;
 
     /**
      * Mail options
      *
      * @var array
      */
-    protected $_mopt;
+    protected $mopt;
 
     /**
      * User authentication object
      *
      * @var object
      */
-    protected $_auth;
+    protected $auth;
 
     /**
      * Database object
      *
      * @var object
      */
-    protected $_db;
+    protected $db;
 
     /**
      * Vault object
      *
      * @var object
      */
-    protected $_vault;
+    protected $vault;
 
 
     /**
@@ -125,33 +125,33 @@ class UserAcc
     public function __construct(db_module $db, UserAuth $auth, Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
-        $this->_options['unique_mail']     = '';
-        $this->_options['debug']           = false;
-        $this->_options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
+        $this->options['unique_mail']     = '';
+        $this->options['debug']           = false;
+        $this->options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options))
         {
-            $this->_options = array_merge($this->_options, $options);
+            $this->options = array_merge($this->options, $options);
         }
 
         // ==== Setting up mail options ==== //
-        $this->_mopt['to']        = $this->_options['mail'];
-        $this->_mopt['subject']   = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->_options['unique_mail'];
-        $this->_mopt['headers']   = 'MIME-Version: 1.0' . "\r\n";
-        $this->_mopt['headers']  .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        $this->mopt['to']        = $this->options['mail'];
+        $this->mopt['subject']   = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
+        $this->mopt['headers']   = 'MIME-Version: 1.0' . "\r\n";
+        $this->mopt['headers']  .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
         // ==== Initializing default values ==== //
-        $this->_log = '';
+        $this->log = '';
 
         // ==== Initializing the authentication object ==== //
-        $this->_auth = $auth;
+        $this->auth = $auth;
 
         // ==== Initializing the database object ==== //
-        $this->_db = $db;
+        $this->db = $db;
 
         // ==== Initializing the vault object ==== //
-        $this->_vault = $vault;
+        $this->vault = $vault;
     }
 
     /**
@@ -162,7 +162,7 @@ class UserAcc
      */
     public function getErrors()
     {
-        return $this->_errors;
+        return $this->errors;
     }
 
     /**
@@ -174,7 +174,7 @@ class UserAcc
      */
     protected function buildPasswd($salt, $passwd)
     {
-        $passwd = hash('sha512', $salt.$this->_vault->encrypt($passwd));
+        $passwd = hash('sha512', $salt.$this->vault->encrypt($passwd));
 
         return $passwd;
     }
@@ -189,9 +189,9 @@ class UserAcc
     public function __get($field)
     {
         // ==== Checking if the field exists ==== //
-        if(!empty($this->_userinfo[$field]))
+        if(!empty($this->userinfo[$field]))
         {
-            return $this->_userinfo[$field];
+            return $this->userinfo[$field];
         }
         else
         {
@@ -216,7 +216,7 @@ class UserAcc
         // == username == //
         if(!empty($data['username']))
         {
-            $data['username'] = $this->_db->escape_string($data['username']);
+            $data['username'] = $this->db->escape_string($data['username']);
         }
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
@@ -229,7 +229,7 @@ class UserAcc
         if(!isset($data['username']))
         {
             // ===== Errors ==== //
-            $this->_errors[] = 150;
+            $this->errors[] = 150;
             $result = false;
         }
         //////////////////////////////////////////////////
@@ -262,13 +262,13 @@ class UserAcc
      * @param array $data
      * @return string or false on failure
      */
-    protected function getSalt(array $data, $from_db = true)
+    protected function getSalt(array $data, $fromdb = true)
     {
         // ==== Result var ==== //
         $result = false;
 
         // ==== Checking if we should get the salt from the database ==== //
-        if($from_db === true)
+        if($fromdb === true)
         {
             // ==== Checking if the username is set ==== //
             if($this->allowSalt($data))
@@ -277,13 +277,13 @@ class UserAcc
                 $sql = $this->sqlSalt($data);
 
                 // ==== executing the SQL ==== //
-                $this->_db->query($sql);
+                $this->db->query($sql);
 
                 // ==== checking if data was found ==== //
-                if($this->_db->num_rows() == 1)
+                if($this->db->num_rows() == 1)
                 {
                     // ==== Retrieving the regdate info === //
-                    $regdate = $this->_db->result(0, 0);
+                    $regdate = $this->db->result(0, 0);
 
                     // ==== The salt ==== //
                     $result = $regdate;
@@ -294,7 +294,7 @@ class UserAcc
                     $result = false;
 
                     // ==== Errors ==== //
-                    $this->_errors[] = 101;
+                    $this->errors[] = 101;
                 }
             }
         }
@@ -325,13 +325,13 @@ class UserAcc
         // == Username == //
         if(!empty($data['username']))
         {
-            $data['username'] = $this->_db->escape_string($data['username']);
+            $data['username'] = $this->db->escape_string($data['username']);
         }
 
         // == Password == //
         if(!empty($data['passwd']))
         {
-            $data['passwd'] = $this->_db->escape_string($data['passwd']);
+            $data['passwd'] = $this->db->escape_string($data['passwd']);
         }
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
@@ -343,14 +343,14 @@ class UserAcc
         // == username == //
         if(empty($data['username']))
         {
-            $this->_errors[] = 1;
+            $this->errors[] = 1;
             $result = false;
         }
 
         // == password == //
         if(empty($data['passwd']))
         {
-            $this->_errors[] = 5;
+            $this->errors[] = 5;
             $result = false;
         }
         //////////////////////////////////////////////////
@@ -441,16 +441,16 @@ class UserAcc
                 $sql = $this->sqlLogin($data);
 
                 // ==== Executing the SQL ==== //
-                $this->_db->query($sql);
+                $this->db->query($sql);
 
                 // ==== Checking if an error occured ==== //
-                if($this->_db->error() == '')
+                if($this->db->error() == '')
                 {
                     // ==== Checking if info was found ==== //
-                    if($this->_db->num_rows() == 1)
+                    if($this->db->num_rows() == 1)
                     {
                         // ==== Getting the query row results ==== //
-                        $row = $this->_db->fetch_assoc();
+                        $row = $this->db->fetch_assoc();
 
                         // ==== Checking if the account is active ==== //
                         if($row['active'] == 1)
@@ -459,7 +459,7 @@ class UserAcc
                             $data['account_id'] = $row['account_id'];
 
                             // ==== Checking if persistent login was requested ==== //
-                            if(isset($data['remember_login']) && $data['remember_login'] == true)
+                            if(isset($data['rememberlogin']) && $data['rememberlogin'] == true)
                             {
                                 $persistent = true;
                             }
@@ -469,7 +469,7 @@ class UserAcc
                             }
 
                             // ==== Letting the authentication class handle the rest of the login ==== //
-                            $auth_result = $this->_auth->login($data, $persistent);
+                            $auth_result = $this->auth->login($data, $persistent);
 
                             // ==== Checking the auth result ==== //
                             if($auth_result == false)
@@ -477,7 +477,7 @@ class UserAcc
                                 $result = false;
 
                                 // ==== Merging the errors ==== //
-                                $this->_errors = array_merge($this->_errors, $this->_auth->getErrors());
+                                $this->errors = array_merge($this->errors, $this->auth->getErrors());
                             }
                             else
                             {
@@ -491,7 +491,7 @@ class UserAcc
                             $result = false;
 
                             // ==== Error ==== //
-                            $this->_errors[] = 15;
+                            $this->errors[] = 15;
                         }
                     }
                     else
@@ -500,7 +500,7 @@ class UserAcc
                         $result = false;
 
                         // ==== Error ==== //
-                        $this->_errors[] = 100;
+                        $this->errors[] = 100;
                     }
                 }
                 else
@@ -509,7 +509,7 @@ class UserAcc
                     $result = false;
 
                     // ==== Error ==== //
-                    $this->_errors[] = 103;
+                    $this->errors[] = 103;
                 }
             }
             else
@@ -535,7 +535,7 @@ class UserAcc
     public function doLogout()
     {
         // ==== Logging out ==== //
-        $this->_auth->logout();
+        $this->auth->logout();
     }
 
     /**
@@ -587,19 +587,19 @@ class UserAcc
         // == username == //
         if(!empty($data['username']))
         {
-            $data['username'] = $this->_db->escape_string($data['username']);
+            $data['username'] = $this->db->escape_string($data['username']);
         }
 
         // == password == //
         if(!empty($data['passwd']))
         {
-            $data['passwd'] = $this->_db->escape_string($data['passwd']);
+            $data['passwd'] = $this->db->escape_string($data['passwd']);
         }
 
         // == email == //
         if(!empty($data['email']))
         {
-            $data['email'] = $this->_db->escape_string($data['email']);
+            $data['email'] = $this->db->escape_string($data['email']);
         }
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
@@ -611,7 +611,7 @@ class UserAcc
         // == username == //
         if(empty($data['username']))
         {
-            $this->_errors[] = 20;
+            $this->errors[] = 20;
             $result = false;
         }
         else
@@ -619,7 +619,7 @@ class UserAcc
             // ==== Checking if the username exists in the database ==== //
             if($this->doesUsenameExist($data['username']))
             {
-                $this->_errors[] = 21;
+                $this->errors[] = 21;
                 $result = false;
             }
         }
@@ -627,7 +627,7 @@ class UserAcc
         // == password == //
         if(empty($data['passwd']))
         {
-            $this->_errors[] = 25;
+            $this->errors[] = 25;
             $result = false;
         }
         else
@@ -639,7 +639,7 @@ class UserAcc
             $complexityOk = ckPasswdComplexity($data['passwd']);
             if($complexityOk == false)
             {
-                $this->_errors[] = 26;
+                $this->errors[] = 26;
                 $result = false;
             }
 
@@ -648,7 +648,7 @@ class UserAcc
         // == email == //
         if(empty($data['email']))
         {
-            $this->_errors[] = 27;
+            $this->errors[] = 27;
             $result = false;
         }
         else
@@ -657,7 +657,7 @@ class UserAcc
             $valid = validateMail($data['email'], true);
             if($valid == false)
             {
-                $this->_errors[] = 28;
+                $this->errors[] = 28;
                 $result = false;
             }
             else
@@ -665,7 +665,7 @@ class UserAcc
                 // ==== Checking if email exists ==== //
                 if($this->doesEmailExist($data['email']))
                 {
-                    $this->_errors[] = 29;
+                    $this->errors[] = 29;
                     $result = false;
                 }
             }
@@ -758,13 +758,13 @@ class UserAcc
                 $sql = $this->sqlRegister($data);
 
                 // ==== Executing the SQL ==== //
-                $this->_db->query($sql);
+                $this->db->query($sql);
 
                 // ==== Checking if an error occured ==== //
-                if($this->_db->error() != '')
+                if($this->db->error() != '')
                 {
                     // ==== Error ==== //
-                    $this->_errors[] = 102;
+                    $this->errors[] = 102;
                 }
             }
             else
@@ -800,7 +800,7 @@ class UserAcc
         // == Email == //
         if(!empty($data['email']))
         {
-            $data['email'] = $this->_db->escape_string($data['email']);
+            $data['email'] = $this->db->escape_string($data['email']);
         }
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
@@ -813,7 +813,7 @@ class UserAcc
         if(empty($data['email']))
         {
             // ==== Errors ==== //
-            $this->_errors[] = 160;
+            $this->errors[] = 160;
             $result = false;
         }
         //////////////////////////////////////////////////
@@ -859,17 +859,17 @@ class UserAcc
     public function __destruct()
     {
         // ==== Debug ==== //
-        if($this->_options['debug'] && $this->_log != '')
+        if($this->options['debug'] && $this->log != '')
         {
             // ==== Adding some more data to the log ==== //
-            $this->_log .= 'Other info<hr>';
-            $this->_log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
-            $this->_log .= '<strong>ERRORS:</strong><pre>'.print_r($this->_errors, true).'<br /><br />';
-            $this->_log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
-            $this->_log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
+            $this->log .= 'Other info<hr>';
+            $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
+            $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
+            $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
+            $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
 
             // ==== Sending debug mail ==== //
-            mail($this->_mopt['to'], $this->_mopt['subject'], $this->_log, $this->_mopt['headers']);
+            mail($this->mopt['to'], $this->mopt['subject'], $this->log, $this->mopt['headers']);
         }
     }
 }

@@ -22,21 +22,21 @@ class Paging
      *
      * @var array
      */
-    private $_options;
+    private $options;
 
     /**
      * URL Object
      *
      * @var object
      */
-    private $_url;
+    private $url;
 
     /**
      * Rows the query had
      *
      * @var integer
      */
-    private $_rows=0;
+    private $rows=0;
 
     /**
      * Class constructor
@@ -48,17 +48,17 @@ class Paging
     public function __construct(URL $url, $options=array())
     {
         // ==== Default options ==== //
-        $this->_options['ipp'] = 10;
-        $this->_options['pages'] = 5;
+        $this->options['ipp'] = 10;
+        $this->options['pages'] = 5;
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options))
         {
-            $this->_options = array_replace($this->_options, $options);
+            $this->options = array_replace($this->options, $options);
         }
 
         // ==== Getting the url object ==== //
-        $this->_url = $url;
+        $this->url = $url;
     }
 
     /**
@@ -78,7 +78,7 @@ class Paging
             $page = 1;
         }
 
-        $ipp = $this->_options['ipp'];
+        $ipp = $this->options['ipp'];
         $offset = ($page-1)*$ipp;
 
         return $offset;
@@ -105,13 +105,13 @@ class Paging
             // ==== Is this a complex search ==== //
             if(!$complex)
             {
-                $this->_rows = $db->num_rows();
+                $this->rows = $db->numrows();
 
                 // ==== Getting offset ==== //
                 $offset = $this->getOffset();
 
                 // ==== Bulding query with LIMIT statement ==== //
-                $query .= " LIMIT ".$offset.", ".$this->_options['ipp']."";
+                $query .= " LIMIT ".$offset.", ".$this->options['ipp']."";
 
                 // ==== Executing query ==== //
                 $db->query($query);
@@ -125,19 +125,19 @@ class Paging
                 $data = array();
 
                 // ==== Getting data ==== //
-                if($db->num_rows() != 0)
+                if($db->numrows() != 0)
                 {
                     // == Adding data from query to the data array == //
                     while($data[] = $db->fetch_assoc());
 
                     // == Getting number of rows == //
-                    $this->_rows = $db->num_rows();
+                    $this->rows = $db->numrows();
 
                     // ==== Getting offset ==== //
                     $offset = $this->getOffset();
 
                     // ==== Slicing the $data array ==== //
-                    $data = array_slice($data, $offset, $this->_options['ipp']);
+                    $data = array_slice($data, $offset, $this->options['ipp']);
 
                     // == Returning result == //
                     return $data;
@@ -163,13 +163,13 @@ class Paging
         if(is_array($array))
         {
             // == Getting number of rows == //
-            $this->_rows = count($array);
+            $this->rows = count($array);
 
             // ==== Getting offset ==== //
             $offset = $this->getOffset();
 
             // ==== Slicing the $data array ==== //
-            $array = array_slice($array, $offset, $this->_options['ipp']);
+            $array = array_slice($array, $offset, $this->options['ipp']);
         }
         else
         {
@@ -191,11 +191,11 @@ class Paging
         // ==== Getting the URL ==== //
         if($pagenr == 1)
         {
-            $url = $this->_url->get('', array('page'));
+            $url = $this->url->get('', array('page'));
         }
         else
         {
-            $url = $this->_url->get('index', array('page' => $pagenr), true);
+            $url = $this->url->get('index', array('page' => $pagenr), true);
         }
 
         return $url;
@@ -224,9 +224,9 @@ class Paging
 
         $minpagenum = 1;                          // Default minimum page number
         $maxpagenum = 0;                          // Default maximum page number
-        $numrows    = &$this->_rows;              // Number of rows got from query
-        $ipp        = &$this->_options['ipp'];    // Items per page
-        $pages      = &$this->_options['pages'];  // Pages displayed
+        $numrows    = &$this->rows;              // Number of rows got from query
+        $ipp        = &$this->options['ipp'];    // Items per page
+        $pages      = &$this->options['pages'];  // Pages displayed
 
         //If rows per page not 0
         if($numrows != 0)

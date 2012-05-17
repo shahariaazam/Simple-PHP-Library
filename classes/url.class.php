@@ -22,14 +22,14 @@ class URL
      *
      * @var array
      */
-    protected $_options;
+    protected $options;
 
     /**
      * Current url
      *
      * @var string
      */
-    protected $_url;
+    protected $url;
 
     /**
      * Site root
@@ -43,35 +43,35 @@ class URL
      *
      * @var string
      */
-    protected $_site_root_tmp = false;
+    protected $site_root_tmp = false;
 
     /**
      * What page is the user in
      *
      * @var string
      */
-    protected $_page;
+    protected $page;
 
     /**
      * Hold the pattern for the rewrite
      *
      * @var string
      */
-    protected $_pattern;
+    protected $pattern;
 
     /**
      * Array of params that the object will automatically load
      *
      * @var array
      */
-    protected $_params = array();
+    protected $params = array();
 
     /**
      * Rewrite active or not
      *
      * @var boolen
      */
-    protected $_rewrite;
+    protected $rewrite;
 
     /**
      * Class constructor. It also validates the URL
@@ -82,13 +82,13 @@ class URL
     public function __construct($options=array())
     {
         // ==== Default options ==== //
-        $this->_options['site_root']      = '';
-        $this->_options['site_root_ssl']  = '';
-        $this->_options['page_token']     = 'goto';
-        $this->_options['index_page']     = 'index';
-        $this->_options['get_params']     = array();
-        $this->_options['rewrite']        = false;
-        $this->_options['secure']         = false;
+        $this->options['site_root']      = '';
+        $this->options['site_root_ssl']  = '';
+        $this->options['page_token']     = 'goto';
+        $this->options['index_page']     = 'index';
+        $this->options['get_params']     = array();
+        $this->options['rewrite']        = false;
+        $this->options['secure']         = false;
 
         // ==== Checking if the site_root option has been set ==== //
         if(!empty($options['site_root']))
@@ -96,32 +96,32 @@ class URL
             // ==== Replacing options with custom ones ==== //
             if(is_array($options))
             {
-                $this->_options = array_replace($this->_options, $options);
+                $this->options = array_replace($this->options, $options);
             }
 
             // ==== Setting rewrite property ==== //
-            $this->_rewrite = $this->_options['rewrite'];
+            $this->rewrite = $this->options['rewrite'];
 
             // ==== Getting URL ==== //
-            $this->_url = getFullURL();
+            $this->url = getFullURL();
 
             // ==== Correcting the site root ==== //
-            if(strlen($this->_options['site_root']) > (strrpos($this->_options['site_root'], '/')+1))
+            if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/')+1))
             {
-                $this->_options['site_root'] .= '/';
+                $this->options['site_root'] .= '/';
             }
 
             // ==== Correcting the URL ==== //
-            if($this->_rewrite && strlen($this->_url) > (strrpos($this->_url, '/')+1) && strpos($this->_url, '?'.$this->_options['page_token'].'=') === false)
+            if($this->rewrite && strlen($this->url) > (strrpos($this->url, '/')+1) && strpos($this->url, '?'.$this->options['page_token'].'=') === false)
             {
-                $this->_url .= '/';
+                $this->url .= '/';
             }
 
             // ==== Getting the site URL ==== //
-            $this->_site_root = $this->_options['site_root'];
+            $this->_site_root = $this->options['site_root'];
 
             // ==== Changing to SSL if that's the case ==== //
-            if($this->_options['secure'] == true)
+            if($this->options['secure'] == true)
             {
                 $this->enableSSL();
             }
@@ -133,7 +133,7 @@ class URL
             $this->initParams();
 
             // ==== Determining if the URL is valid ==== //
-            $is_valid = filter_var($this->_url, FILTER_VALIDATE_URL);
+            $is_valid = filter_var($this->url, FILTER_VALIDATE_URL);
 
             // == If invalid == //
             if($is_valid === false)
@@ -158,10 +158,10 @@ class URL
     protected function initParams()
     {
         // ==== Checking if the get params option has some info in it ==== //
-        if(count($this->_options['get_params']) > 0)
+        if(count($this->options['get_params']) > 0)
         {
             // ==== Going through the $_GET params ==== //
-            foreach($this->_options['get_params'] as $name)
+            foreach($this->options['get_params'] as $name)
             {
                 // ==== Checking if the parameter exists ==== //
                 if(isset($_GET[$name]))
@@ -172,7 +172,7 @@ class URL
                     // ==== Adding parameter to the class parameters ==== //
                     if(!empty($value))
                     {
-                        $this->_params[$name] = $value;
+                        $this->params[$name] = $value;
                     }
                 }
             }
@@ -188,13 +188,13 @@ class URL
     protected function getURLData()
     {
         // ==== Setting some default values ==== //
-        if(!isset($_GET[$this->_options['page_token']]))
+        if(!isset($_GET[$this->options['page_token']]))
         {
-            $_GET[$this->_options['page_token']] = $this->_options['index_page'];
+            $_GET[$this->options['page_token']] = $this->options['index_page'];
         }
 
         // ==== Processing the URL only if it's not the site root ==== //
-        if($this->_site_root != $this->_url)
+        if($this->_site_root != $this->url)
         {
             // ==== Creating a local site root copy to be able to handle the decoding of the URL ==== //
             $site_root = $this->_site_root;
@@ -220,7 +220,7 @@ class URL
                 $site_root = $protocol.$site_root;
 
                 // ==== Adjusting the site root ==== //
-                $this->_options['site_root'] = $site_root;
+                $this->options['site_root'] = $site_root;
             }
 
             // ==== Check variable to see if site root was found ==== //
@@ -231,7 +231,7 @@ class URL
             //    PROCESSING THE URL - REWRITE ENABLED/FOUND
             ///////////////////////////////////////////////////////////////
             // ==== Removing the site root from the URL ==== //
-            $data = str_replace($site_root, '', $this->_url, $found_site_root);
+            $data = str_replace($site_root, '', $this->url, $found_site_root);
 
             // ==== Checking if something was replaced ==== //
             if($found_site_root != 0)
@@ -249,10 +249,10 @@ class URL
                     $get = array();
 
                     // ==== Getting the page ==== //
-                    $this->_page = $data[0];
+                    $this->page = $data[0];
 
                     // ==== Putting the current page in $_GET ==== //
-                    $_GET[$this->_options['page_token']] = $this->_page;
+                    $_GET[$this->options['page_token']] = $this->page;
 
                     // ==== Removing the page from the data array ==== //
                     unset($data[0]);
@@ -280,9 +280,9 @@ class URL
                     //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
                     ///////////////////////////////////////////////////////////////
                     // ==== Getting the current page ==== //
-                    if(isset($_GET[$this->_options['page_token']]))
+                    if(isset($_GET[$this->options['page_token']]))
                     {
-                        $this->_page = $_GET[$this->_options['page_token']];
+                        $this->page = $_GET[$this->options['page_token']];
                     }
                 }
             }
@@ -326,9 +326,9 @@ class URL
     public function enableSSL()
     {
         // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->_options['site_root_ssl']))
+        if(!empty($this->options['site_root_ssl']))
         {
-            $this->_site_root = $this->_options['site_root_ssl'];
+            $this->_site_root = $this->options['site_root_ssl'];
         }
         else
         {
@@ -346,9 +346,9 @@ class URL
     public function disableSSL()
     {
         // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->_options['site_root']))
+        if(!empty($this->options['site_root']))
         {
-            $this->_site_root = $this->_options['site_root'];
+            $this->_site_root = $this->options['site_root'];
         }
         else
         {
@@ -369,16 +369,16 @@ class URL
     public function get_ssl($page='', array $params=array(), $merge_get=false)
     {
         // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->_options['site_root_ssl']))
+        if(!empty($this->options['site_root_ssl']))
         {
             // ==== Setting the temporary site root ==== //
-            $this->_site_root_tmp = $this->_options['site_root_ssl'];
+            $this->site_root_tmp = $this->options['site_root_ssl'];
 
             // ==== Getting the URL ==== //
             $url = $this->get($page, $params, $merge_get);
 
             // ==== Resetting the temporary site root ==== //
-            $this->_site_root_tmp = false;
+            $this->site_root_tmp = false;
         }
         else
         {
@@ -404,9 +404,9 @@ class URL
     public function get($page='', array $params=array(), $merge_get=false)
     {
         // ==== Default URL (actually it's the site root) ==== //
-        if($this->_site_root_tmp !== false)
+        if($this->site_root_tmp !== false)
         {
-            $url = $this->_site_root_tmp;
+            $url = $this->site_root_tmp;
         }
         else
         {
@@ -417,7 +417,7 @@ class URL
         if(empty($page)) // Base link to the same page without the given params
         {
             // ==== Defaulting to the current page ==== //
-            $page = $this->_page;
+            $page = $this->page;
 
             // ==== Parameters should be present in order to remove them from the URL ==== //
             if(count($params) > 0)
@@ -436,7 +436,7 @@ class URL
                 $params = $_GET;
             }
         }
-        elseif($page == $this->_page && $merge_get === true) // Link to the same page but with different params (this includes the $_GET params)
+        elseif($page == $this->page && $merge_get === true) // Link to the same page but with different params (this includes the $_GET params)
         {
             // ==== If the page is exactly the same as the one the user is on then take all the $_GET parameters ==== //
             $params = self::array_append($_GET, $params);
@@ -450,17 +450,17 @@ class URL
             }
 
             // ==== Adding default params ==== //
-            $params = self::array_append($params, $this->_params);
+            $params = self::array_append($params, $this->params);
         }
 
         // ==== Removing the page token from the params ==== //
-        if(isset($params[$this->_options['page_token']]))
+        if(isset($params[$this->options['page_token']]))
         {
-            unset($params[$this->_options['page_token']]);
+            unset($params[$this->options['page_token']]);
         }
 
         // ==== Processing the data to generate the URL ==== //
-        if($this->_rewrite)
+        if($this->rewrite)
         {
             ////////////////////////////////////////////////////////////////
             //    REWRITE ENABLED
@@ -472,7 +472,7 @@ class URL
             foreach($params as $name => $value)
             {
                 // ==== Skipping the page token if present ==== //
-                if($name == $this->_options['page_token'])
+                if($name == $this->options['page_token'])
                 {
                     continue;
                 }
@@ -490,13 +490,13 @@ class URL
             //    REWRITE DISABLED
             ///////////////////////////////////////////////////////////////
             // ==== Adding the requested page to the URL ==== //
-            $url .= '?'.$this->_options['page_token'].'='.$page;
+            $url .= '?'.$this->options['page_token'].'='.$page;
 
             // ==== Going through the params and building the URL ==== //
             foreach($params as $param => $value)
             {
                 // ==== Skipping the page token if present ==== //
-                if($name == $this->_options['page_token'])
+                if($name == $this->options['page_token'])
                 {
                     continue;
                 }

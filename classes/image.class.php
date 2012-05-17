@@ -21,14 +21,14 @@ class Image
      * 
      * @var array
      */
-    private $_options;
+    private $options;
 
     /**
      * An array of supported image types. The format is Array('extension' => 'alias').
      *
      * @var array
      */
-    private $_supported = array('jpg' => 'jpeg', 'jpeg' => 'jpeg', 'png' => 'png');
+    private $supported = array('jpg' => 'jpeg', 'jpeg' => 'jpeg', 'png' => 'png');
 
     /**
      *
@@ -36,7 +36,7 @@ class Image
      *
      * @var array
      */
-    private $_properties;
+    private $properties;
 
     /**
      *
@@ -44,7 +44,7 @@ class Image
      *
      * @var string
      */
-    private $_image = '';
+    private $image = '';
 
     /**
      *
@@ -52,7 +52,7 @@ class Image
      *
      * @var boolean
      */
-    private $_enabled = true;
+    private $enabled = true;
 
     /**
      * Class constructor
@@ -63,21 +63,21 @@ class Image
     public function __construct($image, $options=array())
     {
         // ==== Default options ==== //
-        $this->_options['width']     = '150';       // Width of the new image
-        $this->_options['height']    = '150';       // Height of the new image
-        $this->_options['mode']      = 'box';       // Can take the following values: box, fixed, auto
-        $this->_options['dir']       = 'images/';   // Directory where to put the image
+        $this->options['width']     = '150';       // Width of the new image
+        $this->options['height']    = '150';       // Height of the new image
+        $this->options['mode']      = 'box';       // Can take the following values: box, fixed, auto
+        $this->options['dir']       = 'images/';   // Directory where to put the image
 
         // ==== Replacing options with custom ones ==== //
         if(is_array($options))
         {
-            $this->_options = array_replace($this->_options, $options);
+            $this->options = array_replace($this->options, $options);
         }
 
         // ==== Checking if the image file exists ==== //
         if(is_file($image))
         {
-            $this->_image = $image;
+            $this->image = $image;
 
             // ==== Getting the image properties ==== //
             $this->getImageProperties();
@@ -87,7 +87,7 @@ class Image
             throw new Exception('Image file is invalid');
 
             // ==== Disabling the object ==== //
-            $this->_enabled = false;
+            $this->enabled = false;
         }
     }
 
@@ -101,7 +101,7 @@ class Image
     private function getImageProperties()
     {
         // ==== Getting the image name ==== //
-        $name = basename($this->_image);
+        $name = basename($this->image);
 
         // === Getting image extension ==== //
         $img_data   = explode('.', $name);
@@ -111,12 +111,12 @@ class Image
         $real_name = substr($name, 0, strrpos($name, '.'));
 
         // ==== Getting image dimensions ==== //
-        list($width, $height) = getimagesize($this->_image);
+        list($width, $height) = getimagesize($this->image);
 
         // ==== Adding the image data to the object ==== //
-        $this->_properties = array(
+        $this->properties = array(
             'name'      => $name,
-            'path'      => $this->_image,
+            'path'      => $this->image,
             'real_name' => $real_name,
             'extension' => $extension,
             'width'     => $width,
@@ -134,15 +134,15 @@ class Image
     public function __get($name)
     {
         // ==== If the object is disabled just return the failed value ==== //
-        if($this->_enabled == false)
+        if($this->enabled == false)
         {
             return '';
         }
 
         // ==== Checking if the property exists ==== //
-        if(isset($this->_properties[$name]))
+        if(isset($this->properties[$name]))
         {
-            return $this->_properties[$name];
+            return $this->properties[$name];
         }
         else
         {
@@ -159,7 +159,7 @@ class Image
     public function show($new_ext='')
     {
         // ==== If the object is disabled just return the failed value ==== //
-        if($this->_enabled == false)
+        if($this->enabled == false)
         {
             return false;
         }
@@ -177,19 +177,19 @@ class Image
         }
 
         // ==== Checking if the image provided is supported
-        if(key_exists($ext, $this->_supported))
+        if(key_exists($ext, $this->supported))
         {
             // ==== Resizing image ==== //
-            $new = $this->resizeImg($this->_image);
+            $new = $this->resizeImg($this->image);
 
             // ==== Checking if the new image is a resource ==== //
             if(is_resource($new))
             {
                 // ==== Setting page header and outputting image ===== //
-                header('Content-type: image/' . $this->_supported[$ext]);
+                header('Content-type: image/' . $this->supported[$ext]);
 
                 // ==== Creating the image ==== //
-                switch($this->_supported[$ext])
+                switch($this->supported[$ext])
                 {
                     // == JPEG == //
                     case 'jpeg':
@@ -230,7 +230,7 @@ class Image
     public function write($new_ext='', $random=false)
     {
         // ==== If the object is disabled just return the failed value ==== //
-        if($this->_enabled == false)
+        if($this->enabled == false)
         {
             return false;
         }
@@ -248,10 +248,10 @@ class Image
         }
 
         // ==== Checking if the image extension is supported ==== //
-        if(key_exists($ext, $this->_supported))
+        if(key_exists($ext, $this->supported))
         {
             // ==== Getting the directory where the image will be stored ==== //
-            $dir = $this->_options['dir'];
+            $dir = $this->options['dir'];
 
             // ==== Checking if the directory exists and if not we create it ==== //
             if(!is_dir($dir))
@@ -260,7 +260,7 @@ class Image
             }
 
             // ==== Resizing image ==== //
-            $new = $this->resizeImg($this->_image);
+            $new = $this->resizeImg($this->image);
 
             // ==== Checking if we should generate a random image name ==== //
             if($random === true)
@@ -269,7 +269,7 @@ class Image
                 $name = sha1($image . time());
 
                 // ==== Checking if the file exists or not ==== //
-                if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
+                if(is_file($dir . '/' . $name . '.' . $this->supported[$ext]))
                 {
                     // == Retry count == //
                     $retry = 3;
@@ -278,10 +278,10 @@ class Image
                     while ($retry > 0)
                     {
                         // ==== Generating random name ==== //
-                        $name = sha1($this->_image . time());
+                        $name = sha1($this->image . time());
 
                         // ==== Checking if the file exists or not ==== //
-                        if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
+                        if(is_file($dir . '/' . $name . '.' . $this->supported[$ext]))
                         {
                             $retry--;
                         }
@@ -295,24 +295,24 @@ class Image
             else
             {
                 // ==== Generating the image name ==== //
-                $name = ''.$this->name.'_thumb_'.$this->_options['width'].'x'.$this->_options['height'];
+                $name = ''.$this->name.'_thumb_'.$this->options['width'].'x'.$this->options['height'];
             }
 
             // ==== Checking if we have a resource ==== //
             if(is_resource($new))
             {
                 // ==== Writing image to HDD ==== //
-                switch($this->_supported[$ext])
+                switch($this->supported[$ext])
                 {
                     // == JPEG == //
                     case 'jpeg':
                     case 'jpg':
-                        imagejpeg($new, $dir.'/'.$name.'.'.$this->_supported[$ext], 100);
+                        imagejpeg($new, $dir.'/'.$name.'.'.$this->supported[$ext], 100);
                     break;
 
                     // == PNG == //
                     case 'png':
-                        imagepng($new, $dir.'/'.$name.'.'.$this->_supported[$ext], 9);
+                        imagepng($new, $dir.'/'.$name.'.'.$this->supported[$ext], 9);
                     break;
 
                     // == Format not supported == //
@@ -320,7 +320,7 @@ class Image
                 }
 
                 // ==== Checking if the image has been written to the hard drive ==== //
-                if(is_file($dir . '/' . $name . '.' . $this->_supported[$ext]))
+                if(is_file($dir . '/' . $name . '.' . $this->supported[$ext]))
                 {
                     $result = &$name;
                 }
@@ -346,7 +346,7 @@ class Image
         // CREATING THE IMAGE FROM THE FILE
         /////////////////////////////////////////////////////
         // ==== Getting picture from image ==== //
-        switch($this->_supported[$this->extension])
+        switch($this->supported[$this->extension])
         {
             // == JPEG == //
             case 'jpeg':
@@ -377,29 +377,29 @@ class Image
             $ratio          = $dim['width'] / $dim['height'];
 
             // ==== Creating new image with requested dimensions ==== //
-            switch ($this->_options['mode'])
+            switch ($this->options['mode'])
             {
                 case 'box':
                     // ==== Setting new picture size && determining where to copy the picture in the new image ==== //
                     if($dim['width'] >= $dim['height'])
                     {
                         // ==== Setting new picture size ==== //
-                        $width = $this->_options['width'];
+                        $width = $this->options['width'];
                         $height = round($width / $ratio);
 
                         // ==== Determining the position to start copying the image over the transparent background ==== //
-                        $space = $this->_options['height'] - $height;
+                        $space = $this->options['height'] - $height;
                         $sX = 0;
                         $sY = ($space >= 0 ? round($space / 2) : 0);
                     }
                     elseif($dim['width'] < $dim['height'])
                     {
                         // ==== Setting new picture size ==== //
-                        $height = $this->_options['height'];
+                        $height = $this->options['height'];
                         $width = round($height * $ratio);
 
                         // ==== Determining the position to start copying the image over the transparent background ==== //
-                        $space = $this->_options['width'] - $width;
+                        $space = $this->options['width'] - $width;
                         $sX = ($space >= 0 ? round($space / 2) : 0);
                         $sY = 0;
                     }
@@ -412,8 +412,8 @@ class Image
                     // ==== Getting new image start coordinates and dimensions ==== //
                     $sX     = 0;
                     $sY     = 0;
-                    $width  = $this->_options['width'];
-                    $height = $this->_options['height'];
+                    $width  = $this->options['width'];
+                    $height = $this->options['height'];
 
                     // ==== Generating new image ==== //
                     $new = imagecreatetruecolor($width, $height);

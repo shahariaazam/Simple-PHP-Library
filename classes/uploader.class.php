@@ -20,35 +20,35 @@ class Uploader
      *
      * @var string
      */
-    private $_log;
+    private $log;
 
     /**
      * Variable that contains options for the class
      *
      * @var array
      */
-    private $_options;
+    private $options;
 
     /**
      * Mail options
      *
      * @var array
      */
-    private $_mopt;
+    private $mopt;
 
     /**
      * File list
      *
      * @var array
      */
-    private $_files=array();
+    private $files=array();
 
     /**
      * Error codes
      *
      * @var array
      */
-    private $_errors;
+    private $errors;
 
     /**
      * Class constructor
@@ -59,15 +59,15 @@ class Uploader
     public function __construct(array $options=array())
     {
         // ==== Initializing default values ==== //
-        $this->_log      = '';
-        $this->_errors   = array();
+        $this->log      = '';
+        $this->errors   = array();
 
         // ==== Default $options ==== //
-        $this->_options['debug']         = false;
-        $this->_options['mail']          = 'webmaster@' . $_SERVER['HTTP_HOST'];
-        $this->_options['uploads_dir']   = 'uploads/';
-        $this->_options['extension']     = 'keys'; // Available values: keys, values
-        $this->_options['extensions']    = array(
+        $this->options['debug']         = false;
+        $this->options['mail']          = 'webmaster@' . $_SERVER['HTTP_HOST'];
+        $this->options['uploads_dir']   = 'uploads/';
+        $this->options['extension']     = 'keys'; // Available values: keys, values
+        $this->options['extensions']    = array(
 
             //Office
             "doc"   => "Microsoft Word 2003 Document",
@@ -135,20 +135,20 @@ class Uploader
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options))
         {
-            $this->_options = array_merge($this->_options, $options);
+            $this->options = array_merge($this->options, $options);
         }
 
         // ==== Setting up mail options ==== //
-        $this->_mopt['to']       = $this->_options['mail'];
-        $this->_mopt['subject']  = '[DEBUG] ' . __CLASS__ . ' Class '.$_SERVER['HTTP_HOST'];
-        $this->_mopt['msg']      = '';
-        $this->_mopt['headers']  = 'MIME-Version: 1.0' . "\r\n";
-        $this->_mopt['headers'] .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+        $this->mopt['to']       = $this->options['mail'];
+        $this->mopt['subject']  = '[DEBUG] ' . __CLASS__ . ' Class '.$_SERVER['HTTP_HOST'];
+        $this->mopt['msg']      = '';
+        $this->mopt['headers']  = 'MIME-Version: 1.0' . "\r\n";
+        $this->mopt['headers'] .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
 
         // ==== Checking if the upload directory exists == we create it if not ==== //
-        if(!is_dir($this->_options['uploads_dir']))
+        if(!is_dir($this->options['uploads_dir']))
         {
-            mkdir($this->_options['uploads_dir']);
+            mkdir($this->options['uploads_dir']);
         }
     }
 
@@ -191,16 +191,16 @@ class Uploader
             $extension = substr($filename, strrpos($filename, '.')+1, strlen($filename));
 
             // ==== Checking if the extension is allowed ==== //
-            if($this->_options['extension'] == 'values') // Checking the values of the array
+            if($this->options['extension'] == 'values') // Checking the values of the array
             {
-                if(!in_array($extension, $this->_options['extensions']))
+                if(!in_array($extension, $this->options['extensions']))
                 {
                     $result = false;
                 }
             }
             else // Checking the keys of the array
             {
-                if(!key_in_array($extension, $this->_options['extensions']))
+                if(!key_in_array($extension, $this->options['extensions']))
                 {
                     $result = false;
                 }
@@ -239,29 +239,29 @@ class Uploader
                 if($this->isExtensionAllowed($filename))
                 {
                     // ==== Checking if the file has been uploaded successfully ==== ///
-                    if(move_uploaded_file($file, $this->_options['uploads_dir'].$filename) == false)
+                    if(move_uploaded_file($file, $this->options['uploads_dir'].$filename) == false)
                     {
                         // ==== Adding log data ==== //
-                        if($this->_options['debug'])
+                        if($this->options['debug'])
                         {
-                            $this->_log .= '<b>ERROR:</b> Failed to upload file: '.$filename.'<br /><br />';
+                            $this->log .= '<b>ERROR:</b> Failed to upload file: '.$filename.'<br /><br />';
                         }
 
                         // ==== Adding error data ==== //
-                        $this->_errors[$filename]['upload'] = true;
+                        $this->errors[$filename]['upload'] = true;
 
                         $isOk = false;
                     }
                     else
                     {
                         // ==== Adding the file (with path) to the files array ==== //
-                        $this->_files[] = $this->_options['uploads_dir'].$filename;
+                        $this->files[] = $this->options['uploads_dir'].$filename;
                     }
                 }
                 else
                 {
                     // ==== Adding error data ==== //
-                    $this->_errors[$filename]['extension'] = true;
+                    $this->errors[$filename]['extension'] = true;
 
                     $isOk = false;
                 }
@@ -276,16 +276,16 @@ class Uploader
             if($this->isExtensionAllowed($filename))
             {
                 // ==== Checking if the file has been uploaded successfully ==== ///
-                if(move_uploaded_file($_FILES[$index]['tmp_name'], $this->_options['uploads_dir'].$filename) == false)
+                if(move_uploaded_file($_FILES[$index]['tmp_name'], $this->options['uploads_dir'].$filename) == false)
                 {
                     // ==== Adding log data ==== //
-                    if($this->_options['debug'])
+                    if($this->options['debug'])
                     {
-                        $this->_log .= '<b>ERROR:</b> Failed to upload file: '.$filename.'<br /><br />';
+                        $this->log .= '<b>ERROR:</b> Failed to upload file: '.$filename.'<br /><br />';
                     }
 
                     // ==== Adding error data ==== //
-                    $this->_errors[$filename]['upload'] = true;
+                    $this->errors[$filename]['upload'] = true;
 
                     $isOk = false;
                 }
@@ -342,13 +342,13 @@ class Uploader
      */
     public function getErrors()
     {
-        if(count($this->_errors) == 0)
+        if(count($this->errors) == 0)
         {
             return false;
         }
         else
         {
-            return $this->_errors;
+            return $this->errors;
         }
     }
 
@@ -360,13 +360,13 @@ class Uploader
      */
     public function getFileList()
     {
-        if(count($this->_files) == 0)
+        if(count($this->files) == 0)
         {
             return false;
         }
         else
         {
-            return $this->_files;
+            return $this->files;
         }
     }
 
@@ -379,13 +379,13 @@ class Uploader
     public function __destruct()
     {
         // ==== Sending debug if on ==== //
-        if($this->_options['debug'] && $this->_log != '')
+        if($this->options['debug'] && $this->log != '')
         {
             // ==== Adding log to message ==== //
-            $this->_mopt['msg'] = $this->_log;
+            $this->mopt['msg'] = $this->log;
 
             // ==== Sending debug mail ==== //
-            mail($this->_mopt['to'], $this->_mopt['subject'], $this->_mopt['msg'], $this->_mopt['headers']);
+            mail($this->mopt['to'], $this->mopt['subject'], $this->mopt['msg'], $this->mopt['headers']);
         }
     }
 }
