@@ -9,11 +9,12 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name UserAcc
- * @version 1.3
+ * @version 1.5
  *
  * @uses getFullURL function from functions/common.inc.php
  * @uses ckPasswdComplexity function from functions/common.inc.php
  *
+ * 
  * Internal errors:
  *
  * ========= Login data errors =========
@@ -34,32 +35,29 @@
  * 29 - Email exists
  *
  *
- * ========= Recover password data errors =========
- *
- * 160 - Data required for password recovery was not found or improper format
- *
- *
- * ========= Salt errors =========
- *
- * 150 - Salt data is not present or incorrect
- *
- *
  * ========= Database errors =========
  *
  * 100 - Account with the given login data not found
  * 101 - Salt could not be retrieved from the database because it could not be found aka Account invalid
  * 102 - Could not register account because query failed
  * 103 - Could not do login because query failed
+ * 104 - Could not retrieve the account info for the given account id
  *
  *
+ * ========= Salt errors =========
+ *
+ * 150 - Salt data is not present or incorrect
  * 
- * External errors from the UserAuth class:
  *
- * ========= Data errors =========
+ * ========= Recover password data errors =========
  *
- * 200 - Internal class error (used to signal the UserAcc class that an error has occured)
- * 201 - Could not insert authentication info into the database
+ * 160 - Data required for password recovery was not found or improper format
  *
+ *
+ * ========= Other errors =========
+ *
+ * 200 - No info found in the database for the given account ID
+ * 
  */
 
 class UserAcc
@@ -93,13 +91,6 @@ class UserAcc
     protected $mopt;
 
     /**
-     * User authentication object
-     *
-     * @var object
-     */
-    protected $auth;
-
-    /**
      * Database object
      *
      * @var object
@@ -125,11 +116,11 @@ class UserAcc
      * Class constructor.
      *
      * @param object $db
-     * @param object $auth
+     * @param object $vault
      * @param array $options
      * @return void
      */
-    public function __construct(db_module $db, UserAuth $auth, Vault $vault, array $options=array())
+    public function __construct(db_module $db, Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';
@@ -148,16 +139,16 @@ class UserAcc
         $this->mopt['headers']   = 'MIME-Version: 1.0' . "\r\n";
         $this->mopt['headers']  .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-        // ==== Initializing default values ==== //
+        // ==== Getting default values ==== //
         $this->log = '';
 
-        // ==== Initializing the authentication object ==== //
+        // ==== Getting the authentication object ==== //
         $this->auth = $auth;
 
-        // ==== Initializing the database object ==== //
+        // ==== Getting the database object ==== //
         $this->db = $db;
 
-        // ==== Initializing the vault object ==== //
+        // ==== Getting the vault object ==== //
         $this->vault = $vault;
     }
 
@@ -170,20 +161,6 @@ class UserAcc
     public function getErrors()
     {
         return $this->errors;
-    }
-
-    /**
-     * The method builds the password using a salt and a string
-     *
-     * @param string $salt
-     * @param string $passwd
-     * @return string
-     */
-    protected function buildPasswd($salt, $passwd)
-    {
-        $passwd = hash('sha512', $salt.$this->vault->encrypt($passwd));
-
-        return $passwd;
     }
 
     /**
@@ -204,6 +181,20 @@ class UserAcc
         {
             return NULL;
         }
+    }
+
+    /**
+     * The method builds the password using a salt and a string
+     *
+     * @param string $salt
+     * @param string $passwd
+     * @return string
+     */
+    protected function buildPasswd($salt, $passwd)
+    {
+        $passwd = hash('sha512', $salt.$this->vault->encrypt($passwd));
+
+        return $passwd;
     }
 
     /**
@@ -267,15 +258,16 @@ class UserAcc
      * The method retrieves the salt for a given account
      *
      * @param array $data
+     * @param boolean $generate
      * @return string or false on failure
      */
-    protected function getSalt(array $data, $from_db = true)
+    protected function getSalt(array $data, $generate = false)
     {
         // ==== Result var ==== //
         $result = false;
 
         // ==== Checking if we should get the salt from the database ==== //
-        if($from_db === true)
+        if($generate === false)
         {
             // ==== Checking if the username is set ==== //
             if($this->allowSalt($data))
@@ -290,10 +282,7 @@ class UserAcc
                 if($this->db->num_rows() == 1)
                 {
                     // ==== Retrieving the regdate info === //
-                    $regdate = $this->db->result(0, 0);
-
-                    // ==== The salt ==== //
-                    $result = $regdate;
+                    $result = &$this->db->result(0, 0);
                 }
                 else
                 {
@@ -307,11 +296,11 @@ class UserAcc
         }
         else
         {
-            // ==== the salt ==== //
+            // ==== The salt ==== //
             $result = date('Y-m-d H:i:s', time());
         }
 
-        // ==== returning result ==== //
+        // ==== Returning result ==== //
         return $result;
     }
 
@@ -364,7 +353,7 @@ class UserAcc
         // END REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
 
-        // ==== result ==== //
+        // ==== Result ==== //
         return $result;
     }
 
@@ -425,7 +414,7 @@ class UserAcc
      * The method does the login process
      *
      * @param array $data
-     * @return true on success or an error number on failure
+     * @return mixed false on failure or an account_id on success
      */
     public function doLogin(array $data)
     {
@@ -466,34 +455,7 @@ class UserAcc
                             $this->userinfo = $row;
 
                             // ==== Getting the account ID ==== //
-                            $data['account_id'] = $row['account_id'];
-
-                            // ==== Checking if persistent login was requested ==== //
-                            if(isset($data['remember_login']) && $data['remember_login'] == true)
-                            {
-                                $persistent = true;
-                            }
-                            else
-                            {
-                                $persistent = false;
-                            }
-
-                            // ==== Letting the authentication class handle the rest of the login ==== //
-                            $auth_result = $this->auth->login($data, $persistent);
-
-                            // ==== Checking the auth result ==== //
-                            if($auth_result == false)
-                            {
-                                $result = false;
-
-                                // ==== Merging the errors ==== //
-                                $this->errors = array_merge($this->errors, $this->auth->getErrors());
-                            }
-                            else
-                            {
-                                // ==== Adding the account id to the session ==== //
-                                $_SESSION['userid'] = $data['account_id'];
-                            }
+                            $result = &$row['account_id'];
                         }
                         else
                         {
@@ -533,6 +495,92 @@ class UserAcc
 
         // ==== Returning result ==== //
         return $result;
+    }
+
+    /**
+     *
+     * The method build an SQL used for the account info retrieval
+     *
+     * @param integer $account_id
+     * @return string
+     */
+    protected function sqlAccountInfo($account_id)
+    {
+        /**
+         * ----------------------
+         * OVERWRITE THIS METHOD
+         * ----------------------
+         *
+         */
+    }
+
+    /**
+     *
+     * The method retrieves info about a user using the given account_id
+     *
+     * @param integer $account_id
+     * @return mixed false on failure or an array on success
+     */
+    public function getAccountInfo($account_id=0)
+    {
+        // ==== Result var ==== //
+        $result = false;
+
+        // ==== Getting the account ID if none was provided ==== //
+        if(!is_numeric($account_id) || $account_id == 0)
+        {
+            $account_id = $this->account_id;
+        }
+
+        // ==== Checking if we have the required data ==== //
+        if(is_numeric($account_id) && $account_id != 0)
+        {
+            // ==== Getting the SQL ==== //
+            $sql = $this->sqlAccountInfo($account_id);
+
+            // ==== running the sql ==== //
+            $this->db->query($sql);
+
+            // ==== checking for errors ==== //
+            if($this->db->error() == '')
+            {
+                // ==== checking if anything was found ==== //
+                if($this->db->num_rows() == 1)
+                {
+                    // ==== getting the row ==== //
+                    $row = $this->db->fetch_assoc();
+
+                    // ==== Updating the userinfo ==== //
+                    $this->userinfo = $row;
+
+                    // ==== Updating the result variable ==== //
+                    $result = &$row;
+                }
+                else
+                {
+                    $this->errors[] = 200; // No info found in the database for the given account ID
+                }
+            }
+            else
+            {
+                $this->errors[] = 104; // Could not retrieve the account info for the given account id
+            }
+        }
+
+        // ==== Result ==== //
+        return $result;
+    }
+
+    /**
+     *
+     * The method updates the local account info
+     *
+     * @param integer $userinfo
+     * @return mixed false on failure or an array on success
+     */
+    public function setAccountInfo($userinfo)
+    {
+        $this->userinfo = $userinfo;
     }
 
     /**
