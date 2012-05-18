@@ -276,7 +276,7 @@ class UserAuth
         // ==== Adding log data ==== //
         if($this->options['debug'])
         {
-            $this->log .= '<hr><hr><strong>prepareLogin</strong><hr><br />';
+            $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
             $this->log .= '<strong>Info:</strong><br />';
             $this->log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
             $this->log .= 'Data: '.print_array($data, 1).'<br />';
@@ -375,6 +375,14 @@ class UserAuth
             {
                 // ==== Getting the errors from the UserAccounts class ==== //
                 $this->errors = array_merge($this->errors, $this->userAcc->getErrors());
+
+                // ==== Adding log data ==== //
+                if($this->options['debug'])
+                {
+                    $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                    $this->log .= 'Account ID: ' . $account_id . '<br />';
+                    $this->log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
+                }
             }
         }
         else
@@ -384,7 +392,7 @@ class UserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>login</strong><hr><br />';
+                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                 $this->log .= '<strong>NOTICE:</strong> User already logged in.<br /><br />';
             }
         }
@@ -450,7 +458,7 @@ class UserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>prepareAuth</strong><hr><br />';
+                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                 $this->log .= '<strong>Info:</strong><br />';
                 $this->log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
                 $this->log .= 'Data: '.print_array($data, 1).'<br />';
@@ -462,7 +470,7 @@ class UserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>prepareAuth</strong><hr><br />';
+                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                 $this->log .= '<strong>ERROR:</strong> The required data for the prepareAuth method is not present. Required: authentication cookie.<br /><br />';
             }
         }
@@ -484,8 +492,10 @@ class UserAuth
         $isOk = true;
 
         // ==== Skipping if already authenticated ==== //
-        if((isset($_SESSION['auth']) && $_SESSION['auth'] === false && isset($_COOKIE[$this->options['cookie_name']]))
-                || !isset($_SESSION['auth']))
+        if($account_id >= 1
+                || (isset($_SESSION['auth']) && $_SESSION['auth'] !== true && !empty($_COOKIE[$this->options['cookie_name']]))
+                || (empty($_SESSION['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
+          )
         {
             //////////////////////////////////////////////////////////
             // BEGIN DB CHECK ONLY WHEN AUTHENTICATING VIA COOKIE
@@ -513,7 +523,7 @@ class UserAuth
                             // ==== Adding log data ==== //
                             if($this->options['debug'])
                             {
-                                $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                                 $this->log .= '<strong>Info:</strong><br />';
                                 $this->log .= 'Authentication falied.<br /><br />';
                                 $this->log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
@@ -539,7 +549,7 @@ class UserAuth
                             // ==== Adding log data ==== //
                             if($this->options['debug'])
                             {
-                                $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                                 $this->log .= '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
                             }
                         }
@@ -559,7 +569,7 @@ class UserAuth
                 // ==== Adding log data ==== //
                 if($this->options['debug'])
                 {
-                    $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                    $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                     $this->log .= '<strong>Info:</strong> Skipped db check.<br /><br />';
                 }
             }
@@ -585,7 +595,7 @@ class UserAuth
                 $_SESSION['auth'] = false;
             }
         }
-        else
+        elseif(isset($_SESSION['auth']) && $_SESSION['auth'] == true)
         {
             // ==== Getting the userinfo from the session ==== //
             $userinfo = unserialize($this->vault->decrypt($_SESSION['userinfo']));
@@ -596,12 +606,21 @@ class UserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>authenticate</strong><hr><br />';
+                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                 $this->log .= '<strong>Info:</strong><br />';
                 $this->log .= 'Skipped authentication<br /><br />';
-                $this->log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
-                $this->log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
                 $this->log .= 'User info: '.print_array($userinfo, 1).'<br />';
+                $this->log .= '<br /><br />';
+            }
+        }
+        else
+        {
+            // ==== Adding log data ==== //
+            if($this->options['debug'])
+            {
+                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                $this->log .= '<strong>Info:</strong><br />';
+                $this->log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
                 $this->log .= '<br /><br />';
             }
         }
@@ -690,11 +709,14 @@ class UserAuth
         {
             // ==== Adding some more data to the log ==== //
             $this->log .= '<hr><hr><strong>Other info</strong><hr>';
+            $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
             $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
             $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
+            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($_SESSION, true).'<br /><br />';
             $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
             $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
+            $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
 
             // ==== Sending debug mail ==== //
             mail($this->mopt['to'], $this->mopt['subject'], $this->log, $this->mopt['headers']);

@@ -282,7 +282,7 @@ class UserAcc
                 if($this->db->num_rows() == 1)
                 {
                     // ==== Retrieving the regdate info === //
-                    $result = &$this->db->result(0, 0);
+                    $result = $this->db->result(0, 0);
                 }
                 else
                 {
@@ -907,11 +907,15 @@ class UserAcc
         if($this->options['debug'] && $this->log != '')
         {
             // ==== Adding some more data to the log ==== //
-            $this->log .= 'Other info<hr>';
-            $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
+            $this->log .= '<hr><hr><strong>Other info</strong><hr>';
             $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
+            $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
             $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
+            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($_SESSION, true).'<br /><br />';
+            $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
+            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
+            $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
 
             // ==== Sending debug mail ==== //
             mail($this->mopt['to'], $this->mopt['subject'], $this->log, $this->mopt['headers']);
