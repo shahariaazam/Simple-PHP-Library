@@ -142,9 +142,6 @@ class UserAcc
         // ==== Getting default values ==== //
         $this->log = '';
 
-        // ==== Getting the authentication object ==== //
-        $this->auth = $auth;
-
         // ==== Getting the database object ==== //
         $this->db = $db;
 
