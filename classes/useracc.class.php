@@ -38,7 +38,7 @@
  * ========= Database errors =========
  *
  * 100 - Account with the given login data not found
- * 101 - Salt could not be retrieved from the database because it could not be found aka Account invalid
+ * 101 - Salt could not be retrieved from the database because it could not be found
  * 102 - Could not register account because query failed
  * 103 - Could not do login because query failed
  * 104 - Could not retrieve the account info for the given account id
@@ -46,7 +46,7 @@
  *
  * ========= Salt errors =========
  *
- * 150 - Salt data is not present or incorrect
+ * 150 - Data required for salt retrieval is not present
  * 
  *
  * ========= Recover password data errors =========
@@ -54,7 +54,7 @@
  * 160 - Data required for password recovery was not found or improper format
  *
  *
- * ========= Other errors =========
+ * ========= Account handling =========
  *
  * 200 - No info found in the database for the given account ID
  * 
@@ -221,10 +221,10 @@ class UserAcc
         // BEGIN REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
         // == Username == //
-        if(!isset($data['username']))
+        if(empty($data['username']))
         {
             // ===== Errors ==== //
-            $this->errors[] = 150;
+            $this->errors[] = 150; // Data required for salt retrieval is not present
             $result = false;
         }
         //////////////////////////////////////////////////
@@ -287,7 +287,7 @@ class UserAcc
                     $result = false;
 
                     // ==== Errors ==== //
-                    $this->errors[] = 101;
+                    $this->errors[] = 101; // Salt could not be retrieved from the database because it could not be found
                 }
             }
         }
@@ -336,14 +336,14 @@ class UserAcc
         // == username == //
         if(empty($data['username']))
         {
-            $this->errors[] = 1;
+            $this->errors[] = 1; // Username empty
             $result = false;
         }
 
         // == password == //
         if(empty($data['passwd']))
         {
-            $this->errors[] = 5;
+            $this->errors[] = 5; // Password empty
             $result = false;
         }
         //////////////////////////////////////////////////
@@ -436,8 +436,11 @@ class UserAcc
                 // ==== Executing the SQL ==== //
                 $this->db->query($sql);
 
+                // ==== Getting the SQL error ==== //
+                $sql_error = $this->db->error();
+
                 // ==== Checking if an error occured ==== //
-                if($this->db->error() == '')
+                if($sql_error == '')
                 {
                     // ==== Checking if info was found ==== //
                     if($this->db->num_rows() == 1)
@@ -460,7 +463,7 @@ class UserAcc
                             $result = false;
 
                             // ==== Error ==== //
-                            $this->errors[] = 15;
+                            $this->errors[] = 15; // Account inactive
                         }
                     }
                     else
@@ -469,7 +472,7 @@ class UserAcc
                         $result = false;
 
                         // ==== Error ==== //
-                        $this->errors[] = 100;
+                        $this->errors[] = 100; // Account with the given login data not found
                     }
                 }
                 else
@@ -478,7 +481,16 @@ class UserAcc
                     $result = false;
 
                     // ==== Error ==== //
-                    $this->errors[] = 103;
+                    $this->errors[] = 103; // Could not do login because query failed
+
+                    // ==== Debug === //
+                    if($this->options['debug'])
+                    {
+                        $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                        $this->log .= '<b>ERROR:</b> Login query failed.<br />';
+                        $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                        $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                    }
                 }
             }
             else
@@ -538,8 +550,11 @@ class UserAcc
             // ==== running the sql ==== //
             $this->db->query($sql);
 
+            // ==== Getting the SQL error ==== //
+            $sql_error = $this->db->error();
+
             // ==== checking for errors ==== //
-            if($this->db->error() == '')
+            if($sql_error == '')
             {
                 // ==== checking if anything was found ==== //
                 if($this->db->num_rows() == 1)
@@ -561,6 +576,15 @@ class UserAcc
             else
             {
                 $this->errors[] = 104; // Could not retrieve the account info for the given account id
+
+                // ==== Debug === //
+                if($this->options['debug'])
+                {
+                    $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                    $this->log .= '<b>ERROR:</b> Account info retrieval failed.<br />';
+                    $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                    $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                }
             }
         }
 
@@ -653,7 +677,7 @@ class UserAcc
         // == username == //
         if(empty($data['username']))
         {
-            $this->errors[] = 20;
+            $this->errors[] = 20; // Username field empty
             $result = false;
         }
         else
@@ -661,7 +685,7 @@ class UserAcc
             // ==== Checking if the username exists in the database ==== //
             if($this->doesUsenameExist($data['username']))
             {
-                $this->errors[] = 21;
+                $this->errors[] = 21; // Username exists
                 $result = false;
             }
         }
@@ -669,7 +693,7 @@ class UserAcc
         // == password == //
         if(empty($data['passwd']))
         {
-            $this->errors[] = 25;
+            $this->errors[] = 25; // Password field empty
             $result = false;
         }
         else
@@ -681,7 +705,7 @@ class UserAcc
             $complexityOk = ckPasswdComplexity($data['passwd']);
             if($complexityOk == false)
             {
-                $this->errors[] = 26;
+                $this->errors[] = 26; // Password complexity too low
                 $result = false;
             }
 
@@ -690,7 +714,7 @@ class UserAcc
         // == email == //
         if(empty($data['email']))
         {
-            $this->errors[] = 27;
+            $this->errors[] = 27; // Email field empty
             $result = false;
         }
         else
@@ -699,7 +723,7 @@ class UserAcc
             $valid = validateMail($data['email'], true);
             if($valid == false)
             {
-                $this->errors[] = 28;
+                $this->errors[] = 28; // Email is invalid
                 $result = false;
             }
             else
@@ -707,7 +731,7 @@ class UserAcc
                 // ==== Checking if email exists ==== //
                 if($this->doesEmailExist($data['email']))
                 {
-                    $this->errors[] = 29;
+                    $this->errors[] = 29; // Email exists
                     $result = false;
                 }
             }
@@ -802,11 +826,23 @@ class UserAcc
                 // ==== Executing the SQL ==== //
                 $this->db->query($sql);
 
+                // ==== Getting the SQL error ==== //
+                $sql_error = $this->db->error();
+
                 // ==== Checking if an error occured ==== //
-                if($this->db->error() != '')
+                if($sql_error == '')
                 {
                     // ==== Error ==== //
-                    $this->errors[] = 102;
+                    $this->errors[] = 102; // Could not register account because query failed
+
+                    // ==== Debug === //
+                    if($this->options['debug'])
+                    {
+                        $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                        $this->log .= '<b>ERROR:</b> Register query failed.<br />';
+                        $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                        $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                    }
                 }
             }
             else
@@ -855,7 +891,7 @@ class UserAcc
         if(empty($data['email']))
         {
             // ==== Errors ==== //
-            $this->errors[] = 160;
+            $this->errors[] = 160; // Data required for password recovery is not present
             $result = false;
         }
         //////////////////////////////////////////////////
