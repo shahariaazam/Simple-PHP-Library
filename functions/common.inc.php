@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The file contains common functions
  *
@@ -18,11 +19,11 @@
  */
 function getFullURL()
 {
-    $protocol = isset($_SERVER['HTTPS'])?'https://':'http://';
+    $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
     $domain = $_SERVER['SERVER_NAME'];
     $request_uri = $_SERVER['REQUEST_URI'];
 
-    $full_url = $protocol.$domain.$request_uri;
+    $full_url = $protocol . $domain . $request_uri;
 
     return $full_url;
 }
@@ -37,7 +38,7 @@ function getFullURL()
 function getFileExt($file)
 {
     $array = explode(".", $file);
-    $ext = $array[sizeof($array)-1];
+    $ext = $array[count($array) - 1];
 
     return $ext;
 }
@@ -50,16 +51,17 @@ function getFileExt($file)
  * @param array $settings // Optional but only for http_redirect method
  * @return void
  */
-function redirect($url, $method='header', $settings=array())
+function redirect($url, $method = 'header', $settings = array())
 {
+    // ==== Decoding the URL ==== //
     $url = urldecode($url);
 
     switch($method)
     {
         default:
-            header('Location: '.$url.'');
+            header('Location: ' . $url . '');
             exit();
-        break;
+            break;
 
         case 'http_redirect':
             // ==== Default http_redirect parameters ==== //
@@ -68,21 +70,21 @@ function redirect($url, $method='header', $settings=array())
             $params['status'] = 0;
 
             // ==== Merging arrays ==== //
-            if(is_array($settings))
+            if(is_array($settings) && count($settings) > 0)
             {
-                    $params = array_replace($params, $settings);
+                $params = array_replace($params, $settings);
             }
 
             if(function_exists('http_redirect'))
             {
-                    http_redirect($url, $params['params'], $params['session'], $params['status']);
-                    exit();
+                http_redirect($url, $params['params'], $params['session'], $params['status']);
+                exit();
             }
             else
             {
                 trigger_error('You need PECL extension to use the http_redirect function. <br />Please install the PECL extension or switch to header redirect.', E_USER_ERROR);
             }
-        break;
+            break;
     }
 }
 
@@ -108,20 +110,20 @@ function getHeaders($url)
  * @param numeric $type //This can be 0 (for numeric array) or 1 for associative array)
  * @return void
  */
-function setHeaders($headers, $type=1)
+function setHeaders($headers, $type = 1)
 {
     if($type == 0) // Numeric array
     {
-        foreach($headers as $header)
+        foreach ($headers as $header)
         {
             header(trim($header));
         }
     }
     elseif($type == 1) // Associative array
     {
-        foreach($headers as $header => $value)
+        foreach ($headers as $header => $value)
         {
-            header(trim($header).': '.trim($value));
+            header(trim($header) . ': ' . trim($value));
         }
     }
 }
@@ -134,16 +136,15 @@ function setHeaders($headers, $type=1)
  */
 function deparse_url($comps)
 {
-    $url = $comps['scheme'].'://'.                              // Protocol
-           $comps['host'].                                      // Host
-           (isset($comps['port'])?':'.$comps['port']:'').           // Port
-           (isset($comps['path'])?$comps['path']:'').           // Path
-           (isset($comps['query'])?'?'.$comps['query']:'').     // Query string
-           (isset($comps['fragment'])?$comps['fragment']:'');   // Anchor
+    $url = $comps['scheme'] . '://' . // Protocol
+            $comps['host'] . // Host
+            (isset($comps['port']) ? ':' . $comps['port'] : '') . // Port
+            (isset($comps['path']) ? $comps['path'] : '') . // Path
+            (isset($comps['query']) ? '?' . $comps['query'] : '') . // Query string
+            (isset($comps['fragment']) ? $comps['fragment'] : '');   // Anchor
 
     return $url;
 }
-
 
 /**
  * The function cuts a string to size similar to substr but it also checks for html entities to avoid
@@ -155,67 +156,67 @@ function deparse_url($comps)
  * @param array $more_entities
  * @return string on success or false on failure
  */
-function cutstr($string, $from, $length, $more_entities=array())
+function cutstr($string, $from, $length, $more_entities = array())
 {
-	// ==== HTML entities array ==== //
-	$entities = array(
-		"&trade;",
-		"&#039;"
-	);
+    // ==== HTML entities array ==== //
+    $entities = array(
+        "&trade;",
+        "&#039;"
+    );
 
-	// ==== Adding more entities to the ones already defined ==== //
-	if(is_array($more_entities) && sizeof($more_entities) > 0)
-	{
-		$entities = array_merge($entities, $more_entities);
-	}
+    // ==== Adding more entities to the ones already defined ==== //
+    if(is_array($more_entities) && sizeof($more_entities) > 0)
+    {
+        $entities = array_merge($entities, $more_entities);
+    }
 
-	// ==== Getting $to limit ==== //
-	$to = $from+$length;
+    // ==== Getting $to limit ==== //
+    $to = $from + $length;
 
-	// ==== Going through the text and checking if there are any entities that get cut ==== //
-	foreach($entities as $key => $entity)
-	{
-		// ==== Getting entity size ==== //
-		$esize = strlen($entity);
+    // ==== Going through the text and checking if there are any entities that get cut ==== //
+    foreach ($entities as $key => $entity)
+    {
+        // ==== Getting entity size ==== //
+        $esize = strlen($entity);
 
-		// ==== Getting start position of entity ==== //
-		$epos_start = strpos($string, $entity);
+        // ==== Getting start position of entity ==== //
+        $epos_start = strpos($string, $entity);
 
-		// ==== Getting end position of entity ==== //
-		$epos_end = $epos_start + $esize;
+        // ==== Getting end position of entity ==== //
+        $epos_end = $epos_start + $esize;
 
-		// ==== Checking if $from will cut the $entity ==== //
-		if($from > $epos_start && $from <= $epos_end)
-		{
-			$from = $epos_start;
-		}
+        // ==== Checking if $from will cut the $entity ==== //
+        if($from > $epos_start && $from <= $epos_end)
+        {
+            $from = $epos_start;
+        }
 
-		// ==== Checking if $to will cut the $entity ==== //
-		if($to >= $epos_start && $to < $epos_end)
-		{
-			$to = $epos_start;
-		}
-	}
+        // ==== Checking if $to will cut the $entity ==== //
+        if($to >= $epos_start && $to < $epos_end)
+        {
+            $to = $epos_start;
+        }
+    }
 
-	// ==== Getting $current_length ==== //
-	$new_length = $to-$from;
+    // ==== Getting $current_length ==== //
+    $new_length = $to - $from;
 
-	// ==== Cutting the text to the proper length ==== //
-	if($new_length <= $length)
-	{
-		// ==== Cutting string to size ==== //
-		$string = substr($string, $from, $new_length);
+    // ==== Cutting the text to the proper length ==== //
+    if($new_length <= $length)
+    {
+        // ==== Cutting string to size ==== //
+        $string = substr($string, $from, $new_length);
 
-		return $string;
-	}
-	elseif($new_length > $length) // If the text has shifted go through the function again
-	{
-		return cutstr($string, $from, $length, $more_entities);
-	}
-	else
-	{
-		return false;
-	}
+        return $string;
+    }
+    elseif($new_length > $length) // If the text has shifted go through the function again
+    {
+        return cutstr($string, $from, $length, $more_entities);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 /**
@@ -281,7 +282,7 @@ function validateMail($email, $checkDNS = false)
  * @param array $whitelist
  * @return void
  */
-function cleanup($dir, array $whitelist=array())
+function cleanup($dir, array $whitelist = array())
 {
     // ==== Reading the files from the directory and deleting the ones not present in the whitelist ==== //
     if(is_dir($dir))
@@ -292,24 +293,24 @@ function cleanup($dir, array $whitelist=array())
         // ==== Checking if the directory was opened succesfully ==== //
         if($dh != false)
         {
-            while(($file = readdir($dh)) !== false)
+            while (($file = readdir($dh)) !== false)
             {
                 // ==== Checking if the file exists in the whitelist and it's different from dot ==== //
                 if(!in_array($file, $whitelist) && $file != '.' && $file != '..')
                 {
                     // ==== Removing ==== //
-                    if(is_dir($dir.$file))
+                    if(is_dir($dir . $file))
                     {
                         // ==== Recursive ==== //
-                        cleanup($dir.$file.'/', $whitelist);
+                        cleanup($dir . $file . '/', $whitelist);
 
                         // ==== Removing directory ==== //
-                        @rmdir($dir.$file);
+                        @rmdir($dir . $file);
                     }
-                    elseif(is_file($dir.$file))
+                    elseif(is_file($dir . $file))
                     {
                         // ==== Deleting file ==== //
-                        unlink($dir.$file);
+                        unlink($dir . $file);
                     }
                     else
                     {
@@ -328,7 +329,7 @@ function cleanup($dir, array $whitelist=array())
  * @param string $directory
  * @return boolean
  */
-function unzip($archive, $directory='./')
+function unzip($archive, $directory = './')
 {
     // ==== Check variable ==== //
     $isOk = true;
@@ -437,7 +438,7 @@ function secure_download($file)
         ob_start();
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename='.basename($file));
+        header('Content-Disposition: attachment; filename=' . basename($file));
         header('Content-Transfer-Encoding: binary');
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -455,7 +456,7 @@ function secure_download($file)
  * @param array $options
  * @return boolean
  */
-function ckPasswdComplexity($passwd, array $options=array())
+function ckPasswdComplexity($passwd, array $options = array())
 {
     // ==== Result variable ==== //
     $result = true;
@@ -485,7 +486,7 @@ function ckPasswdComplexity($passwd, array $options=array())
             $uChr = 0;
 
             // ==== Checking each character in the password ==== //
-            for($i=0; $i < strlen($passwd); $i++)
+            for ($i = 0; $i < strlen($passwd); $i++)
             {
                 // ==== Check variables ==== //
                 $checked = false;
@@ -561,9 +562,9 @@ function ckPasswdComplexity($passwd, array $options=array())
  * @param array $array
  * @return void
  */
-function print_array($array, $return=false)
+function print_array($array, $return = false)
 {
-    $str = '<pre>'.print_r($array, 1).'</pre>';
+    $str = '<pre>' . print_r($array, 1) . '</pre>';
 
     if($return == true)
     {
@@ -583,11 +584,11 @@ function print_array($array, $return=false)
  */
 function get_request_headers()
 {
-    // ==== headers array ===== //
+    // ==== Headers array ===== //
     $headers = array();
 
     // ==== Going through the $_SERVER array ===== //
-    foreach($_SERVER as $key => $value)
+    foreach ($_SERVER as $key => $value)
     {
         if(preg_match('/(HTTP_)/', $key))
         {
@@ -598,4 +599,3 @@ function get_request_headers()
     // ==== result ==== //
     return $headers;
 }
-?>
