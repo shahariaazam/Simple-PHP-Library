@@ -494,7 +494,7 @@ class UserAuth
         // ==== Skipping if already authenticated ==== //
         if($account_id >= 1
                 || (isset($_SESSION['auth']) && $_SESSION['auth'] !== true && !empty($_COOKIE[$this->options['cookie_name']]))
-                || (empty($_SESSION['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
+                || (isset($_SESSION['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
           )
         {
             //////////////////////////////////////////////////////////
