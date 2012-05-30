@@ -4,7 +4,7 @@
  *
  * @author Brian
  * @copyright 2012
- * @link http://brian.hopto.org/framework_wiki/
+ * @link http://brian.hopto.org/wiki/hypermvc/
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * 

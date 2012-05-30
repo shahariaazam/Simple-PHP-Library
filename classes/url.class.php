@@ -4,7 +4,7 @@
  * URL manager class.
  *
  * @author Brian
- * @link http://brian.hopto.org/framework_wiki/
+ * @link http://brian.hopto.org/wiki/hypermvc/
  * @copyright 2011
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
