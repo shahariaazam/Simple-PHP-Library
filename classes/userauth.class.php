@@ -491,12 +491,6 @@ class UserAuth
         // ==== Check variable ==== //
         $isOk = true;
 
-        if(isset($_GET['test']))
-        {
-            session_unset();
-            session_destroy();
-        }
-
         // ==== Skipping if already authenticated ==== //
         if($account_id >= 1
                 || (isset($_SESSION['auth']) && $_SESSION['auth'] !== true && !empty($_COOKIE[$this->options['cookie_name']]))
