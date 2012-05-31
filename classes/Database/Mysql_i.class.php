@@ -20,7 +20,7 @@ namespace Database;
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //              MySQLi Database Class                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class Mysql_i implements db_module
+class Mysql_i implements \Database\db_module
 {
 
     /**
@@ -86,7 +86,7 @@ class Mysql_i implements db_module
         $this->conn_trigger = true;
 
         // ==== Initializing MySQLi object ==== //
-        $this->link = new mysqli($this->options['host'], $this->options['user'], $this->options['passwd'], $this->options['db'], $this->options['port']);
+        $this->link = new \mysqli($this->options['host'], $this->options['user'], $this->options['passwd'], $this->options['db'], $this->options['port']);
 
         // ==== Checking if connection was successfull ==== //
         if($this->link->connect_error != NULL)
