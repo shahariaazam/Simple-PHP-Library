@@ -10,7 +10,7 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name Database
+ * @name Pgsql
  * @version 3.6
  *
  */
