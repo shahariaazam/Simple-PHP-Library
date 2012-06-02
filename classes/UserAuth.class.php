@@ -491,16 +491,10 @@ class UserAuth
         // ==== Check variable ==== //
         $isOk = true;
 
-        if(isset($_GET['test']))
-        {
-            session_unset();
-            session_destroy();
-        }
-
         // ==== Skipping if already authenticated ==== //
         if($account_id >= 1
                 || (isset($_SESSION['auth']) && $_SESSION['auth'] !== true && !empty($_COOKIE[$this->options['cookie_name']]))
-                || (isset($_SESSION['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
+                || (!isset($_SESSION['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
           )
         {
             //////////////////////////////////////////////////////////
@@ -614,7 +608,7 @@ class UserAuth
             {
                 $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
                 $this->log .= '<strong>Info:</strong><br />';
-                $this->log .= 'Skipped authentication<br /><br />';
+                $this->log .= 'Skipped database authentication<br /><br />';
                 $this->log .= 'User info: '.print_array($userinfo, 1).'<br />';
                 $this->log .= '<br /><br />';
             }
@@ -653,6 +647,14 @@ class UserAuth
      */
     public function isLoggedIn()
     {
+        // ==== Adding log data ==== //
+        if($this->options['debug'])
+        {
+            $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+            $this->log .= '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true?'yes':'no') . '<br />';
+            $this->log .= '<br /><br />';
+        }
+
         // ==== returning the result ==== //
         return $this->authenticated;
     }
