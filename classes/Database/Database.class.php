@@ -13,6 +13,10 @@
  * @name Database
  * @version 3.6
  *
+ * ERROR CODES:
+ *
+ * 2 - The database type is not supported by any implemented handlers
+ *
  */
 
 namespace Database;
@@ -43,7 +47,7 @@ abstract class Database
      * @param void
      * @return object on success or integer on fail: 2 for wrong options, 3 for unsupported database type
      */
-    public static function init($options=array(), $new=false)
+    public static function init(array $options=array(), $new=false)
     {
         // ==== Error code ==== //
         $error_code = false;
@@ -70,24 +74,17 @@ abstract class Database
                 // ==== Correcting the type name ==== //
                 $class = '\Database\\' . ucfirst($type);
 
-                // ==== Checking if the $options parameter is an array ==== //
-                if(is_array($options))
-                {
-                    self::$instance = new $class($options);
-                }
-                else
-                {
-                    $error_code = 2;
-                }
+                // ==== Creating the requested database object ==== //
+                self::$instance = new $class($options);
             }
             else
             {
-                $error_code = 3;
+                $error_code = 2; // The database type is not supported by any implemented handlers
             }
         }
 
-        // ==== Checking if a database instance has been created ==== //
-        if(is_object(self::$instance))
+        // ==== Checking if there were any errors ==== //
+        if($error_code === false)
         {
             return self::$instance;
         }
