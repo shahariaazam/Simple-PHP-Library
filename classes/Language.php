@@ -173,7 +173,7 @@ class Language
           )
         {
             // ==== Setting the cookie ==== //
-            setcookie('lang_'.$this->uq, $lang, $this->options['cookie']['expire'], $this->options['cookie']['path'], $this->options['cookie']['domain']);
+            setcookie('lang_'.$this->uq, $lang, time()+$this->options['cookie']['expire'], $this->options['cookie']['path'], $this->options['cookie']['domain']);
 
             // ==== Setting the cookie var ==== //
             $_COOKIE['lang_'.$this->uq] = $lang;
