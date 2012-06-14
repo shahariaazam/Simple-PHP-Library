@@ -169,6 +169,7 @@ class Language
                 && $this->options['cookie_expire'] >= 0
                 && !empty($this->options['cookie_path'])
                 && !empty($this->options['cookie_domain'])
+                && ((isset($_COOKIE['lang_'.$this->uq]) && $_COOKIE['lang_'.$this->uq] != $lang) || !isset($_COOKIE['lang_'.$this->uq]))
           )
         {
             // ==== Setting the cookie ==== //
