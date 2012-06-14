@@ -67,6 +67,8 @@ class Language
         $this->options['default_language']  = 'en';
         $this->options['lang_dir']          = 'lang/';
         $this->options['lang_sufix']        = '.lang.php';
+        $this->options['remember']          = false;
+        $this->options['cookie']            = array('expire' => 0, 'path' => '', 'domain' => '');
         $this->options['debug']             = false;
         $this->options['mail_id']           = '[GENERIC]';
         $this->options['mail']              = 'webmaster@'.$_SERVER['HTTP_HOST'];
@@ -107,6 +109,10 @@ class Language
         elseif(isset($_SESSION['lang_'.$this->uq]))
         {
             $lang = $_SESSION['lang_'.$this->uq];
+        }
+        elseif(isset($_COOKIE['lang_'.$this->uq]) && $this->options['remember'] == true)
+        {
+            $lang = $_COOKIE['lang_'.$this->uq];
         }
         else
         {
@@ -154,6 +160,24 @@ class Language
 
         // ==== Intializing or overwriting the session variable ===== //
         $_SESSION['lang_'.$this->uq] = $lang;
+
+        // ==== If rememeber is active ==== //
+        if($this->options['remember'] == true
+                && isset($this->options['cookie']['expire'])
+                && is_numeric($this->options['cookie']['expire'])
+                && $this->options['cookie']['expire'] >= 0
+                && isset($this->options['cookie']['path'])
+                && !empty($this->options['cookie']['path'])
+                && isset($this->options['cookie']['domain'])
+                && !empty($this->options['cookie']['domain'])
+          )
+        {
+            // ==== Setting the cookie ==== //
+            setcookie('lang_'.$this->uq, $lang, $this->options['cookie']['expire'], $this->options['cookie']['path'], $this->options['cookie']['domain']);
+
+            // ==== Setting the cookie var ==== //
+            $_COOKIE['lang_'.$this->uq] = $lang;
+        }
 
         // ==== Assign language file path ==== //
         $this->file = $langfile;
