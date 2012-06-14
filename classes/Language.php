@@ -68,7 +68,7 @@ class Language
         $this->options['lang_dir']          = 'lang/';
         $this->options['lang_sufix']        = '.lang.php';
         $this->options['remember']          = false;
-        $this->options['cookie']            = array('expire' => 0, 'path' => '', 'domain' => '');
+        $this->options['cookie']            = array('expire' => 0, 'path' => '/', 'domain' => '');
         $this->options['debug']             = false;
         $this->options['mail_id']           = '[GENERIC]';
         $this->options['mail']              = 'webmaster@'.$_SERVER['HTTP_HOST'];
