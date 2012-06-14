@@ -27,7 +27,7 @@ if(!function_exists('class_loader'))
             $paths = array();
 
             // ==== Adjusting the class name ==== //
-            $class_name = str_replace("\\", DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR . $class_name);
+            $class_name = str_replace("\\", DIRECTORY_SEPARATOR, $class_name);
 
             // ==== Going through the directories ==== //
             if(isset($classes_dirs) && is_array($classes_dirs))
@@ -118,7 +118,7 @@ if(!function_exists('class_loader'))
                 }
 
                 // ==== Showing message to users ==== //
-                exit('<h1>An error has occured. Our team has been notified and is working right now to fix it.<br /><br />Please come back later...</h1>');
+                exit('An error has occured. Our team has been notified and is working right now to fix it.<br /><br />Please come back later...');
             }
         }
     }
