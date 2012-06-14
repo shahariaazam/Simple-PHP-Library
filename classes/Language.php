@@ -55,7 +55,7 @@ class Language
      * @param array $options
      * @return void
      */
-    public function __construct($options=array())
+    public function __construct(array $options=array())
     {
         // ==== Checking if a session exists ==== //
         if(session_id() == '')
@@ -67,8 +67,10 @@ class Language
         $this->options['default_language']  = 'en';
         $this->options['lang_dir']          = 'lang/';
         $this->options['lang_sufix']        = '.lang.php';
-        $this->options['remember']          = false;
-        $this->options['cookie']            = array('expire' => 0, 'path' => '/', 'domain' => '');
+        $this->options['cookie_enabled']    = false;
+        $this->options['cookie_expire']     = 0;
+        $this->options['cookie_domain']     = '';
+        $this->options['cookie_path']       = '/';
         $this->options['debug']             = false;
         $this->options['mail_id']           = '[GENERIC]';
         $this->options['mail']              = 'webmaster@'.$_SERVER['HTTP_HOST'];
@@ -110,7 +112,7 @@ class Language
         {
             $lang = $_SESSION['lang_'.$this->uq];
         }
-        elseif(isset($_COOKIE['lang_'.$this->uq]) && $this->options['remember'] == true)
+        elseif(isset($_COOKIE['lang_'.$this->uq]) && $this->options['cookie_enabled'] == true)
         {
             $lang = $_COOKIE['lang_'.$this->uq];
         }
@@ -162,18 +164,15 @@ class Language
         $_SESSION['lang_'.$this->uq] = $lang;
 
         // ==== If rememeber is active ==== //
-        if($this->options['remember'] == true
-                && isset($this->options['cookie']['expire'])
-                && is_numeric($this->options['cookie']['expire'])
-                && $this->options['cookie']['expire'] >= 0
-                && isset($this->options['cookie']['path'])
-                && !empty($this->options['cookie']['path'])
-                && isset($this->options['cookie']['domain'])
-                && !empty($this->options['cookie']['domain'])
+        if($this->options['cookie_enabled'] == true
+                && is_numeric($this->options['cookie_expire'])
+                && $this->options['cookie_expire'] >= 0
+                && !empty($this->options['cookie_path'])
+                && !empty($this->options['cookie_domain'])
           )
         {
             // ==== Setting the cookie ==== //
-            setcookie('lang_'.$this->uq, $lang, time()+$this->options['cookie']['expire'], $this->options['cookie']['path'], $this->options['cookie']['domain']);
+            setcookie('lang_'.$this->uq, $lang, time()+$this->options['cookie_expire'], $this->options['cookie_path'], $this->options['cookie_domain']);
 
             // ==== Setting the cookie var ==== //
             $_COOKIE['lang_'.$this->uq] = $lang;
