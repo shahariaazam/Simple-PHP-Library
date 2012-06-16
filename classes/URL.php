@@ -191,24 +191,33 @@ class URL
         if(!isset($_GET[$this->options['page_token']]))
         {
             $_GET[$this->options['page_token']] = $this->options['index_page'];
+
+            // ==== Setting the current page var ==== //
+            $this->page = $this->options['index_page'];
         }
 
         // ==== Processing the URL only if it's not the site root ==== //
         if($this->_site_root != $this->url)
         {
+            // ==== Site root matches ==== //
+            $matches = array();
+
+            // ==== Check variable to see if site root was found ==== //
+            $found_site_root = 0;
+
             // ==== Creating a local site root copy to be able to handle the decoding of the URL ==== //
             $site_root = $this->_site_root;
 
-            // ==== Getting the actual protocol used to access the site ==== //
-            $protocol = isset($_SERVER['HTTPS'])?'https://':'http://';
+            // ==== Getting the protocol used to access the site ==== //
+            $protocol = isset($_SERVER['HTTPS'])?'https://':'http://'; // SITE ACCESS
 
-            // ==== Matches array for the preg match ==== //
-            $matches = array();
+            // ==== Getting the protocol used for the site root ==== //
+            preg_match('((http://)|(https://))', $site_root, $matches); // SITE ROOT
 
-            // ==== Getting matches ==== //
-            preg_match('((http://)|(https://))', $site_root, $matches);
-
-            // ==== Getting the site root protocol ==== //
+            /////////////////////////////////////////////////////////////////////////////////////////
+            //  Adjusting the site root protocol to match the protocol used to access the site
+            ////////////////////////////////////////////////////////////////////////////////////////
+            // ==== Making sure that a match was made ==== //
             if(isset($matches[0]))
             {
                 // ==== Replacing the site root protocol with the actual protocol so that we can remove the site root from the URL ==== //
@@ -219,17 +228,10 @@ class URL
                 // ==== Creating the correct site root ==== //
                 $site_root = $protocol.$site_root;
 
-                // ==== Adjusting the site root ==== //
+                // ==== Updating the site root ==== //
                 $this->options['site_root'] = $site_root;
-            }
+            }            
 
-            // ==== Check variable to see if site root was found ==== //
-            $found_site_root = 0;
-            
-
-            ////////////////////////////////////////////////////////////////
-            //    PROCESSING THE URL - REWRITE ENABLED/FOUND
-            ///////////////////////////////////////////////////////////////
             // ==== Removing the site root from the URL ==== //
             $data = str_replace($site_root, '', $this->url, $found_site_root);
 
@@ -239,12 +241,15 @@ class URL
                 // ==== Breaking the URL into pieces ==== //
                 $data = explode('/', $data);
 
-                // ==== Removing the last piece of the array ==== //
+                // ==== Removing the last piece of the array (because it's empty) ==== //
                 array_pop($data);
 
                 // ==== Checking if there is any data to process ==== //
                 if(count($data) > 0)
                 {
+                    ////////////////////////////////////////////////////////////////
+                    //    PROCESSING THE URL - REWRITE ENABLED/FOUND
+                    ///////////////////////////////////////////////////////////////
                     // ==== Temporary get holder ==== //
                     $get = array();
 
@@ -286,6 +291,16 @@ class URL
                     }
                 }
             }
+        }
+
+        // ==== Defining the CURRENT_PAGE constant ==== //
+        if(!defined('CURRENT_PAGE'))
+        {
+            define('CURRENT_PAGE', $this->page);
+        }
+        else
+        {
+            throw new Exception('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
         }
     }
 
