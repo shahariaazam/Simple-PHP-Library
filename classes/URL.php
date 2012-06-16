@@ -493,7 +493,7 @@ class URL
                 }
 
                 // ==== Adding the parameter to the URL ==== //
-                if(!empty($value))
+                if(trim($value) != '')
                 {
                     $url .= $name.'/'.$value.'/';
                 }
@@ -517,7 +517,7 @@ class URL
                 }
 
                 // ==== Adding the parameter to the URL ==== //
-                if(!empty($value))
+                if(trim($value) != '')
                 {
                     $url .= '&'.$param.'='.$value;
                 }
