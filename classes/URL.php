@@ -69,15 +69,15 @@ class URL
     /**
      * Rewrite active or not
      *
-     * @var boolen
+     * @var boolean
      */
     protected $rewrite;
 
     /**
      * Class constructor. It also validates the URL
      *
-     * @param string $url
-     * @return boolean
+     * @param array $options
+     * @return \URL
      */
     public function __construct($options=array())
     {
@@ -180,9 +180,9 @@ class URL
     }
 
     /**
-     * The method retrives data from the URL
+     * The method retrieves data from the URL
      *
-     * @param void
+     * @throws Exception
      * @return void
      */
     protected function getURLData()
@@ -508,7 +508,7 @@ class URL
             $url .= '?'.$this->options['page_token'].'='.$page;
 
             // ==== Going through the params and building the URL ==== //
-            foreach($params as $param => $value)
+            foreach($params as $name => $value)
             {
                 // ==== Skipping the page token if present ==== //
                 if($name == $this->options['page_token'])
@@ -519,7 +519,7 @@ class URL
                 // ==== Adding the parameter to the URL ==== //
                 if(trim($value) != '')
                 {
-                    $url .= '&'.$param.'='.$value;
+                    $url .= '&'.$name.'='.$value;
                 }
             }
         }
