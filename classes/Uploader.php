@@ -200,7 +200,7 @@ class Uploader
             }
             else // Checking the keys of the array
             {
-                if(!key_in_array($extension, $this->options['extensions']))
+                if(array_key_exists($extension, $this->options['extensions']) == false)
                 {
                     $result = false;
                 }
@@ -303,8 +303,8 @@ class Uploader
     /**
      * The method is the interface with the user that does the actual selection of which files to upload
      *
-     * @param array or string $indexes
-     * @return void
+     * @param mixed Array or string $indexes
+     * @return mixed Array on success or false on failure
      */
     public function upload($index)
     {
@@ -389,4 +389,3 @@ class Uploader
         }
     }
 }
-?>
