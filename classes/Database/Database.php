@@ -22,7 +22,7 @@
 namespace Database;
 
 ////////////////////////////////////////////////////////////////////////////
-//  Database Initializor                                                 //
+//  Database Initializer                                                 //
 //////////////////////////////////////////////////////////////////////////
 abstract class Database
 {
@@ -97,7 +97,7 @@ abstract class Database
     /**
      * The method checks if the database type is supported
      *
-     * @param string type
+     * @param string $type
      * @return boolean
      */
     private static function isSupported($type)
