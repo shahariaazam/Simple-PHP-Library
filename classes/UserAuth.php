@@ -580,6 +580,9 @@ class UserAuth
             // ==== Checking if the authentication process went OK ==== //
             if($isOk == true)
             {
+                // ==== Getting the userinfo ==== //
+                $userinfo = $this->userAcc->getAccountInfo($account_id);
+
                 // ==== Regenerating the session ==== //
                 session_regenerate_id();
 
@@ -587,10 +590,10 @@ class UserAuth
                 $_SESSION['auth'] = true;
 
                 // ==== Storing the userinfo into the session ==== //
-                $_SESSION['userinfo'] = $this->vault->encrypt(serialize($this->userAcc->getAccountInfo($account_id)));
+                $_SESSION['userinfo'] = $this->vault->encrypt(serialize($userinfo));
 
                 // ==== Updating the userinfo of the UserAccounts class ==== //
-                $this->userAcc->setAccountInfo($_SESSION['userinfo']);
+                $this->userAcc->setAccountInfo($userinfo);
             }
             else
             {
