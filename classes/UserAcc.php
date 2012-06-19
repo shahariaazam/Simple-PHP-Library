@@ -538,7 +538,7 @@ class UserAcc
         // ==== Getting the account ID if none was provided ==== //
         if(!is_numeric($account_id) || $account_id == 0)
         {
-            $account_id = $this->account_id;
+            $account_id = $this->userinfo['account_id'];
         }
 
         // ==== Checking if we have the required data ==== //
@@ -801,7 +801,7 @@ class UserAcc
      * The method takes care of the registration process
      *
      * @param array $data
-     * @return true on success of an error number on fail
+     * @return mixed true on success of an error number on fail
      */
     public function doRegister(array $data)
     {
@@ -900,6 +900,22 @@ class UserAcc
 
         // ==== Result ==== //
         return $result;
+    }
+
+    /**
+     * The method is used to retrieve the SQL for the retrive password process
+     *
+     * @param array $data
+     * @return string
+     */
+    protected function sqlRecovery(array $data)
+    {
+        // ==== Default SQL value ==== //
+        $sql = "";
+
+
+        // ==== Returning the result ==== //
+        return $sql;
     }
 
     /**
