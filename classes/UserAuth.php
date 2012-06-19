@@ -588,6 +588,9 @@ class UserAuth
 
                 // ==== Storing the userinfo into the session ==== //
                 $_SESSION['userinfo'] = $this->vault->encrypt(serialize($this->userAcc->getAccountInfo($account_id)));
+
+                // ==== Updating the userinfo of the UserAccounts class ==== //
+                $this->userAcc->setAccountInfo($_SESSION['userinfo']);
             }
             else
             {
@@ -663,7 +666,7 @@ class UserAuth
      * SQL logout
      *
      * @param array $data
-     * @return void
+     * @return string
      */
     protected function sqlLogout(array $data)
     {
