@@ -591,9 +591,6 @@ class UserAuth
 
                 // ==== Storing the userinfo into the session ==== //
                 $_SESSION['userinfo'] = $this->vault->encrypt(serialize($userinfo));
-
-                // ==== Updating the userinfo of the UserAccounts class ==== //
-                $this->userAcc->setAccountInfo($userinfo);
             }
             else
             {
