@@ -524,7 +524,7 @@ abstract class BaseUserAcc
                     $result = false;
                                        
                     // ==== Adding the error ==== //
-                    $this->log_message('sql', 'Could not do login because query failed', __METHOD__, 103);
+                    $this->log_message('sql', 'Could not do login because query failed', __METHOD__, 103, $sql, $sql_error);
                 }
             }
             else
@@ -857,10 +857,10 @@ abstract class BaseUserAcc
                 $sql_error = $this->db->error();
 
                 // ==== Checking if an error occured ==== //
-                if($sql_error == '')
+                if($sql_error != '')
                 {                   
                     // ==== Adding the error ==== //
-                    $this->log_message('sql', 'Could not register account because query failed', __METHOD__, 102);
+                    $this->log_message('sql', 'Could not register account because query failed', __METHOD__, 102, $sql, $sql_error);
                 }
             }
             else
