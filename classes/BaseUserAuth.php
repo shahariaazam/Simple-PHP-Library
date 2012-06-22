@@ -299,7 +299,7 @@ abstract class BaseUserAuth
      * @param array $data
      * @return string
      */
-    protected abstract function sqlLogin(array $data);
+    protected abstract function sqlLogin($account_id, array $data);
 
     /**
      * Login data
