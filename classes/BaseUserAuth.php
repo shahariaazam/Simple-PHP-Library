@@ -8,7 +8,7 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name UserAuth
+ * @name BaseUserAuth
  * @version 1.5
  *
  *
@@ -65,7 +65,7 @@
  * 
  */
 
-class UserAuth
+abstract class BaseUserAuth
 {
     /**
      * Options array
@@ -243,15 +243,7 @@ class UserAuth
      * @param array $data
      * @return string
      */
-    protected function sqlLogin(array $data)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function sqlLogin(array $data);
 
     /**
      * Login data
@@ -407,15 +399,7 @@ class UserAuth
      * @param array $data
      * @return string
      */
-    protected function sqlAuth(array $data)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function sqlAuth(array $data);
 
     /**
      * Authentication data
@@ -668,15 +652,7 @@ class UserAuth
      * @param array $data
      * @return string
      */
-    protected function sqlLogout(array $data)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function sqlLogout(array $data);
 
     /**
      * Logout method

@@ -8,7 +8,7 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name UserAcc
+ * @name BaseUserAcc
  * @version 1.5
  *
  * @uses getFullURL function from functions/common.inc.php
@@ -60,7 +60,7 @@
  * 
  */
 
-class UserAcc
+abstract class BaseUserAcc
 {
     /**
      * Options array
@@ -241,15 +241,7 @@ class UserAcc
      * @param array $data
      * @return string
      */
-    protected function sqlSalt(array $data)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         * 
-         */
-    }
+    protected abstract function sqlSalt(array $data);
 
     /**
      * The method retrieves the salt for a given account
@@ -360,15 +352,7 @@ class UserAcc
      * @param array $data
      * @return string
      */
-    protected function sqlLogin(array $data)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function sqlLogin(array $data);
 
     /**
      * This method prepares the data for the login SQL and returns the SQL
@@ -513,15 +497,7 @@ class UserAcc
      * @param integer $account_id
      * @return string
      */
-    protected function sqlAccountInfo($account_id)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function sqlAccountInfo($account_id);
 
     /**
      *
@@ -750,15 +726,7 @@ class UserAcc
      * @param array $data
      * @return array
      */
-    protected function sqlRegister(array $data)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function sqlRegister(array $data);
 
     /**
      * This method prepares the SQL for the login and the data that is required for the query
@@ -908,15 +876,7 @@ class UserAcc
      * @param array $data
      * @return string
      */
-    protected function sqlRecovery(array $data)
-    {
-        // ==== Default SQL value ==== //
-        $sql = "";
-
-
-        // ==== Returning the result ==== //
-        return $sql;
-    }
+    protected abstract function sqlRecovery(array $data);
 
     /**
      * The function takes care of Stage 1 of the password recovery process
