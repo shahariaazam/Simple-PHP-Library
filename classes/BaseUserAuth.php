@@ -98,14 +98,14 @@ abstract class BaseUserAuth
     /**
      * Database object
      *
-     * @var object
+     * @var db_module
      */
     protected $db;
 
     /**
      * Vault object
      *
-     * @var object
+     * @var Vault
      */
     protected $vault;
 
@@ -127,7 +127,7 @@ abstract class BaseUserAuth
      *
      * UserAccount object
      *
-     * @var object
+     * @var BaseUserAcc
      */
     protected $userAcc;
 
@@ -139,7 +139,7 @@ abstract class BaseUserAuth
      * @param array $options
      * @return void
      */
-    public function __construct(\Database\db_module $db, UserAcc $userAcc, Vault $vault, array $options=array())
+    public function __construct(\Database\db_module $db, BaseUserAcc $userAcc, Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';

@@ -27,7 +27,7 @@ class Paging
     /**
      * URL Object
      *
-     * @var object
+     * @var URL
      */
     private $url;
 
