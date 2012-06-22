@@ -191,6 +191,62 @@ abstract class BaseUserAuth
     {
         return $this->errors;
     }
+    
+    /**
+     * The method is used to log a message
+     * 
+     * @param string $type
+     * @param string $message
+     * @param string $location
+     * @param string $number
+     * @param string $extra1
+     * @param string $extra2
+     * @return void
+     */
+     protected function log_message($type, $message, $location = '', $number=0, $extra1 = '', $extra2 = '')
+     {
+        // ==== Switching based on type ==== //
+        switch($type)
+        {
+            // SQL
+            case 'sql';
+                // ==== Error ==== //
+                if(is_numeric($number) && $number > 0)
+                {
+                    $this->errors[] = $number;
+                }
+            
+                // ==== Checking if debug is active ==== //
+                if($this->options['debug'])
+                {
+                    $this->log .= '<hr><hr><strong>' . $location . '</strong><hr><br />';
+                    $this->log .= '<b>ERROR:</b> ' . $message . '<br />';
+                    $this->log .= '<b>QUERY:</b>' . $extra1 . '<br />';
+                    $this->log .= '<b>SQL ERROR:</b>' . $extra2 . '<br /><br />';
+                }
+                
+                break;
+                
+            // ERROR
+            case 'error':
+                // ==== Error ==== //
+                if(is_numeric($number) && $number > 0)
+                {
+                    $this->errors[] = $number;
+                }
+                
+            // LOG
+            case 'log':
+                $this->log .= '<hr><hr><strong>' . $location . '</strong><hr><br />';
+                $this->log .= $message;
+                
+                break;
+                
+            // INVALID TYPE
+            default:
+                break;
+        }
+     }
 
     /**
      * The method hides the cookies purpose
@@ -268,11 +324,13 @@ abstract class BaseUserAuth
         // ==== Adding log data ==== //
         if($this->options['debug'])
         {
-            $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-            $this->log .= '<strong>Info:</strong><br />';
-            $this->log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-            $this->log .= 'Data: '.print_array($data, 1).'<br />';
-            $this->log .= '<br /><br />';
+            $log = '<strong>Info:</strong><br />';
+            $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
+            $log .= 'Data: '.print_array($data, 1).'<br />';
+            $log .= '<br /><br />';
+            
+            // ==== Adding log ==== //
+            $this->log_message('log', $log, __METHOD__);
         }
 
         // ==== Result ==== //
@@ -338,14 +396,14 @@ abstract class BaseUserAuth
                         }
                         else
                         {
-                            // ==== Errors ==== //
-                            $this->errors[] = 501;
+                            // ==== Adding the error ==== //
+                            $this->log_message('error', 'Could not insert authentication info into the database', __METHOD__, 501);
                         }
                     }
                     else
-                    {
-                        // ==== Errors ==== //
-                        $this->errors[] = 500;
+                    {                       
+                        // ==== Adding the error ==== //
+                        $this->log_message('error', 'Internal class error (used to signal the UserAcc class that an error has occured)', __METHOD__, 500);
                     }
                 }
                 else
@@ -371,9 +429,11 @@ abstract class BaseUserAuth
                 // ==== Adding log data ==== //
                 if($this->options['debug'])
                 {
-                    $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                    $this->log .= 'Account ID: ' . $account_id . '<br />';
-                    $this->log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
+                    $log = 'Account ID: ' . $account_id . '<br />';
+                    $log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
+                    
+                    // ==== Adding the error ==== //
+                    $this->log_message('log', $log, __METHOD__);
                 }
             }
         }
@@ -384,8 +444,10 @@ abstract class BaseUserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                $this->log .= '<strong>NOTICE:</strong> User already logged in.<br /><br />';
+                $log = '<strong>NOTICE:</strong> User already logged in.<br /><br />';
+                
+                // ==== Adding the error ==== //
+                $this->log_message('log', $log, __METHOD__);
             }
         }
 
@@ -442,11 +504,13 @@ abstract class BaseUserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                $this->log .= '<strong>Info:</strong><br />';
-                $this->log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-                $this->log .= 'Data: '.print_array($data, 1).'<br />';
-                $this->log .= '<br /><br />';
+                $log = '<strong>Info:</strong><br />';
+                $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
+                $log .= 'Data: '.print_array($data, 1).'<br />';
+                $log .= '<br /><br />';
+                
+                // ==== Adding the error ==== //
+                $this->log_message('log', $log, __METHOD__);
             }
         }
         else
@@ -454,8 +518,10 @@ abstract class BaseUserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                $this->log .= '<strong>ERROR:</strong> The required data for the prepareAuth method is not present. Required: authentication cookie.<br /><br />';
+                $log = '<strong>ERROR:</strong> The required data for the prepareAuth method is not present. Required: authentication cookie.<br /><br />';
+                
+                // ==== Adding the error ==== //
+                $this->log_message('log', $log, __METHOD__);
             }
         }
 
@@ -507,12 +573,14 @@ abstract class BaseUserAuth
                             // ==== Adding log data ==== //
                             if($this->options['debug'])
                             {
-                                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                                $this->log .= '<strong>Info:</strong><br />';
-                                $this->log .= 'Authentication falied.<br /><br />';
-                                $this->log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
-                                $this->log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
-                                $this->log .= '<br /><br />';
+                                $log = '<strong>Info:</strong><br />';
+                                $log .= 'Authentication falied.<br /><br />';
+                                $log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
+                                $log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
+                                $log .= '<br /><br />';
+                                
+                                // ==== Adding the error ==== //
+                                $this->log_message('log', $log, __METHOD__);
                             }
 
                             // ==== Removing the cookie ==== //
@@ -533,8 +601,10 @@ abstract class BaseUserAuth
                             // ==== Adding log data ==== //
                             if($this->options['debug'])
                             {
-                                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                                $this->log .= '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
+                                $log = '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
+                                
+                                // ==== Adding the error ==== //
+                                $this->log_message('log', $log, __METHOD__);
                             }
                         }
                     }
@@ -553,8 +623,10 @@ abstract class BaseUserAuth
                 // ==== Adding log data ==== //
                 if($this->options['debug'])
                 {
-                    $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                    $this->log .= '<strong>Info:</strong> Skipped db check.<br /><br />';
+                    $log = '<strong>Info:</strong> Skipped db check.<br /><br />';
+                    
+                    // ==== Adding the error ==== //
+                    $this->log_message('log', $log, __METHOD__);
                 }
             }
             //////////////////////////////////////////////////////////
@@ -593,11 +665,13 @@ abstract class BaseUserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                $this->log .= '<strong>Info:</strong><br />';
-                $this->log .= 'Skipped database authentication<br /><br />';
-                $this->log .= 'User info: '.print_array($userinfo, 1).'<br />';
-                $this->log .= '<br /><br />';
+                $log = '<strong>Info:</strong><br />';
+                $log .= 'Skipped database authentication<br /><br />';
+                $log .= 'User info: '.print_array($userinfo, 1).'<br />';
+                $log .= '<br /><br />';
+                
+                // ==== Adding the error ==== //
+                $this->log_message('log', $log, __METHOD__);
             }
         }
         else
@@ -605,10 +679,12 @@ abstract class BaseUserAuth
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                $this->log .= '<strong>Info:</strong><br />';
-                $this->log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
-                $this->log .= '<br /><br />';
+                $log = '<strong>Info:</strong><br />';
+                $log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
+                $log .= '<br /><br />';
+                
+                // ==== Adding the error ==== //
+                $this->log_message('log', $log, __METHOD__);
             }
         }
 
@@ -637,9 +713,12 @@ abstract class BaseUserAuth
         // ==== Adding log data ==== //
         if($this->options['debug'])
         {
-            $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-            $this->log .= '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true?'yes':'no') . '<br />';
-            $this->log .= '<br /><br />';
+            $log = '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+            $log .= '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true?'yes':'no') . '<br />';
+            $log .= '<br /><br />';
+            
+            // ==== Adding the error ==== //
+            $this->log_message('log', $log, __METHOD__);
         }
 
         // ==== returning the result ==== //
