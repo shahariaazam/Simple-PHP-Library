@@ -51,6 +51,13 @@ class Language
     private $mopt;
     
     /**
+     * Array that will hold elements from $_GET
+     * 
+     * @var array
+     */
+    protected $get;
+    
+    /**
      * CodeIgniter object
      * 
      * @var CodeIgniter
@@ -88,9 +95,15 @@ class Language
         if($this->options['code_igniter'])
         {
             $this->CI = &get_instance();
+            
+            // ==== Getting stuff from GET ==== //
+            $this->get = $this->CI->input->get();
         }
         else
         {
+            // ==== Getting stuff from GET ==== //
+            $this->get = $_GET;
+            
             // ==== Checking for session initialization ==== //
             if(session_id() == '')
             {
@@ -121,9 +134,9 @@ class Language
     public function getLanguage()
     {
         // ==== Checking the possible locations for a language ==== //
-        if(isset($_GET['lang'])) // LANG PARAM IN GET
+        if(isset($this->get['lang'])) // LANG PARAM IN GET
         {
-            $lang = $_GET['lang'];
+            $lang = $this->get['lang'];
         }
         elseif(isset($_SESSION['lang_' . $this->uq])) // LANGUAGE ID FROM SESSION
         {
