@@ -89,6 +89,14 @@ class Language
         {
             $this->CI = &get_instance();
         }
+        else
+        {
+            // ==== Checking for session initialization ==== //
+            if(session_id() == '')
+            {
+                trigger_error('The Language class requires sessions to work properly.', E_USER_WARNING);
+            }
+        }
 
         // ==== Setting up mail options ==== //
         $this->mopt['to']         = $this->options['mail'];
