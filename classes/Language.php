@@ -49,6 +49,13 @@ class Language
      * @var array
      */
     private $mopt;
+    
+    /**
+     * CodeIgniter object
+     * 
+     * @var CodeIgniter
+     */
+     private $CI;
 
     /**
      * Class constructor
@@ -58,14 +65,9 @@ class Language
      */
     public function __construct(array $options = array())
     {
-        // ==== Checking if a session exists ==== //
-        if(session_id() == '')
-        {
-            trigger_error('The Language class needs and active session in order to work.', E_USER_WARNING);
-        }
-
         // ==== Default options ==== //
         $this->options['default_language']  = 'en';
+        $this->options['code_igniter']      = false;
         $this->options['lang_dir']          = 'lang/';
         $this->options['lang_sufix']        = '.lang.php';
         $this->options['cookie_enabled']    = false;
@@ -80,6 +82,12 @@ class Language
         if(is_array($options))
         {
             $this->options = array_merge($this->options, $options);
+        }
+        
+        // ==== Getting the Code Igniter object instance if the class has the support activated for it ==== //
+        if($this->options['code_igniter'])
+        {
+            $this->CI = &get_instance();
         }
 
         // ==== Setting up mail options ==== //
@@ -105,19 +113,23 @@ class Language
     public function getLanguage()
     {
         // ==== Checking the possible locations for a language ==== //
-        if(isset($_GET['lang']))
+        if(isset($_GET['lang'])) // LANG PARAM IN GET
         {
             $lang = $_GET['lang'];
         }
-        elseif(isset($_SESSION['lang_' . $this->uq]))
+        elseif(isset($_SESSION['lang_' . $this->uq])) // LANGUAGE ID FROM SESSION
         {
             $lang = $_SESSION['lang_' . $this->uq];
         }
-        elseif(isset($_COOKIE['lang_' . $this->uq]) && $this->options['cookie_enabled'] == true)
+        elseif($this->options['code_igniter'] == true && $this->CI->session->userdata('lang_' . $this->uq) != false) // LANGUAGE ID FROM CI SESSION
+        {
+            $lang = $this->CI->session->userdata('lang_' . $this->uq);
+        }
+        elseif(isset($_COOKIE['lang_' . $this->uq]) && $this->options['cookie_enabled'] == true) // LANGUAGE ID FROM COOKIE
         {
             $lang = $_COOKIE['lang_' . $this->uq];
         }
-        else
+        else // DEFAULT LANGUAGE
         {
             $lang = $this->options['default_language'];
         }
@@ -162,7 +174,14 @@ class Language
         }
 
         // ==== Intializing or overwriting the session variable ===== //
-        $_SESSION['lang_' . $this->uq] = $lang;
+        if($this->options['code_igniter'] == true)
+        {
+            $this->CI->session->set_userdata('lang_' . $this->uq, $lang);   
+        }
+        else
+        {
+            $_SESSION['lang_' . $this->uq] = $lang;
+        }
 
         // ==== If rememeber is active ==== //
         if($this->options['cookie_enabled'] == true
