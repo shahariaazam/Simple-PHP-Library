@@ -72,6 +72,13 @@ class URL
      * @var boolean
      */
     protected $rewrite;
+    
+    /**
+     * CodeIgniter object
+     * 
+     * @var CodeIgniter
+     */
+    protected $CI;
 
     /**
      * Class constructor. It also validates the URL
@@ -89,21 +96,38 @@ class URL
         $this->options['get_params']     = array();
         $this->options['rewrite']        = false;
         $this->options['secure']         = false;
+        $this->options['code_igniter']   = false;
 
-        // ==== Checking if the site_root option has been set ==== //
-        if(!empty($options['site_root']))
+        // ==== Replacing options with custom ones ==== //
+        if(is_array($options))
         {
-            // ==== Replacing options with custom ones ==== //
-            if(is_array($options))
-            {
-                $this->options = array_replace($this->options, $options);
-            }
-
+            $this->options = array_replace($this->options, $options);
+        }
+        
+        // ==== Checking if the CodeIgniter support is enabled ==== //
+        if($this->options['code_igniter'])
+        {
+            $this->CI = &get_instance();
+            
+            // ==== Getting some options from CodeIgniter ==== //
+            $this->options['site_root']     = $this->CI->config->item('base_url'); // SITE ROOT
+            $this->options['site_root_ssl'] = 'https://' . str_replace('http://', '', $this->options['site_root']); // SITE ROOT SSL
+            $this->options['rewrite']       = $this->CI->config->item('enable_query_strings'); // REWRITE
+            $this->options['controller']    = $this->CI->config->item('controller_trigger'); // CONTROLLER TRIGGER
+            $this->options['method']        = $this->CI->config->item('function_trigger'); // FUNCTION TRIGGER
+            $this->options['id']            = 'id'; // ID
+            $this->options['index_page']    = $this->CI->config->item('default_controller'); // INDEX PAGE
+            $this->options['page_token']    = $this->options['controller']; // BACKWARD COMPATIBILITY
+        }
+        
+        // ==== Checking if the site_root option has been set ==== //
+        if(!empty($this->options['site_root']))
+        {
             // ==== Setting rewrite property ==== //
             $this->rewrite = $this->options['rewrite'];
 
             // ==== Getting URL ==== //
-            $this->url = getFullURL();
+            $this->url = self::getFullURL();
 
             // ==== Correcting the site root ==== //
             if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/')+1))
@@ -146,6 +170,24 @@ class URL
             // ==== Triggering error ==== //
             exit('The site root is not set.');
         }
+    }
+    
+    /**
+     *
+     * The method returns the current url (everything in the URL bar)
+     *
+     * @param void
+     * @return string
+     */
+    public static function getFullURL()
+    {
+        $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+        $domain = $_SERVER['SERVER_NAME'];
+        $request_uri = $_SERVER['REQUEST_URI'];
+    
+        $full_url = $protocol . $domain . $request_uri;
+    
+        return $full_url;
     }
 
     /**
@@ -197,7 +239,7 @@ class URL
         }
 
         // ==== Processing the URL only if it's not the site root ==== //
-        if($this->_site_root != $this->url)
+        if($this->site_root != $this->url)
         {
             // ==== Site root matches ==== //
             $matches = array();
@@ -241,53 +283,128 @@ class URL
                 // ==== Breaking the URL into pieces ==== //
                 $data = explode('/', $data);
 
-                // ==== Removing the last piece of the array (because it's empty) ==== //
-                array_pop($data);
+                // ==== Removing the last piece of the array (if it's empty) ==== //
+                if(trim($data[count($data) - 1]) == '')
+                {
+                    array_pop($data);
+                }
 
-                // ==== Checking if there is any data to process ==== //
-                if(count($data) > 0)
+                // ==== Checking if CodeIgniter support is enabled ==== //
+                if($this->options['code_igniter'])
                 {
                     ////////////////////////////////////////////////////////////////
-                    //    PROCESSING THE URL - REWRITE ENABLED/FOUND
+                    //    CODEIGNITER SUPPORT ENABLED
                     ///////////////////////////////////////////////////////////////
-                    // ==== Temporary get holder ==== //
-                    $get = array();
-
-                    // ==== Getting the page ==== //
-                    $this->page = $data[0];
-
-                    // ==== Putting the current page in $_GET ==== //
-                    $_GET[$this->options['page_token']] = $this->page;
-
-                    // ==== Removing the page from the data array ==== //
-                    unset($data[0]);
-
-                    // ==== The data should contain an even number of elements ==== //
-                    if(count($data)%2 == 0)
+                    // ==== Checking if there is any data to process ==== //
+                    if(count($data) > 0)
                     {
-                        // ==== Going through the data ==== //
-                        foreach($data as $idx => $value)
+                        ////////////////////////////////////////////////////////////////
+                        //    PROCESSING THE URL - REWRITE ENABLED/FOUND
+                        ///////////////////////////////////////////////////////////////
+                        // ==== Temporary get holder ==== //
+                        $get = array();
+                        
+                        // ==== Getting the controller ==== //
+                        $controller = $data[0];
+                        
+                        // ==== Getting the method ==== //
+                        $method = $data[1];
+                        
+                        // ==== Getting the method ==== //
+                        $id = $data[2];
+                        
+                        // ==== Getting the page ==== //
+                        $this->page = $controller;
+    
+                        // ==== Removing the unecessary from the data array ==== //
+                        unset($data[0]);
+                        unset($data[1]);
+                        unset($data[2]);
+                        
+                        // ==== Putting the stuff in $_GET ==== //
+                        $_GET[$this->options['controller']] = $controller;
+                        $_GET[$this->options['method']]     = $method;
+                        $_GET[$this->options['id']]         = $id;
+    
+                        // ==== The data should contain an even number of elements ==== //
+                        if(count($data)%2 == 0)
                         {
-                            // ==== Checking if this should be skipped ==== //
-                            if($idx%2 != 0)
+                            // ==== Going through the data ==== //
+                            foreach($data as $idx => $value)
                             {
-                                $get[$value] = $data[$idx+1];
+                                // ==== Checking if this should be skipped ==== //
+                                if($idx%2 != 0)
+                                {
+                                    $get[$value] = $data[$idx+1];
+                                }
                             }
                         }
+    
+                        // ==== Merging the $_GET array with the $get array ==== //
+                        $_GET = array_merge($_GET, $get);
                     }
-
-                    // ==== Merging the $_GET array with the $get array ==== //
-                    $_GET = array_merge($_GET, $get);
+                    else
+                    {
+                        ////////////////////////////////////////////////////////////////
+                        //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
+                        ///////////////////////////////////////////////////////////////
+                        // ==== Getting the current page ==== //
+                        if(isset($_GET[$this->options['page_token']]))
+                        {
+                            $this->page = $_GET[$this->options['page_token']];
+                        }
+                    }
                 }
                 else
                 {
                     ////////////////////////////////////////////////////////////////
-                    //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
-                    ///////////////////////////////////////////////////////////////
-                    // ==== Getting the current page ==== //
-                    if(isset($_GET[$this->options['page_token']]))
+                    //    CODEIGNITER SUPPORT DISABLED
+                    ///////////////////////////////////////////////////////////////                    
+                    // ==== Checking if there is any data to process ==== //
+                    if(count($data) > 0)
                     {
-                        $this->page = $_GET[$this->options['page_token']];
+                        ////////////////////////////////////////////////////////////////
+                        //    PROCESSING THE URL - REWRITE ENABLED/FOUND
+                        ///////////////////////////////////////////////////////////////
+                        // ==== Temporary get holder ==== //
+                        $get = array();
+    
+                        // ==== Getting the page ==== //
+                        $this->page = $data[0];
+    
+                        // ==== Putting the current page in $_GET ==== //
+                        $_GET[$this->options['page_token']] = $this->page;
+    
+                        // ==== Removing the page from the data array ==== //
+                        unset($data[0]);
+    
+                        // ==== The data should contain an even number of elements ==== //
+                        if(count($data)%2 == 0)
+                        {
+                            // ==== Going through the data ==== //
+                            foreach($data as $idx => $value)
+                            {
+                                // ==== Checking if this should be skipped ==== //
+                                if($idx%2 != 0)
+                                {
+                                    $get[$value] = $data[$idx+1];
+                                }
+                            }
+                        }
+    
+                        // ==== Merging the $_GET array with the $get array ==== //
+                        $_GET = array_merge($_GET, $get);
+                    }
+                    else
+                    {
+                        ////////////////////////////////////////////////////////////////
+                        //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
+                        ///////////////////////////////////////////////////////////////
+                        // ==== Getting the current page ==== //
+                        if(isset($_GET[$this->options['page_token']]))
+                        {
+                            $this->page = $_GET[$this->options['page_token']];
+                        }
                     }
                 }
             }
@@ -473,6 +590,28 @@ class URL
         {
             unset($params[$this->options['page_token']]);
         }
+        
+        // ==== Failsafes for when CI support is enabled ==== //
+        if($this->options['code_igniter'])
+        {
+            // Controller param
+            if(!isset($params[$this->options['controller']]))
+            {
+                $params[$this->options['controller']] = $page;
+            }
+            
+            // Method param
+            if(!isset($params[$this->options['method']]))
+            {
+                $params[$this->options['method']] = 'index';
+            }
+            
+            // ID param
+            if(!isset($params[$this->options['id']]))
+            {
+                $params[$this->options['id']] = '0';
+            }
+        }
 
         // ==== Processing the data to generate the URL ==== //
         if($this->rewrite)
@@ -480,14 +619,35 @@ class URL
             ////////////////////////////////////////////////////////////////
             //    REWRITE ENABLED
             ///////////////////////////////////////////////////////////////
-            // ==== Adding the requested page to the URL ==== //
-            $url .= $page.'/';
-
+            // ==== Checking for CI support activation then performing specific actions ==== //
+            if($this->options['code_igniter'])
+            {
+                // ==== Building the firs part of the URL ==== //
+                $url .= $params[$this->options['controller']] . '/' . $params[$this->options['method']] . '/' . $params[$this->options['id']] . '/';
+                
+                // ==== Building the omit array ==== //
+                $omit_array = array(
+                    $this->options['controller'],
+                    $this->options['method'],
+                    $this->options['id']
+                );
+            }
+            else
+            {
+                // ==== Adding the requested page to the URL ==== //
+                $url .= $page.'/';
+                
+                // ==== Building the omit array ==== //
+                $omit_array = array(
+                    $this->options['page_token']
+                );
+            }
+            
             // ==== Going through the params and building the URL ==== //
             foreach($params as $name => $value)
             {
                 // ==== Skipping the page token if present ==== //
-                if($name == $this->options['page_token'])
+                if(in_array($name, $omit_array))
                 {
                     continue;
                 }
@@ -504,14 +664,37 @@ class URL
             ////////////////////////////////////////////////////////////////
             //    REWRITE DISABLED
             ///////////////////////////////////////////////////////////////
-            // ==== Adding the requested page to the URL ==== //
-            $url .= '?'.$this->options['page_token'].'='.$page;
+            // ==== Checking for CI support activation then performing specific actions ==== //
+            if($this->options['code_igniter'])
+            {
+                // ==== Building the firs part of the URL ==== //
+                $url .= '?' . $this->options['controller'] . '=' . $params[$this->options['controller']];
+                $url .= '&' . $this->options['method'] . '=' . $params[$this->options['method']];
+                $url .= '&' . $this->options['id'] . '=' . $params[$this->options['id']];
+                
+                // ==== Building the omit array ==== //
+                $omit_array = array(
+                    $this->options['controller'],
+                    $this->options['method'],
+                    $this->options['id']
+                );
+            }
+            else
+            {
+                // ==== Adding the requested page to the URL ==== //
+                $url .= '?'.$this->options['page_token'].'='.$page;
+                
+                // ==== Building the omit array ==== //
+                $omit_array = array(
+                    $this->options['page_token']
+                );
+            }
 
             // ==== Going through the params and building the URL ==== //
             foreach($params as $name => $value)
             {
                 // ==== Skipping the page token if present ==== //
-                if($name == $this->options['page_token'])
+                if(in_array($name, $omit_array))
                 {
                     continue;
                 }
