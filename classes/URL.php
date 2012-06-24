@@ -305,26 +305,31 @@ class URL
                         $get = array();
                         
                         // ==== Getting the controller ==== //
-                        $controller = $data[0];
+                        $_GET[$this->options['controller']] = $data[0];
+                        
+                        // Removing from data
+                        unset($data[0]);
                         
                         // ==== Getting the method ==== //
-                        $method = $data[1];
+                        if(isset($data[1]))
+                        {
+                            $_GET[$this->options['method']] = $data[1];
+                            
+                            // Removing from data
+                            unset($data[1]);
+                        }
                         
                         // ==== Getting the method ==== //
-                        $id = $data[2];
+                        if(isset($data[2]))
+                        {
+                            $_GET[$this->options['id']] = $data[2];
+                            
+                            // Removing from data
+                            unset($data[2]);
+                        }
                         
                         // ==== Getting the page ==== //
-                        $this->page = $controller;
-    
-                        // ==== Removing the unecessary from the data array ==== //
-                        unset($data[0]);
-                        unset($data[1]);
-                        unset($data[2]);
-                        
-                        // ==== Putting the stuff in $_GET ==== //
-                        $_GET[$this->options['controller']] = $controller;
-                        $_GET[$this->options['method']]     = $method;
-                        $_GET[$this->options['id']]         = $id;
+                        $this->page = $_GET[$this->options['controller']];
     
                         // ==== The data should contain an even number of elements ==== //
                         if(count($data)%2 == 0)
