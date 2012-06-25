@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name BaseUserAuth
- * @version 1.5
+ * @version 2.0
  *
  *
  * External errors:
@@ -108,6 +108,13 @@ abstract class BaseUserAuth
      * @var Vault
      */
     protected $vault;
+    
+    /**
+     * Local session array
+     * 
+     * @var array
+     */
+    protected $session;
 
     /**
      * Cookie container
@@ -139,7 +146,7 @@ abstract class BaseUserAuth
      * @param array $options
      * @return void
      */
-    public function __construct(\Database\db_module $db, BaseUserAcc $userAcc, Vault $vault, array $options=array())
+    public function __construct($db, BaseUserAcc $userAcc, Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';
@@ -174,6 +181,9 @@ abstract class BaseUserAuth
         // ==== Getting the UserAccounts object ==== //
         $this->userAcc = $userAcc;
 
+        // ==== Getting the session data ==== //
+        $this->getSession();
+
         // ==== Hidding the cookie ==== //
         $this->hideCookie();
 
@@ -190,6 +200,28 @@ abstract class BaseUserAuth
     public function getErrors()
     {
         return $this->errors;
+    }
+    
+    /**
+     * The method retrieves the data from the session
+     * 
+     * @param void
+     * @return void
+     */
+    protected function getSession()
+    {
+        $this->session = $_SESSION;
+    }
+    
+    /**
+     * The method sets the data to the session
+     * 
+     * @param void
+     * @return void
+     */
+    protected function setSession()
+    {
+        $_SESSION = array_merge($_SESSION, $this->session);
     }
     
     /**
@@ -543,8 +575,8 @@ abstract class BaseUserAuth
 
         // ==== Skipping if already authenticated ==== //
         if($account_id >= 1
-                || (isset($_SESSION['auth']) && $_SESSION['auth'] !== true && !empty($_COOKIE[$this->options['cookie_name']]))
-                || (!isset($_SESSION['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
+                || (isset($this->session['auth']) && $this->session['auth'] !== true && !empty($_COOKIE[$this->options['cookie_name']]))
+                || (!isset($this->session['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
           )
         {
             //////////////////////////////////////////////////////////
@@ -643,21 +675,21 @@ abstract class BaseUserAuth
                 session_regenerate_id();
 
                 // ==== Setting the authentication flag ==== //
-                $_SESSION['auth'] = true;
+                $this->session['auth'] = true;
 
                 // ==== Storing the userinfo into the session ==== //
-                $_SESSION['userinfo'] = $this->vault->encrypt(serialize($userinfo));
+                $this->session['userinfo'] = $this->vault->encrypt(serialize($userinfo));
             }
             else
             {
                 // ==== Setting the authentication flag ==== //
-                $_SESSION['auth'] = false;
+                $this->session['auth'] = false;
             }
         }
-        elseif(isset($_SESSION['auth']) && $_SESSION['auth'] == true)
+        elseif(isset($this->session['auth']) && $this->session['auth'] === true)
         {
             // ==== Getting the userinfo from the session ==== //
-            $userinfo = unserialize($this->vault->decrypt($_SESSION['userinfo']));
+            $userinfo = unserialize($this->vault->decrypt($this->session['userinfo']));
 
             // ==== Updating the userinfo of the UserAccounts class ==== //
             $this->userAcc->setAccountInfo($userinfo);
@@ -689,7 +721,7 @@ abstract class BaseUserAuth
         }
 
         // ==== Checking if authenticated ==== //
-        if(isset($_SESSION['auth']) && $_SESSION['auth'] == true)
+        if(isset($this->session['auth']) && $this->session['auth'] === true)
         {
             $this->authenticated = true;
         }
@@ -770,6 +802,9 @@ abstract class BaseUserAuth
      */
     public function __destruct()
     {
+        // ==== Saving the session info ==== //
+        $this->setSession();
+
         // ==== Debug ==== //
         if($this->options['debug'] && $this->log != '')
         {
@@ -779,7 +814,7 @@ abstract class BaseUserAuth
             $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
             $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
-            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($_SESSION, true).'<br /><br />';
+            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';
             $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
             $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
             $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';

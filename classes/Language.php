@@ -10,7 +10,7 @@
  *
  *
  * @name Language
- * @version 3.5
+ * @version 3.7
  */
 class Language
 {
@@ -98,6 +98,9 @@ class Language
             
             // ==== Getting stuff from GET ==== //
             $this->get = $this->CI->input->get();
+            
+            // ==== Getting the cookie domain ==== //
+            $this->options['cookie_domain'] = $this->CI->config->item('cookie_domain');
         }
         else
         {

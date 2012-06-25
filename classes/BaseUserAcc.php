@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name BaseUserAcc
- * @version 1.5
+ * @version 2.0
  *
  * @uses getFullURL function from functions/common.inc.php
  * @uses ckPasswdComplexity function from functions/common.inc.php
@@ -104,6 +104,13 @@ abstract class BaseUserAcc
      * @var Vault
      */
     protected $vault;
+    
+    /**
+     * Local session array
+     * 
+     * @var array
+     */
+    protected $session;
 
     /**
      * Array with the userinfo
@@ -121,7 +128,7 @@ abstract class BaseUserAcc
      * @param array $options
      * @return void
      */
-    public function __construct(\Database\db_module $db, Vault $vault, array $options=array())
+    public function __construct($db, Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';
@@ -148,6 +155,9 @@ abstract class BaseUserAcc
 
         // ==== Getting the vault object ==== //
         $this->vault = $vault;
+        
+        // ==== Getting the session data ==== //
+        $this->getSession();
     }
 
     /**
@@ -159,6 +169,28 @@ abstract class BaseUserAcc
     public function getErrors()
     {
         return $this->errors;
+    }
+    
+    /**
+     * The method retrieves the data from the session
+     * 
+     * @param void
+     * @return void
+     */
+    protected function getSession()
+    {
+        $this->session = $_SESSION;
+    }
+    
+    /**
+     * The method sets the data to the session
+     * 
+     * @param void
+     * @return void
+     */
+    protected function setSession()
+    {
+        $_SESSION = array_merge($_SESSION, $this->session);
     }
 
     /**
@@ -638,15 +670,7 @@ abstract class BaseUserAcc
      * @param string $username
      * @return boolean
      */
-    protected function doesUsenameExist($username)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function doesUsenameExist($username);
 
     /**
      * The method checks if the email exits
@@ -654,15 +678,7 @@ abstract class BaseUserAcc
      * @param string $email
      * @return boolean
      */
-    protected function doesEmailExist($email)
-    {
-        /**
-         * ----------------------
-         * OVERWRITE THIS METHOD
-         * ----------------------
-         *
-         */
-    }
+    protected abstract function doesEmailExist($email);
 
     /**
      * Register conditions
@@ -980,6 +996,9 @@ abstract class BaseUserAcc
      */
     public function __destruct()
     {
+        // ==== Saving the session info ==== //
+        $this->setSession();
+        
         // ==== Debug ==== //
         if($this->options['debug'] && $this->log != '')
         {
@@ -989,7 +1008,7 @@ abstract class BaseUserAcc
             $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
             $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
-            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($_SESSION, true).'<br /><br />';
+            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';
             $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
             $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
             $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';

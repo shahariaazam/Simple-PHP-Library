@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name URL
- * @version 2.5
+ * @version 2.7
  *
  * @uses getFullURL function from functions/common.inc.php
  *
@@ -549,7 +549,7 @@ class URL
         {
             $url = $this->_site_root;
         }
-
+ 
         // ==== Checking if a page has actualy been requested ==== //
         if(empty($page)) // Base link to the same page without the given params
         {
@@ -595,7 +595,7 @@ class URL
         {
             unset($params[$this->options['page_token']]);
         }
-        
+       
         // ==== Failsafes for when CI support is enabled ==== //
         if($this->options['code_igniter'])
         {
@@ -605,16 +605,20 @@ class URL
                 $params[$this->options['controller']] = $page;
             }
             
-            // Method param
-            if(!isset($params[$this->options['method']]))
+            // Adding the default params only if params count is higher then 1
+            if(count($params) > 1)
             {
-                $params[$this->options['method']] = 'index';
-            }
-            
-            // ID param
-            if(!isset($params[$this->options['id']]))
-            {
-                $params[$this->options['id']] = '0';
+                // Method param
+                if(!isset($params[$this->options['method']]))
+                {
+                    $params[$this->options['method']] = 'index';
+                }
+                
+                // ID param
+                if(!isset($params[$this->options['id']]))
+                {
+                    $params[$this->options['id']] = '0';
+                }
             }
         }
 
@@ -628,7 +632,14 @@ class URL
             if($this->options['code_igniter'])
             {
                 // ==== Building the firs part of the URL ==== //
-                $url .= $params[$this->options['controller']] . '/' . $params[$this->options['method']] . '/' . $params[$this->options['id']] . '/';
+                $url .= $params[$this->options['controller']] . '/';
+                
+                // ==== Checking for the rest of the params ==== //
+                if(isset($params[$this->options['method']]) && isset($params[$this->options['id']]))
+                {
+                     $url .= $params[$this->options['method']] . '/';
+                     $url .= $params[$this->options['id']] . '/';
+                }
                 
                 // ==== Building the omit array ==== //
                 $omit_array = array(
@@ -647,7 +658,7 @@ class URL
                     $this->options['page_token']
                 );
             }
-            
+
             // ==== Going through the params and building the URL ==== //
             foreach($params as $name => $value)
             {
@@ -674,8 +685,14 @@ class URL
             {
                 // ==== Building the firs part of the URL ==== //
                 $url .= '?' . $this->options['controller'] . '=' . $params[$this->options['controller']];
-                $url .= '&' . $this->options['method'] . '=' . $params[$this->options['method']];
-                $url .= '&' . $this->options['id'] . '=' . $params[$this->options['id']];
+
+                
+                // ==== Checking for the rest of the params ==== //
+                if(isset($params[$this->options['method']]) && isset($params[$this->options['id']]))
+                {
+                    $url .= '&' . $this->options['method'] . '=' . $params[$this->options['method']];
+                    $url .= '&' . $this->options['id'] . '=' . $params[$this->options['id']];
+                }
                 
                 // ==== Building the omit array ==== //
                 $omit_array = array(
