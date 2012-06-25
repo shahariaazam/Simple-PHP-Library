@@ -210,7 +210,7 @@ abstract class BaseUserAuth
      */
     protected function getSession()
     {
-        $this->session = $_SESSION;
+        $this->session = &$_SESSION;
     }
     
     /**
@@ -574,8 +574,8 @@ abstract class BaseUserAuth
         $isOk = true;
 
         // ==== Skipping if already authenticated ==== //
-        if($account_id >= 1
-                || (isset($this->session['auth']) && $this->session['auth'] !== true && !empty($_COOKIE[$this->options['cookie_name']]))
+        if($account_id > 0
+                || (isset($this->session['auth']) && $this->session['auth'] != true && !empty($_COOKIE[$this->options['cookie_name']]))
                 || (!isset($this->session['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
           )
         {
@@ -686,7 +686,7 @@ abstract class BaseUserAuth
                 $this->session['auth'] = false;
             }
         }
-        elseif(isset($this->session['auth']) && $this->session['auth'] === true)
+        elseif(isset($this->session['auth']) && $this->session['auth'] == true)
         {
             // ==== Getting the userinfo from the session ==== //
             $userinfo = unserialize($this->vault->decrypt($this->session['userinfo']));
@@ -721,7 +721,7 @@ abstract class BaseUserAuth
         }
 
         // ==== Checking if authenticated ==== //
-        if(isset($this->session['auth']) && $this->session['auth'] === true)
+        if(isset($this->session['auth']) && $this->session['auth'] == true)
         {
             $this->authenticated = true;
         }

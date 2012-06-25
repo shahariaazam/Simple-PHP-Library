@@ -179,7 +179,7 @@ abstract class BaseUserAcc
      */
     protected function getSession()
     {
-        $this->session = $_SESSION;
+        $this->session = &$_SESSION;
     }
     
     /**
