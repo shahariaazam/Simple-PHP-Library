@@ -409,10 +409,13 @@ abstract class BaseUserAuth
                     if($sql != '')
                     {
                         // ==== Executing the SQL ==== //
-                        $result = $this->db->query($sql);
-
-                        // ==== Checking the result ==== //
-                        if($result == true)
+                        $this->db->query($sql);
+        
+                        // ==== Getting the SQL error ==== //
+                        $sql_error = $this->db->error();
+        
+                        // ==== Checking if an error occured ==== //
+                        if($sql_error == '')
                         {
                             // ==== Setting the cookie ==== //
                             $this->createCookie();
@@ -597,10 +600,13 @@ abstract class BaseUserAuth
                     if($sql != '')
                     {
                         // ==== Executing the SQL ==== //
-                        $success = $this->db->query($sql);
+                        $this->db->query($sql);
+        
+                        // ==== Getting the SQL error ==== //
+                        $sql_error = $this->db->error();
 
                         // ==== Checking if something found ==== //
-                        if($success == false || $this->db->num_rows() != 1)
+                        if($sql_error != '' || $this->db->num_rows() != 1)
                         {
                             // ==== Adding log data ==== //
                             if($this->options['debug'])
