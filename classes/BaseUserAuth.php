@@ -4,12 +4,12 @@
  * The class handles the authentication of users
  *
  * @author Brian
- * @link http://brian.hopto.org/framework_wik/
+ * @link http://brian.hopto.org/wiki/hypermvc/
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name BaseUserAuth
- * @version 2.0
+ * @version 2.1
  *
  *
  * External errors:
@@ -735,6 +735,9 @@ abstract class BaseUserAuth
         {
             $isOk = false;
         }
+        
+        // ==== Saving the session info ==== //
+        $this->setSession();
 
         // ===== Result ==== //
         return $isOk;
@@ -808,9 +811,6 @@ abstract class BaseUserAuth
      */
     public function __destruct()
     {
-        // ==== Saving the session info ==== //
-        $this->setSession();
-
         // ==== Debug ==== //
         if($this->options['debug'] && $this->log != '')
         {
