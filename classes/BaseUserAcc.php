@@ -4,12 +4,12 @@
  * The class handles the user accounts
  *
  * @author Brian
- * @link http://brian.hopto.org/framework_wik/
+ * @link http://brian.hopto.org/wiki/hypermvc/
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name BaseUserAcc
- * @version 2.0
+ * @version 2.1
  *
  * @uses getFullURL function from functions/common.inc.php
  * @uses ckPasswdComplexity function from functions/common.inc.php
@@ -513,7 +513,7 @@ abstract class BaseUserAcc
 
                 // ==== Getting the SQL error ==== //
                 $sql_error = $this->db->error();
-
+                
                 // ==== Checking if an error occured ==== //
                 if($sql_error == '')
                 {
@@ -984,9 +984,6 @@ abstract class BaseUserAcc
         // ==== Returning result ==== //
         return $result;
     }
-    
-    /**
-     * The method generates a new password
 
     /**
      * Class destructor
@@ -995,10 +992,7 @@ abstract class BaseUserAcc
      * @return void
      */
     public function __destruct()
-    {
-        // ==== Saving the session info ==== //
-        $this->setSession();
-        
+    {        
         // ==== Debug ==== //
         if($this->options['debug'] && $this->log != '')
         {
