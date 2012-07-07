@@ -21,7 +21,7 @@
  * 
  * 1 - Username empty
  * 5 - Password empty
- * 15 - Account inactive
+ * 15 - User inactive
  * 
  *
  * ========= Register data errors =========
@@ -37,7 +37,7 @@
  *
  * ========= Database errors =========
  *
- * 100 - Account with the given login data not found
+ * 100 - User with the given login data not found
  * 101 - Salt could not be retrieved from the database because it could not be found
  * 102 - Could not register account because query failed
  * 103 - Could not do login because query failed
@@ -55,7 +55,7 @@
  * 161 - An error occured while trying to recover your password
  *
  *
- * ========= Account handling =========
+ * ========= User handling =========
  *
  * 200 - No info found in the database for the given account ID
  * 
@@ -486,7 +486,7 @@ abstract class BaseUserAcc
      * The method does the login process
      *
      * @param array $data
-     * @return mixed false on failure or an account_id on success
+     * @return mixed false on failure or an user_id on success
      */
     public function doLogin(array $data)
     {
@@ -530,7 +530,7 @@ abstract class BaseUserAcc
                             $this->userinfo = $row;
 
                             // ==== Getting the account ID ==== //
-                            $result = &$row['account_id'];
+                            $result = &$row['user_id'];
                         }
                         else
                         {
@@ -538,7 +538,7 @@ abstract class BaseUserAcc
                             $result = false;
                             
                             // ==== Adding the error ==== //
-                            $this->log_message('error', 'Account inactive', __METHOD__, 15);
+                            $this->log_message('error', 'User inactive', __METHOD__, 15);
                         }
                     }
                     else
@@ -547,7 +547,7 @@ abstract class BaseUserAcc
                         $result = false;
                         
                         // ==== Adding the error ==== //
-                        $this->log_message('error', 'Account with the given login data not found', __METHOD__, 100);
+                        $this->log_message('error', 'User with the given login data not found', __METHOD__, 100);
                     }
                 }
                 else
@@ -576,34 +576,34 @@ abstract class BaseUserAcc
      *
      * The method build an SQL used for the account info retrieval
      *
-     * @param integer $account_id
+     * @param integer $user_id
      * @return string
      */
-    protected abstract function sqlAccountInfo($account_id);
+    protected abstract function sqlUserInfo($user_id);
 
     /**
      *
-     * The method retrieves info about a user using the given account_id
+     * The method retrieves info about a user using the given user_id
      *
-     * @param integer $account_id
+     * @param integer $user_id
      * @return mixed false on failure or an array on success
      */
-    public function getAccountInfo($account_id=0)
+    public function getUserInfo($user_id=0)
     {
         // ==== Result var ==== //
         $result = false;
 
         // ==== Getting the account ID if none was provided ==== //
-        if(!is_numeric($account_id) || $account_id == 0)
+        if(!is_numeric($user_id) || $user_id == 0)
         {
-            $account_id = $this->userinfo['account_id'];
+            $user_id = $this->userinfo['user_id'];
         }
 
         // ==== Checking if we have the required data ==== //
-        if(is_numeric($account_id) && $account_id != 0)
+        if(is_numeric($user_id) && $user_id != 0)
         {
             // ==== Getting the SQL ==== //
-            $sql = $this->sqlAccountInfo($account_id);
+            $sql = $this->sqlUserInfo($user_id);
 
             // ==== running the sql ==== //
             $this->db->query($sql);
@@ -641,7 +641,7 @@ abstract class BaseUserAcc
                 if($this->options['debug'])
                 {
                     $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-                    $this->log .= '<b>ERROR:</b> Account info retrieval failed.<br />';
+                    $this->log .= '<b>ERROR:</b> User info retrieval failed.<br />';
                     $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
                     $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
                 }
@@ -659,7 +659,7 @@ abstract class BaseUserAcc
      * @param integer $userinfo
      * @return mixed false on failure or an array on success
      */
-    public function setAccountInfo($userinfo)
+    public function setUserInfo($userinfo)
     {
         $this->userinfo = $userinfo;
     }

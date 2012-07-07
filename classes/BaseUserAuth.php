@@ -18,7 +18,7 @@
  *
  * 1 - Username empty
  * 5 - Password empty
- * 15 - Account inactive
+ * 15 - User inactive
  *
  *
  * ========= Register data errors =========
@@ -34,8 +34,8 @@
  *
  * ========= Database errors =========
  *
- * 100 - Account with the given login data not found
- * 101 - Salt could not be retrieved from the database because it could not be found aka Account invalid
+ * 100 - User with the given login data not found
+ * 101 - Salt could not be retrieved from the database because it could not be found aka User invalid
  * 102 - Could not register account because query failed
  * 103 - Could not do login because query failed
  * 104 - Could not retrieve the account info for the given account id
@@ -132,7 +132,7 @@ abstract class BaseUserAuth
 
     /**
      *
-     * UserAccount object
+     * UserAcc object
      *
      * @var BaseUserAcc
      */
@@ -178,7 +178,7 @@ abstract class BaseUserAuth
         // ==== Getting the vault object ==== //
         $this->vault = $vault;
 
-        // ==== Getting the UserAccounts object ==== //
+        // ==== Getting the UserAcc object ==== //
         $this->userAcc = $userAcc;
 
         // ==== Getting the session data ==== //
@@ -331,7 +331,7 @@ abstract class BaseUserAuth
      * @param array $data
      * @return string
      */
-    protected abstract function sqlLogin($account_id, array $data);
+    protected abstract function sqlLogin($user_id, array $data);
 
     /**
      * Login data
@@ -384,11 +384,11 @@ abstract class BaseUserAuth
         // ==== Checking if the user is not already authenticated ==== //
         if(!$this->authenticated)
         {
-            // ==== Doing the login via the UserAccount object ==== //
-            $account_id = $this->userAcc->doLogin($data);
+            // ==== Doing the login via the UserAcc object ==== //
+            $user_id = $this->userAcc->doLogin($data);
 
             // ==== Checking if the login went OK ==== //
-            if($account_id !== false)
+            if($user_id !== false)
             {
                 // ==== Checking if persistent login is enabled ==== //
                 if($remember === true)
@@ -403,7 +403,7 @@ abstract class BaseUserAuth
                     $data = $this->prepareLogin($data);
 
                     // ==== Getting the SQL for the cookie insertion ==== //
-                    $sql = $this->sqlLogin($account_id, $data);
+                    $sql = $this->sqlLogin($user_id, $data);
 
                     // ==== Checking if the SQL is not empty ==== //
                     if($sql != '')
@@ -421,7 +421,7 @@ abstract class BaseUserAuth
                             $this->createCookie();
 
                             // ==== Authenticating ==== //
-                            $success = $this->doAuth($account_id, false);
+                            $success = $this->doAuth($user_id, false);
 
                             // ==== Checking if the authentication went ok ==== //
                             if($success == true)
@@ -447,7 +447,7 @@ abstract class BaseUserAuth
                     // NON-PERSISTENT LOGIN
                     ///////////////////////////////////////////////////////////////
                     // ==== Authenticating ==== //
-                    $success = $this->doAuth($account_id, false);
+                    $success = $this->doAuth($user_id, false);
 
                     // ==== Checking if the authentication went ok ==== //
                     if($success == true)
@@ -458,13 +458,13 @@ abstract class BaseUserAuth
             }
             else
             {
-                // ==== Getting the errors from the UserAccounts class ==== //
+                // ==== Getting the errors from the UserAcc class ==== //
                 $this->errors = array_merge($this->errors, $this->userAcc->getErrors());
 
                 // ==== Adding log data ==== //
                 if($this->options['debug'])
                 {
-                    $log = 'Account ID: ' . $account_id . '<br />';
+                    $log = 'User ID: ' . $user_id . '<br />';
                     $log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
                     
                     // ==== Adding the error ==== //
@@ -567,17 +567,17 @@ abstract class BaseUserAuth
     /**
      * The method authenticates the user
      *
-     * @param integer $account_id
+     * @param integer $user_id
      * @param boolean $via_db
      * @return boolean
      */
-    public function doAuth($account_id=0, $via_db=true)
+    public function doAuth($user_id=0, $via_db=true)
     {
         // ==== Check variable ==== //
         $isOk = true;
 
         // ==== Skipping if already authenticated ==== //
-        if($account_id > 0
+        if($user_id > 0
                 || (isset($this->session['auth']) && $this->session['auth'] != true && !empty($_COOKIE[$this->options['cookie_name']]))
                 || (!isset($this->session['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
           )
@@ -634,7 +634,7 @@ abstract class BaseUserAuth
                             $row = $this->db->fetch_assoc();
 
                             // ==== Getting the account ID ==== //
-                            $account_id = &$row['account_id'];
+                            $user_id = &$row['user_id'];
 
                             // ==== Adding log data ==== //
                             if($this->options['debug'])
@@ -675,7 +675,7 @@ abstract class BaseUserAuth
             if($isOk == true)
             {
                 // ==== Getting the userinfo ==== //
-                $userinfo = $this->userAcc->getAccountInfo($account_id);
+                $userinfo = $this->userAcc->getUserInfo($user_id);
 
                 // ==== Regenerating the session ==== //
                 session_regenerate_id();
@@ -697,8 +697,8 @@ abstract class BaseUserAuth
             // ==== Getting the userinfo from the session ==== //
             $userinfo = unserialize($this->vault->decrypt($this->session['userinfo']));
 
-            // ==== Updating the userinfo of the UserAccounts class ==== //
-            $this->userAcc->setAccountInfo($userinfo);
+            // ==== Updating the userinfo of the UserAcc class ==== //
+            $this->userAcc->setUserInfo($userinfo);
 
             // ==== Adding log data ==== //
             if($this->options['debug'])
