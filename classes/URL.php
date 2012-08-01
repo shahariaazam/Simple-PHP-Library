@@ -112,7 +112,6 @@ class URL
             // ==== Getting some options from CodeIgniter ==== //
             $this->options['site_root']     = $this->CI->config->item('base_url'); // SITE ROOT
             $this->options['site_root_ssl'] = 'https://' . str_replace('http://', '', $this->options['site_root']); // SITE ROOT SSL
-            $this->options['rewrite']       = $this->CI->config->item('enable_query_strings'); // REWRITE
             $this->options['controller']    = $this->CI->config->item('controller_trigger'); // CONTROLLER TRIGGER
             $this->options['method']        = $this->CI->config->item('function_trigger'); // FUNCTION TRIGGER
             $this->options['index_page']    = $this->CI->config->item('default_controller'); // INDEX PAGE
