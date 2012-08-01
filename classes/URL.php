@@ -279,13 +279,17 @@ class URL
             // ==== Checking if something was replaced ==== //
             if($found_site_root != 0)
             {
-                // ==== Breaking the URL into pieces ==== //
-                $data = explode('/', $data);
-
-                // ==== Removing the last piece of the array (if it's empty) ==== //
-                if(trim($data[count($data) - 1]) == '')
+                // ==== Checking if the data (query string) contains the question mark sign ==== //
+                if(strpos(trim($data), '?') !== 0)
                 {
-                    array_pop($data);
+                    // ==== Breaking the URL into pieces ==== //
+                    $data = explode('/', $data);
+
+                    // ==== Removing the last piece of the array (if it's empty) ==== //
+                    if(trim($data[count($data) - 1]) == '')
+                    {
+                        array_pop($data);
+                    }   
                 }
 
                 // ==== Checking if CodeIgniter support is enabled ==== //
@@ -295,7 +299,7 @@ class URL
                     //    CODEIGNITER SUPPORT ENABLED
                     ///////////////////////////////////////////////////////////////
                     // ==== Checking if there is any data to process ==== //
-                    if(count($data) > 0)
+                    if(is_array($data) && count($data) > 0)
                     {
                         ////////////////////////////////////////////////////////////////
                         //    PROCESSING THE URL - REWRITE ENABLED/FOUND
@@ -320,15 +324,18 @@ class URL
                         
                         // ==== Getting the page ==== //
                         $this->page = $_GET[$this->options['controller']];
-    
+
                         // ==== The data should contain an even number of elements ==== //
                         if(count($data)%2 == 0)
                         {
+                            // Counter
+                            $count = 0;
+                            
                             // ==== Going through the data ==== //
                             foreach($data as $idx => $value)
                             {
                                 // ==== Checking if this should be skipped ==== //
-                                if($idx%2 != 0)
+                                if($idx%2 == 0)
                                 {
                                     $get[$value] = $data[$idx+1];
                                 }
@@ -356,7 +363,7 @@ class URL
                     //    CODEIGNITER SUPPORT DISABLED
                     ///////////////////////////////////////////////////////////////                    
                     // ==== Checking if there is any data to process ==== //
-                    if(count($data) > 0)
+                    if(is_array($data) && count($data) > 0)
                     {
                         ////////////////////////////////////////////////////////////////
                         //    PROCESSING THE URL - REWRITE ENABLED/FOUND
