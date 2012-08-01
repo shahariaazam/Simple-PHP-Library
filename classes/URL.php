@@ -115,7 +115,6 @@ class URL
             $this->options['rewrite']       = $this->CI->config->item('enable_query_strings'); // REWRITE
             $this->options['controller']    = $this->CI->config->item('controller_trigger'); // CONTROLLER TRIGGER
             $this->options['method']        = $this->CI->config->item('function_trigger'); // FUNCTION TRIGGER
-            $this->options['id']            = 'id'; // ID
             $this->options['index_page']    = $this->CI->config->item('default_controller'); // INDEX PAGE
             $this->options['page_token']    = $this->options['controller']; // BACKWARD COMPATIBILITY
         }
