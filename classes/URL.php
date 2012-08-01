@@ -319,15 +319,6 @@ class URL
                             unset($data[1]);
                         }
                         
-                        // ==== Getting the method ==== //
-                        if(isset($data[2]))
-                        {
-                            $_GET[$this->options['id']] = $data[2];
-                            
-                            // Removing from data
-                            unset($data[2]);
-                        }
-                        
                         // ==== Getting the page ==== //
                         $this->page = $_GET[$this->options['controller']];
     
@@ -613,12 +604,6 @@ class URL
                 {
                     $params[$this->options['method']] = 'index';
                 }
-                
-                // ID param
-                if(!isset($params[$this->options['id']]))
-                {
-                    $params[$this->options['id']] = '0';
-                }
             }
         }
 
@@ -635,17 +620,15 @@ class URL
                 $url .= $params[$this->options['controller']] . '/';
                 
                 // ==== Checking for the rest of the params ==== //
-                if(isset($params[$this->options['method']]) && isset($params[$this->options['id']]))
+                if(isset($params[$this->options['method']]))
                 {
                      $url .= $params[$this->options['method']] . '/';
-                     $url .= $params[$this->options['id']] . '/';
                 }
                 
                 // ==== Building the omit array ==== //
                 $omit_array = array(
                     $this->options['controller'],
-                    $this->options['method'],
-                    $this->options['id']
+                    $this->options['method']
                 );
             }
             else
@@ -688,17 +671,15 @@ class URL
 
                 
                 // ==== Checking for the rest of the params ==== //
-                if(isset($params[$this->options['method']]) && isset($params[$this->options['id']]))
+                if(isset($params[$this->options['method']]))
                 {
                     $url .= '&' . $this->options['method'] . '=' . $params[$this->options['method']];
-                    $url .= '&' . $this->options['id'] . '=' . $params[$this->options['id']];
                 }
                 
                 // ==== Building the omit array ==== //
                 $omit_array = array(
                     $this->options['controller'],
-                    $this->options['method'],
-                    $this->options['id']
+                    $this->options['method']
                 );
             }
             else
