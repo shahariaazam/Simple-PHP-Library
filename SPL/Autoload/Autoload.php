@@ -37,7 +37,13 @@ class Autoload
         self::$paths = explode(PATH_SEPARATOR, get_include_path());
         
         // Registering the autoload function
-        spl_autoload_register(array('\SPL\Autoload\Autoload', 'load'));
+        $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'load'));
+        
+        // Checking if the autoload class was loaded or not
+        if($registered === false)
+        {
+            throw new \Exception('Unable to register the autoload function');
+        }
     }
     
     /**
