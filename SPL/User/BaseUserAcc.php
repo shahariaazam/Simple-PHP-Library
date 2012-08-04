@@ -61,6 +61,8 @@
  * 
  */
 
+namespace SPL\User;
+
 abstract class BaseUserAcc
 {
     /**

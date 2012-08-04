@@ -13,6 +13,8 @@
  * 
  */
 
+namespace SPL\Upload;
+
 class Uploader
 {
     /**

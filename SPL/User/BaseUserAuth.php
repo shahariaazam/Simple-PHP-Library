@@ -65,6 +65,8 @@
  * 
  */
 
+namespace SPL\User;
+
 abstract class BaseUserAuth
 {
     /**
