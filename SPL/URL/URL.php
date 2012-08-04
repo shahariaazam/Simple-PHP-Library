@@ -149,20 +149,22 @@ class URL
             {
                 $this->enableSSL();
             }
-
-            // ==== Getting the URL data ==== //
-            $this->getURLData();
-
-            // ==== Initializing the default params ==== //
-            $this->initParams();
-
-            // ==== Determining if the URL is valid ==== //
-            $is_valid = filter_var($this->url, FILTER_VALIDATE_URL);
+            
+            // ==== Determining if the site root URL is valid ==== //
+            $is_valid = filter_var($this->options['site_root'], FILTER_VALIDATE_URL);
 
             // == If invalid == //
             if($is_valid === false)
             {
-                trigger_error('Invalid URL. The URL class could not process the URL. URL: '.$this->url, E_USER_WARNING);
+                trigger_error('Invalid site root URL. URL: ' . $this->url, E_USER_WARNING);
+            }
+            else
+            {
+                // ==== Getting the URL data ==== //
+                $this->getURLData();
+
+                // ==== Initializing the default params ==== //
+                $this->initParams();
             }
         }
         else
