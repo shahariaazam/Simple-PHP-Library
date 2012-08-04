@@ -148,7 +148,7 @@ abstract class BaseUserAuth
      * @param array $options
      * @return void
      */
-    public function __construct($db, BaseUserAcc $userAcc, Vault $vault, array $options=array())
+    public function __construct($db, \SPL\User\BaseUserAcc $userAcc, \Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';

@@ -130,7 +130,7 @@ abstract class BaseUserAcc
      * @param array $options
      * @return void
      */
-    public function __construct($db, Vault $vault, array $options=array())
+    public function __construct($db, \Vault $vault, array $options=array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';
