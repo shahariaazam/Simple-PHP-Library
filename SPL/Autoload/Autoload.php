@@ -40,7 +40,7 @@ class Autoload
         $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'load'));
         
         // Checking if the autoload class was loaded or not
-        if($registered === false)
+        if($registered == false)
         {
             throw new \Exception('Unable to register the autoload function');
         }
