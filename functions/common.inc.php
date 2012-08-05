@@ -353,57 +353,6 @@ function unzip($archive, $directory = './')
 }
 
 /**
- * The function checks if a given URL location exists
- *
- * @param string $url
- * @return boolean
- */
-function url_exists($url)
-{
-    // ==== Check variable ==== //
-    $exists = true;
-
-    // ==== Sanitizing the URL ==== //
-    $url = filter_var($url, FILTER_SANITIZE_URL);
-
-    // ==== Validating URL ==== //
-    $url = filter_var($url, FILTER_VALIDATE_URL);
-
-    // ==== Checking if the URL passed the previous checks ==== //
-    if($url === false)
-    {
-        $exists = false;
-    }
-    else
-    {
-        // ==== Initializing the cURL handle ==== //
-        $ch = curl_init();
-
-        // ==== Setting the cURL options ==== //
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_NOBODY, true);
-
-        // ==== Executing the cURL ==== //
-        curl_exec($ch);
-
-        // ==== Getting the returned code ==== //
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        // ==== Closing the cURL handle ==== //
-        curl_close($ch);
-
-        // ==== If code is different than 200 then the URL does not exist ==== //
-        if($code != 200)
-        {
-            $exists = false;
-        }
-    }
-
-    // ==== Returning result ==== //
-    return $exists;
-}
-
-/**
  * Converts a string containg a boolean value to a true boolean
  *
  * @param string $value
