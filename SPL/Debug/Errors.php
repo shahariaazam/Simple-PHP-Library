@@ -53,6 +53,10 @@ class Errors
         {
             self::$email = $email;
         }
+        else
+        {
+            throw new \Exception('The provided email for the Errors debug class is invalid.');
+        }
     }
     
     /**
