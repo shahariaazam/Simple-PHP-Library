@@ -11,7 +11,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Pgsql
- * @version 3.6
+ * @version 3.6.1
  *
  */
 

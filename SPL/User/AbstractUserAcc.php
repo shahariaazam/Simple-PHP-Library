@@ -8,8 +8,8 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name BaseUserAcc
- * @version 2.1
+ * @name AbstractUserAcc
+ * @version 2.3
  *
  * @uses getFullURL function from functions/common.inc.php
  * @uses ckPasswdComplexity function from functions/common.inc.php
@@ -63,7 +63,7 @@
 
 namespace SPL\User;
 
-abstract class BaseUserAcc
+abstract class AbstractUserAcc
 {
     /**
      * Options array

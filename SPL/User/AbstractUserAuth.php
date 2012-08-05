@@ -8,8 +8,8 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name BaseUserAuth
- * @version 2.1
+ * @name AbstractUserAuth
+ * @version 2.3
  *
  *
  * External errors:
@@ -68,7 +68,7 @@
 namespace SPL\User;
 
 
-abstract class BaseUserAuth
+abstract class AbstractUserAuth
 {
     /**
      * Options array

@@ -4,7 +4,7 @@
  * The class send the last detected error to the set email
  *
  * @name Errors
- * @version 1.0
+ * @version 1.1
  */
 
 namespace SPL\Debug;

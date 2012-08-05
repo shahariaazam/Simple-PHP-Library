@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Paging
- * @version 2.3
+ * @version 2.3.1
  * 
  * @uses database object
  * 

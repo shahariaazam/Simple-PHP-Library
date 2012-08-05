@@ -10,7 +10,7 @@
  *
  *
  * @name Language
- * @version 3.7
+ * @version 3.7.1
  */
 
 namespace SPL\Language;

@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name URL
- * @version 2.7
+ * @version 2.8
  *
  * @uses getFullURL function from functions/common.inc.php
  *

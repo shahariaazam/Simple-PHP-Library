@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Benchmark
- * @version 1.5
+ * @version 1.5.1
  */
 
 namespace SPL\Benchmark;
