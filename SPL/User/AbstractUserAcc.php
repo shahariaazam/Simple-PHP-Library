@@ -11,7 +11,6 @@
  * @name AbstractUserAcc
  * @version 2.3
  *
- * @uses getFullURL function from functions/common.inc.php
  * @uses ckPasswdComplexity function from functions/common.inc.php
  *
  * 
@@ -62,6 +61,8 @@
  */
 
 namespace SPL\User;
+
+use SPL\URL;
 
 abstract class AbstractUserAcc
 {
