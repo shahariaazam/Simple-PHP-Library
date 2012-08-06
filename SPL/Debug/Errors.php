@@ -9,6 +9,8 @@
 
 namespace SPL\Debug;
 
+use SPL\URL;
+
 class Errors
 {
     /**
@@ -118,7 +120,7 @@ class Errors
 
                 // ==== Message ==== //
                 $message = '';
-                $message .= '<b>URL:</b> ' . getFullURL() . '<hr><br /><br />';
+                $message .= '<b>URL:</b> ' . URL\URL::getFullURL() . '<hr><br /><br />';
                 $message .= '<b>MESSAGE:</b> ' . $error['message'] . '<br />';
                 $message .= '<b>FILE:</b> ' . $error['file'] . '<br />';
                 $message .= '<b>LINE:</b> ' . $error['line'] . '<br />';

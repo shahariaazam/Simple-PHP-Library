@@ -12,24 +12,6 @@
 
 /**
  *
- * The function returns the current url (everything in the URL bar)
- *
- * @param void
- * @return string
- */
-function getFullURL()
-{
-    $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
-    $domain = $_SERVER['SERVER_NAME'];
-    $request_uri = $_SERVER['REQUEST_URI'];
-
-    $full_url = $protocol . $domain . $request_uri;
-
-    return $full_url;
-}
-
-/**
- *
  * The function gets the extension of a given filename
  *
  * @param string $file
