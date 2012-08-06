@@ -1002,7 +1002,7 @@ abstract class AbstractUserAcc
             // ==== Adding some more data to the log ==== //
             $this->log .= '<hr><hr><strong>Other info</strong><hr>';
             $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
-            $this->log .= '<strong>URL:</strong><pre>'.getFullURL().'<br /><br />';
+            $this->log .= '<strong>URL:</strong><pre>' . URL\URL::getFullURL() . '<br /><br />';
             $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
             $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';
