@@ -426,8 +426,7 @@ function ckPasswdComplexity($passwd, array $options = array())
         }
     }
 
-
-    // ==== returning result ==== //
+    // ==== Returning result ==== //
     return $result;
 }
 
