@@ -63,6 +63,7 @@
 namespace SPL\User;
 
 use SPL\URL;
+use SPL\Validator;
 
 abstract class AbstractUserAcc
 {
@@ -772,7 +773,7 @@ abstract class AbstractUserAcc
         else
         {
             // ==== Checking if the email is valid ==== //
-            $valid = validateMail($data['email'], true);
+            $valid = Validator\Email::isValid($data['email'], true);
             if($valid == false)
             {
                 // ==== Adding the error ==== //

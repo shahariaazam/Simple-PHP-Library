@@ -202,62 +202,6 @@ function cutstr($string, $from, $length, $more_entities = array())
 }
 
 /**
- * The function validates the email address provided. It also can check the DNS to see if it is valid.
- *
- * @param string $email
- * @param boolean $checkDNS [optional]
- * @return boolean
- */
-function validateMail($email, $checkDNS = false)
-{
-    // ==== Check variable ==== //
-    $isOk = true;
-
-    // ==== Sanitizing the email ==== //
-    $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-
-    // ==== Validating email ==== //
-    $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-
-    // ==== Checking DNS record (if activated) if the email is ok so far ===== //
-    if($email == false)
-    {
-        $isOk = false;
-    }
-    elseif($checkDNS)
-    {
-        // ==== Getting DNS part of the mail ==== //
-        $pieces = explode('@', $email);
-        $dns = $pieces[1];
-
-        // ==== Checking for required function ==== //
-        if(function_exists('checkdnsrr'))
-        {
-            // ==== Checking DNS ==== //
-            if(checkdnsrr($dns) === false)
-            {
-                $isOk = false;
-            }
-        }
-        elseif(function_exists('gethostbyname'))
-        {
-            // ==== Checking DNS ==== //
-            if(gethostbyname($dns) === $dns)
-            {
-                $isOk = false;
-            }
-        }
-        else
-        {
-            trigger_error('DNS checking requires the checkdnsrr or the gethostbyname function.', E_USER_WARNING);
-        }
-    }
-
-    // ==== Returning result ==== //
-    return $isOk;
-}
-
-/**
  * The function cleans up a given directory except for the files in the whitelist
  *
  * @param string $dir
