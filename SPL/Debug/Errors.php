@@ -3,6 +3,11 @@
 /**
  * The class send the last detected error to the set email
  *
+ * @author Brian
+ * @link https://github.com/brian978
+ * @copyright 2012
+ * @license Creative Commons Attribution-ShareAlike 3.0
+ * 
  * @name Errors
  * @version 1.1
  */

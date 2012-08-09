@@ -4,15 +4,12 @@
  * URL manager class.
  *
  * @author Brian
- * @link http://brian.hopto.org/wiki/hypermvc/
- * @copyright 2011
+ * @link https://github.com/brian978
+ * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name URL
  * @version 2.8
- *
- * @uses getFullURL function from functions/common.inc.php
- *
  */
 
 namespace SPL\URL;

@@ -6,13 +6,12 @@
  * Pgsql Module
  *
  * @author Brian
- * @link http://brian.hopto.org/wiki/hypermvc/
+ * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Pgsql
  * @version 3.6.1
- *
  */
 
 namespace SPL\Database;

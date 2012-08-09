@@ -3,14 +3,13 @@
  * The class can be used to upload files to the server
  *
  * @author Brian
+ * @link https://github.com/brian978
  * @copyright 2012
- * @link http://brian.hopto.org/wiki/hypermvc/
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * 
  * @name Uploader
  * @version 1.5
- * 
  */
 
 namespace SPL\Upload;

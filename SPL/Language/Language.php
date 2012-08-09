@@ -4,7 +4,7 @@
  * Language class
  *
  * @author Brian
- * @link http://brian.hopto.org/framwork_wiki/
+ * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *

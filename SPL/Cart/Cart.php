@@ -4,13 +4,12 @@
  * Simple cart class
  * 
  * @author Brian
- * @link http://brian.serveblog.net
+ * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Cart
  * @version 1.3.1
- * 
  */
 
 namespace SPL\Cart;

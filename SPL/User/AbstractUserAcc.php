@@ -4,14 +4,14 @@
  * The class handles the user accounts
  *
  * @author Brian
- * @link http://brian.hopto.org/wiki/hypermvc/
+ * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name AbstractUserAcc
  * @version 2.3
  *
- * @uses ckPasswdComplexity function from functions/common.inc.php
+ * @uses Password validator object
  *
  * 
  * Internal errors:
@@ -751,9 +751,12 @@ abstract class AbstractUserAcc
         {
             // ==== Password complexity options ==== //
             $options = array();
+            
+            // Creating the password validator object
+            $passwdValidator = new Validator\Password();
 
             // ===== Checking the complexity ==== //
-            $complexityOk = ckPasswdComplexity($data['passwd']);
+            $complexityOk = $passwdValidator->isValid($data['passwd']);
             if($complexityOk == false)
             {
                 // ==== Adding the error ==== //

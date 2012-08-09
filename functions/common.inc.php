@@ -3,11 +3,9 @@
 /**
  * The file contains common functions
  *
- * @author Brian
- * @link http://brian.serveblog.net
- * @copyright 2011
+ * @author brian978
+ * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
- *
  */
 
 /**
@@ -324,111 +322,6 @@ function secure_download($file)
     }
 }
 
-/**
- * The function checks the complexity of a password
- *
- * @param string $passwd
- * @param array $options
- * @return boolean
- */
-function ckPasswdComplexity($passwd, array $options = array())
-{
-    // ==== Result variable ==== //
-    $result = true;
-
-    // ==== Checking if overwrite is in effect ==== //
-    if((isset($options['overwrite']) && $options['overwrite'] == false) || !isset($options['overwrite']))
-    {
-        // ==== Check variable ==== //
-        $failed_count = 0;
-
-        // ==== Checking if the length check is enabled ==== //
-        if(isset($options['length']) && is_numeric($options['length']))
-        {
-            // ==== Checking the length ==== //
-            if(strlen(trim($passwd)) < $options['length'])
-            {
-                $failed_count++;
-            }
-        }
-
-        // ==== Checking if the number or lowercase or uppercase check is active ==== //
-        if(isset($options['number']) || isset($options['lcase']) || isset($options['ucase']))
-        {
-            // ==== Character counters ==== //
-            $lChr = 0;
-            $number = 0;
-            $uChr = 0;
-
-            // ==== Checking each character in the password ==== //
-            for ($i = 0; $i < strlen($passwd); $i++)
-            {
-                // ==== Check variables ==== //
-                $checked = false;
-
-                // ==== Number check ==== //
-                if(isset($options['number']))
-                {
-                    if(is_numeric(substr($passwd, $i, 1)))
-                    {
-                        $number++;
-
-                        $checked = true;
-                    }
-                }
-
-                // ==== Lowercase check ==== //
-                if(isset($options['lcase']) && $checked == false)
-                {
-                    if(is_string(substr($passwd, $i, 1)) && preg_match('/[a-z]/', substr($passwd, $i, 1)))
-                    {
-                        $lChr++;
-
-                        $checked = true;
-                    }
-                }
-
-                // ==== Uppercase check ==== //
-                if(isset($options['ucase']) && $checked == false)
-                {
-                    if(is_string(substr($passwd, $i, 1)) && preg_match('/[A-Z]/', substr($passwd, $i, 1)))
-                    {
-                        $uChr++;
-
-                        $checked = true;
-                    }
-                }
-            }
-
-            // ==== Checking number count ==== //
-            if(isset($options['number']) && $number == 0)
-            {
-                $failed_count++;
-            }
-
-            // ==== Checking lowercase count ==== //
-            if(isset($options['lcase']) && $lChr == 0)
-            {
-                $failed_count++;
-            }
-
-            // ==== Checking uppercase count ==== //
-            if(isset($options['ucase']) && $uChr == 0)
-            {
-                $failed_count++;
-            }
-        }
-
-        // ==== Checking the failed count ==== //
-        if($failed_count != 0)
-        {
-            $result = false;
-        }
-    }
-
-    // ==== Returning result ==== //
-    return $result;
-}
 
 /**
  * The function properly prints an array
