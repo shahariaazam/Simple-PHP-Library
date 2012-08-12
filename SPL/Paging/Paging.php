@@ -8,10 +8,11 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
+ * @uses URL object
+ * 
  * @name Paging
  * @version 2.3.1
  * 
- * @uses URL object
  */
 
 namespace SPL\Paging;

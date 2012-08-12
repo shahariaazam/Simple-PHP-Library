@@ -10,6 +10,7 @@
  * 
  * @name Errors
  * @version 1.1
+ * 
  */
 
 namespace SPL\Debug;

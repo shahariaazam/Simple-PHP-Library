@@ -8,9 +8,9 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- *
  * @name Language
  * @version 3.7.1
+ * 
  */
 
 namespace SPL\Language;

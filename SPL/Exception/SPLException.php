@@ -12,6 +12,7 @@
  * 
  * @name SPLException
  * @version 1.0
+ * 
  */
 
 namespace SPL\Exception;

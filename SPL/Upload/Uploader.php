@@ -7,9 +7,9 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * 
  * @name Uploader
  * @version 1.5
+ * 
  */
 
 namespace SPL\Upload;

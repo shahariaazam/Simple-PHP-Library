@@ -10,6 +10,7 @@
  * 
  * @name Password
  * @version 1.0
+ * 
  */
 
 namespace SPL\Validator;

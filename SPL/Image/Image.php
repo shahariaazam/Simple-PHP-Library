@@ -10,6 +10,7 @@
  * 
  * @name Image
  * @version 3.2.1
+ * 
  */
 
 namespace SPL\Image;
