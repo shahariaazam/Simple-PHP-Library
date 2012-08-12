@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  * 
  * @name Autoload
- * @version 1.0
+ * @version 1.1
  */
 
 namespace SPL\Autoload;
@@ -30,6 +30,28 @@ class Autoload
      */
     private static $paths = array();
     
+    /**
+     * Flag that determines if the an exception is thrown or not when a class file is not found
+     * 
+     * @var boolean
+     */
+    private static $skip = false;
+    
+    /**
+     * Sets the skip property
+     * 
+     * @param boolean $skip
+     * @return void
+     */
+    public static function setSkip($skip)
+    {
+        // Checking if boolean
+        if(is_bool($skip))
+        {
+            self::$skip = $skip;
+        }
+    }
+
     /**
      * Registers the autoload function
      * 
@@ -98,9 +120,9 @@ class Autoload
             }
             
             // Checking if the class file was loaded
-            if(!isset(self::$loaded[$class_name]))
+            if(!isset(self::$loaded[$class_name]) && self::$skip === false)
             {
-                throw new \Exception('No file was found for class ' . $class_name);
+                throw new \SPL\Exception\SPLException('No file was found for class ' . $class_name);
             }
         }
     }
