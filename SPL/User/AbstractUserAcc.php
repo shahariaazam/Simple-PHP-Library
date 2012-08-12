@@ -8,10 +8,10 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
+ * @uses Password validator object
+ * 
  * @name AbstractUserAcc
  * @version 2.3
- *
- * @uses Password validator object
  *
  * 
  * Internal errors:
