@@ -1,0 +1,15 @@
+The library requires at least PHP 5.3 to work.
+
+To use the library you need to add to your code the following code:
+
+// Sets the paths where the autloader will look for the classes
+set_include_path(implode(PATH_SEPARATOR, array(
+    get_include_path(),
+    realpath(dirname(__FILE__) . '/SPL'),
+)));
+
+// Here we include the autoloader
+require 'SPL/Autoload/Autoload.php';
+
+// Here we register the autoloader
+SPL\Autoload\Autoload::registerAutoload();
