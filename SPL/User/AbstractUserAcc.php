@@ -64,6 +64,7 @@ namespace SPL\User;
 
 use SPL\URL;
 use SPL\Validator;
+use SPL\Headers\Headers as Headers;
 
 abstract class AbstractUserAcc
 {
@@ -1011,7 +1012,7 @@ abstract class AbstractUserAcc
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
             $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';
             $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
-            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
+            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(Headers::request(), true).'<br /><br />';
             $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
 
             // ==== Sending debug mail ==== //

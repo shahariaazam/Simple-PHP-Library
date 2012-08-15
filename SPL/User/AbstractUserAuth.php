@@ -68,6 +68,7 @@
 namespace SPL\User;
 
 use SPL\URL;
+use SPL\Headers\Headers as Headers;
 
 abstract class AbstractUserAuth
 {
@@ -352,7 +353,7 @@ abstract class AbstractUserAuth
         $data['cookie'] = $this->cookie;
 
         // ==== Getting all the headers ==== //
-        $headers = get_request_headers();
+        $headers = Headers::request();
 
         // ==== Getting the headers ==== //
         $data['headers'] = base64_encode(serialize($headers['HTTP_USER_AGENT']));
@@ -526,7 +527,7 @@ abstract class AbstractUserAuth
             $data['cookie']  = $_COOKIE[$this->options['cookie_name']];
 
             // ==== Getting all the headers ==== //
-            $headers = get_request_headers();
+            $headers = Headers::request();
 
             // ==== Getting the headers ==== //
             $data['headers'] = base64_encode(serialize($headers['HTTP_USER_AGENT']));
@@ -826,7 +827,7 @@ abstract class AbstractUserAuth
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
             $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';
             $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
-            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(get_request_headers(), true).'<br /><br />';
+            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(Headers::request(), true).'<br /><br />';
             $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
 
             // ==== Sending debug mail ==== //

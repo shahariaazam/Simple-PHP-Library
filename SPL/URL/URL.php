@@ -720,4 +720,24 @@ class URL
         // ==== Returning result ==== //
         return $url;
     }
+    
+    /**
+     * The method reverses the effect of parse_url
+     *
+     * @param array $comps
+     * @return string
+     */
+    public static function deparse_url($comps)
+    {
+        // Building the URL from the components
+        $url = (isset($comps['scheme']) ? $comps['scheme'] : '') . '://' .  // Protocol
+               (isset($comps['host']) ? $comps['host'] : '') .              // Host
+               (isset($comps['port']) ? ':' . $comps['port'] : '') .        // Port
+               (isset($comps['path']) ? $comps['path'] : '') .              // Path
+               (isset($comps['query']) ? '?' . $comps['query'] : '') .      // Query string
+               (isset($comps['fragment']) ? $comps['fragment'] : '');       // Anchor
+
+        // Returning the URL
+        return $url;
+    }
 }

@@ -69,64 +69,6 @@ function redirect($url, $method = 'header', $settings = array())
 }
 
 /**
- * The function returns the headers of a given URL in 2 formats: numeric and associative array
- *
- * @param string $url
- * @return array
- */
-function getHeaders($url)
-{
-    $headers = array();
-    $headers['numeric'] = get_headers($url);
-    $headers['assoc'] = get_headers($url, 1);
-
-    return $headers;
-}
-
-/**
- * The function replaces or adds header data
- *
- * @param array $headers
- * @param numeric $type //This can be 0 (for numeric array) or 1 for associative array)
- * @return void
- */
-function setHeaders($headers, $type = 1)
-{
-    if($type == 0) // Numeric array
-    {
-        foreach ($headers as $header)
-        {
-            header(trim($header));
-        }
-    }
-    elseif($type == 1) // Associative array
-    {
-        foreach ($headers as $header => $value)
-        {
-            header(trim($header) . ': ' . trim($value));
-        }
-    }
-}
-
-/**
- * The function reverses the effect of parse_url
- *
- * @param array $comps
- * @return string
- */
-function deparse_url($comps)
-{
-    $url = $comps['scheme'] . '://' .                                   // Protocol
-            $comps['host'] .                                            // Host
-            (isset($comps['port']) ? ':' . $comps['port'] : '') .       // Port
-            (isset($comps['path']) ? $comps['path'] : '') .             // Path
-            (isset($comps['query']) ? '?' . $comps['query'] : '') .     // Query string
-            (isset($comps['fragment']) ? $comps['fragment'] : '');      // Anchor
-
-    return $url;
-}
-
-/**
  * The function cuts a string to size similar to substr but it also checks for html entities to avoid
  * cutting a html entity in half
  *
@@ -341,28 +283,4 @@ function print_array($array, $return = false)
     {
         echo $str;
     }
-}
-
-/**
- * The function retrieves the request headers
- *
- * @param void
- * @return array
- */
-function get_request_headers()
-{
-    // ==== Headers array ===== //
-    $headers = array();
-
-    // ==== Going through the $_SERVER array ===== //
-    foreach ($_SERVER as $key => $value)
-    {
-        if(preg_match('/(HTTP_)/', $key))
-        {
-            $headers[strtoupper($key)] = $value;
-        }
-    }
-
-    // ==== result ==== //
-    return $headers;
 }
