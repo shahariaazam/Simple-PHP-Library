@@ -15,8 +15,17 @@ set_include_path(implode(PATH_SEPARATOR, array(
 // Here we include the autoloader
 require 'SPL/Autoload/Autoload.php';
 
-// Here we register the autoloader
-SPL\Autoload\Autoload::registerAutoload();
+// Namespace alias
+use SPL\Autoload\Autoload as Autoload;
+
+// Creating the autoload object
+Autoload::registerAutoload();
+
+
+If you are using CodeIgniter for example and you want the class to not throw an exception when a file for a class is not found you can use the following method:
+
+// Skips the Exception trigger when no file is found for the requested class
+Autoload::setSkip(true);
 
 
 Class documentation:

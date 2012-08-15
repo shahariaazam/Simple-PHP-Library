@@ -16,8 +16,11 @@ require 'SPL/Autoload/Autoload.php';
 // Getting the functions
 require 'functions/common.inc.php';
 
+// Namespaces
+use SPL\Autoload\Autoload as Autoload;
+
 // Creating the autoload object
-SPL\Autoload\Autoload::registerAutoload();
+Autoload::registerAutoload();
 
 /////////////////////////////////////////////////////////////////////////////////////
 // AREA 53
