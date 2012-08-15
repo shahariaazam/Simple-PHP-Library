@@ -1,4 +1,8 @@
-The library requires at least PHP 5.3 to work.
+Requirements:
+PHP 5.3 or higher
+
+
+Documentation:
 
 To use the library you need to add the following code to your application:
 
@@ -13,3 +17,8 @@ require 'SPL/Autoload/Autoload.php';
 
 // Here we register the autoloader
 SPL\Autoload\Autoload::registerAutoload();
+
+
+Class documentation:
+
+Comming soon...
