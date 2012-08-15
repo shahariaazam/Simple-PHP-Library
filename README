@@ -1,3 +1,6 @@
+If you use the library DO NOT modify/remove the links to this page.
+
+
 Requirements:
 PHP 5.3 or higher
 
@@ -30,4 +33,6 @@ Autoload::setSkip(true);
 
 Class documentation:
 
-Comming soon...
+Partial documentation can be found here: https://brian.hopto.org/wiki/hypermvc/category/library/
+
+I will update the class and function documentation after deciding if I will move the remaining function to some classes.
