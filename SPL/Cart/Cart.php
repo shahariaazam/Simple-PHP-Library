@@ -54,7 +54,7 @@ class Cart
     }
 
     /**
-     * Singleton initiator
+     * Called to create a Cart object
      *
      * @param void
      * @return object
@@ -165,7 +165,7 @@ class Cart
     }
 
     /**
-     * The method retrieves info about an item
+     * Retrieves info about an item
      *
      * @access public
      * @param numeric $id
@@ -217,7 +217,7 @@ class Cart
     }
 
     /**
-     * The method returns some stats about the items in the car
+     * Returns some stats about the items in the car
      *
      * @param void
      * @return array
@@ -242,7 +242,7 @@ class Cart
     }
 
     /**
-     * The method returns an array of items
+     * Returns an array of items
      *
      * @param void
      * @return array
@@ -254,7 +254,7 @@ class Cart
 
 
     /**
-     * The method is used to empty the contents of the cart
+     * Is used to empty the contents of the cart
      *
      * @param void
      * @return void
@@ -278,7 +278,7 @@ class Cart
 
 
     /**
-     * Class destructor. If makes sure the cart is save after each page load
+     * Saves the cart contents if the Cart::emptyCart method hasn't been called
      *
      * @param void
      * @return void
@@ -293,5 +293,3 @@ class Cart
     }
 
 }
-
-?>

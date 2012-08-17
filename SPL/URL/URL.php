@@ -86,7 +86,7 @@ class URL
      * @param array $options
      * @return \URL
      */
-    public function __construct($options=array())
+    public function __construct(array $options = array())
     {
         // ==== Default options ==== //
         $this->options['site_root']      = '';
@@ -99,7 +99,7 @@ class URL
         $this->options['code_igniter']   = false;
 
         // ==== Replacing options with custom ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_replace($this->options, $options);
         }
@@ -174,7 +174,7 @@ class URL
     
     /**
      *
-     * The method returns the current url (everything in the URL bar)
+     * Returns the current url (everything in the URL bar)
      *
      * @param void
      * @return string
@@ -191,8 +191,7 @@ class URL
     }
 
     /**
-     * The method initializes the parameters that must be passed along in the URL, with the values
-     * found in the URL
+     * Initializes the parameters that must be passed along in the URL, with the values found in the URL
      *
      * @param void
      * @return void
@@ -222,7 +221,7 @@ class URL
     }
 
     /**
-     * The method retrieves data from the URL
+     * Retrieves data from the URL string
      *
      * @throws Exception
      * @return void
@@ -425,8 +424,7 @@ class URL
     }
 
     /**
-     * The method replaces the values in the first array with ones from the second one (similar to array_merge) but then appends the remaining values
-     * from the first to the end of the second
+     * Replaces the values in the first array with ones from the second one (similar to array_merge) but then appends the remaining values from the first to the end of the second
      *
      * @param array $array1
      * @param array $array2
@@ -453,7 +451,7 @@ class URL
     }
 
     /**
-     * The method changes the site root to the SSL one
+     * Changes the site root to the SSL one
      *
      * @param void
      * @return void
@@ -473,7 +471,7 @@ class URL
     }
 
     /**
-     * The method changes the site root to the non-SSL one
+     * Changes the site root to the non-SSL one
      *
      * @param void
      * @return void
@@ -493,15 +491,14 @@ class URL
     }
 
     /**
-     * The method returns the HTTPS URL.
-     * It uses the get method to do this
+     * Builds the HTTPS URL using the provided params
      *
      * @param string $page Page to link to
      * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
      * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
      * @return string
      */
-    public function get_ssl($page='', array $params=array(), $merge_get=false)
+    public function get_ssl($page = '', array $params = array(), $merge_get = false)
     {
         // ==== Checking if the SSL site root is even set ==== //
         if(!empty($this->options['site_root_ssl']))
@@ -529,14 +526,14 @@ class URL
     }
 
     /**
-     * The method builds the URL with the available data
+     * Builds the URL using the provided params
      *
      * @param string $page Page to link to
      * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
      * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
      * @return string
      */
-    public function get($page='', array $params=array(), $merge_get=false)
+    public function get($page = '', array $params = array(), $merge_get = false)
     {
         // ==== Default URL (actually it's the site root) ==== //
         if($this->site_root_tmp !== false)
@@ -722,7 +719,7 @@ class URL
     }
     
     /**
-     * The method reverses the effect of parse_url
+     * Reverses the effect of parse_url
      *
      * @param array $comps
      * @return string

@@ -52,12 +52,12 @@ class Uploader
     private $errors;
 
     /**
-     * Class constructor
+     * Sets the class options
      *
      * @param array $options
      * @return void
      */
-    public function __construct(array $options=array())
+    public function __construct(array $options = array())
     {
         // ==== Initializing default values ==== //
         $this->log      = '';
@@ -134,7 +134,7 @@ class Uploader
         );
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }
@@ -154,7 +154,7 @@ class Uploader
     }
 
     /**
-     * The method checks if the file is valid (not dot and not empty
+     * Checks if the file is valid
      *
      * @param string $filename
      * @return boolean
@@ -172,7 +172,7 @@ class Uploader
     }
 
     /**
-     * The method is used to check if the extension is allowed
+     * Checks if the file extension is allowed
      *
      * @param string $file
      * @return boolean
@@ -217,7 +217,7 @@ class Uploader
     }
 
     /**
-     * The method does the actual uploading using the index given to it
+     * Does the actual uploading using the index given to it
      *
      * @param string $index
      * @return boolean
@@ -302,7 +302,7 @@ class Uploader
     }
 
     /**
-     * The method is the interface with the user that does the actual selection of which files to upload
+     * Used to upload the files
      *
      * @param mixed Array or string $indexes
      * @return mixed Array on success or false on failure
@@ -336,10 +336,10 @@ class Uploader
     }
 
     /**
-     * The method returns an array of errors or false if there are none
+     * Returns an array of errors or false if there are none
      *
      * @param void
-     * @return array or false for no errors
+     * @return mixed Array of errors or false if no errors were found
      */
     public function getErrors()
     {
@@ -354,10 +354,10 @@ class Uploader
     }
 
     /**
-     * The method returns an array of files or false if there are none
+     * Returns an array of files or false if there are none
      *
      * @param void
-     * @return array or false for no errors
+     * @return mixed Array of files or false if no files were found
      */
     public function getFileList()
     {
@@ -372,7 +372,7 @@ class Uploader
     }
 
     /**
-     * Destructor. Sends email and stuff
+     * Sends debug email (if debug is active and there is something to send)
      *
      * @param void
      * @return void

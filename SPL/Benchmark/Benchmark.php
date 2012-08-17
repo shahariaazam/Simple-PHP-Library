@@ -81,12 +81,12 @@ class Benchmark
     private $enabled = true;
 
     /**
-     * Class constructor
+     * Sets different options
      *
      * @param array $options
      * @return void
      */
-    public function __construct($options=array())
+    public function __construct(array $options=array())
     {
         // ==== Initializing default values ==== //
         $this->log = '';
@@ -99,7 +99,7 @@ class Benchmark
         $this->options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }
@@ -120,7 +120,7 @@ class Benchmark
     }
 
     /**
-     * The method disables the benchmark
+     * Disables the benchmark
      *
      * @param void
      * @return void
@@ -131,7 +131,7 @@ class Benchmark
     }
 
     /**
-     * The method kills all output that this class might output
+     * Disables both the benchmark and the debug
      *
      * @param void
      * @return void
@@ -144,10 +144,10 @@ class Benchmark
     }
 
     /**
-     * The method retrieves an array of data regarding the requested benchmark
+     * Retrieves an array of data for the requested benchmark
      *
      * @param string $id
-     * @return array on success or false on fail
+     * @return mixed Array on success or false on fail
      */
     public function get($id)
     {
@@ -180,7 +180,7 @@ class Benchmark
     }
 
     /**
-     * The method adds the starting point for the benchmark
+     * Starts a benchmark with the specified ID
      *
      * @param string $id
      * @return void
@@ -216,7 +216,7 @@ class Benchmark
     }
 
     /**
-     * The method stops the benchmark for a certain uniqueid
+     * Stops a benchmark with the specified ID
      *
      * @param string $id
      * @return void
@@ -261,7 +261,7 @@ class Benchmark
     }
 
     /**
-     * The method stops all the benchmarks
+     * Stops all the benchmarks
      *
      * @param void
      * @return void
@@ -280,7 +280,7 @@ class Benchmark
     }
 
     /**
-     * The method processes the results data and makes a cool string out of it
+     * Retrieves all the benchmark data and outputs the results
      *
      * @param void
      * @return string
@@ -324,7 +324,7 @@ class Benchmark
     }
 
     /**
-     * Class destructor.
+     * Shows the benchmark results or sends them via email depending on the selected option
      *
      * @param void
      * @return void
@@ -391,4 +391,3 @@ class Benchmark
     }
 
 }
-?>

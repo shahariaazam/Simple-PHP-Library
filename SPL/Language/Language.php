@@ -68,7 +68,7 @@ class Language
      private $CI;
 
     /**
-     * Class constructor
+     * Sets class options
      *
      * @param array $options
      * @return void
@@ -89,7 +89,7 @@ class Language
         $this->options['mail']              = 'webmaster@'.$_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }
@@ -132,7 +132,7 @@ class Language
     }
 
     /**
-     * The method retrieves the current language
+     * Retrieves the current language
      *
      * @param void
      * @return string
@@ -166,7 +166,7 @@ class Language
     }
 
     /**
-     * The methods loads the language file
+     * Loads the language file for the requested language
      *
      * @param void
      * @return void
@@ -231,7 +231,7 @@ class Language
     }
 
     /**
-     * The method loads the texts in the class cache
+     * Loads the texts in the class cache
      *
      * @param void
      * @return void
@@ -292,7 +292,7 @@ class Language
     }
 
     /**
-     * The method retrieves a text from the language file
+     * Retrieves a text from the cache
      *
      * @param string $text
      * @param array $data The given data is used to parse the text
@@ -340,7 +340,7 @@ class Language
     }
 
     /**
-     * Class destructor
+     * Sends debug mail (if debug is active and present)
      *
      * @param void
      * @return void
@@ -356,5 +356,3 @@ class Language
     }
 
 }
-
-?>

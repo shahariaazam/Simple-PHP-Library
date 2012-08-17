@@ -18,7 +18,7 @@ namespace SPL\Validator;
 class URL
 {
     /**
-     * The method validates a given URL
+     * Validates a given URL. It can also check if the URL is accessible (on by default).
      * 
      * @param string $url
      * @param boolean $checkIfAccessible When this parameter is set to true (which is default) the function also make a cURL call to see if the URL is accessible
@@ -29,11 +29,8 @@ class URL
         // ==== Check variable ==== //
         $isValid = true;
 
-        // ==== Sanitizing the URL ==== //
-        $url = filter_var($url, FILTER_SANITIZE_URL);
-
-        // ==== Validating URL ==== //
-        $url = filter_var($url, FILTER_VALIDATE_URL);
+        // ==== Sanitizing and validating the URL ==== //
+        $url = filter_var(filter_var($url, FILTER_SANITIZE_URL), FILTER_VALIDATE_URL);
 
         // ==== Checking if the URL passed the previous checks ==== //
         if($url === false)

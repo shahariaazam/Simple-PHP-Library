@@ -145,7 +145,7 @@ abstract class AbstractUserAuth
 
 
     /**
-     * Class constructor
+     * Sets different class properties and some options
      *
      * @param object $db
      * @param array $options
@@ -197,10 +197,10 @@ abstract class AbstractUserAuth
     }
 
     /**
-     * The method is used to retrieve the errors
+     * Retrieve the errors
      *
      * @param void
-     * @return array
+     * @return array Empty array when no errors present or an array of error numbers
      */
     public function getErrors()
     {
@@ -208,7 +208,7 @@ abstract class AbstractUserAuth
     }
     
     /**
-     * The method retrieves the data from the session
+     * Retrieves the data from the session
      * 
      * @param void
      * @return void
@@ -219,7 +219,7 @@ abstract class AbstractUserAuth
     }
     
     /**
-     * The method sets the data to the session
+     * Sets the data to the session
      * 
      * @param void
      * @return void
@@ -230,7 +230,7 @@ abstract class AbstractUserAuth
     }
     
     /**
-     * The method is used to log a message
+     * Logs a message
      * 
      * @param string $type
      * @param string $message
@@ -286,7 +286,7 @@ abstract class AbstractUserAuth
      }
 
     /**
-     * The method hides the cookies purpose
+     * Generates an unredable cookie name
      *
      * @param void
      * @return void
@@ -309,7 +309,7 @@ abstract class AbstractUserAuth
     }
 
     /**
-     * Creates the cookie on the users computer
+     * Creates the cookie on the user's computer
      *
      * @param void
      * @return void
@@ -320,7 +320,7 @@ abstract class AbstractUserAuth
     }
 
     /**
-     * Deletes the cookie from the users computer
+     * Deletes the cookie from the user's computer
      *
      * @param void
      * @return void
@@ -339,7 +339,7 @@ abstract class AbstractUserAuth
     protected abstract function sqlLogin($user_id, array $data);
 
     /**
-     * Login data
+     * Prepares the login data
      *
      * @param array $data
      * @return array
@@ -375,13 +375,13 @@ abstract class AbstractUserAuth
     }
 
     /**
-     * Login method. It creates the necessary info for the authentication.
+     * Does the user loginprocess
      *
      * @param array $data
      * @param boolean $remember
      * @return boolean
      */
-    public function doLogin(array $data, $remember=false)
+    public function doLogin(array $data, $remember = false)
     {
         // ==== Default result ==== //
         $result = false;
@@ -504,7 +504,7 @@ abstract class AbstractUserAuth
     protected abstract function sqlAuth(array $data);
 
     /**
-     * Authentication data
+     * Prepares the authentication data
      *
      * @param void
      * @return array on success of false on fail
@@ -570,7 +570,7 @@ abstract class AbstractUserAuth
     }
 
     /**
-     * The method authenticates the user
+     * Authenticates the user
      *
      * @param integer $user_id
      * @param boolean $via_db
@@ -749,7 +749,7 @@ abstract class AbstractUserAuth
     }
 
     /**
-     * The method verifies if the user is logged in or not
+     * Verifies if the user is logged in or not
      *
      * @param void
      * @return boolean
@@ -809,7 +809,7 @@ abstract class AbstractUserAuth
     }
 
     /**
-     * Class destructor
+     * Sends debug mail (if debug is active and there is something to send)
      *
      * @param void
      * @return void

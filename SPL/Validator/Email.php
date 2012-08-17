@@ -18,7 +18,7 @@ namespace SPL\Validator;
 class Email
 {
     /**
-     * The method validates the email address provided. It also can check the DNS to see if it is valid.
+     * Validates the email address provided. It can also check the DNS to see if it is valid.
      *
      * @param string $email
      * @param boolean $checkDNS [optional]
@@ -29,11 +29,8 @@ class Email
         // ==== Check variable ==== //
         $isValid = true;
 
-        // ==== Sanitizing the email ==== //
-        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-
-        // ==== Validating email ==== //
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+        // ==== Sanitizing and validating the email ==== //
+        $email = filter_var(filter_var($email, FILTER_SANITIZE_EMAIL), FILTER_VALIDATE_EMAIL);
 
         // ==== Checking DNS record (if activated) if the email is ok so far ===== //
         if($email == false)

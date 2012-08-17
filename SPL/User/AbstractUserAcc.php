@@ -126,7 +126,7 @@ abstract class AbstractUserAcc
 
 
     /**
-     * Class constructor.
+     * Sets different class properties and some options
      *
      * @param object $db
      * @param object $vault
@@ -166,7 +166,7 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * The method is used to retrieve the errors
+     * Used to retrieve the errors
      *
      * @param void
      * @return array
@@ -177,7 +177,7 @@ abstract class AbstractUserAcc
     }
     
     /**
-     * The method retrieves the data from the session
+     * Retrieves the data from the session
      * 
      * @param void
      * @return void
@@ -188,7 +188,7 @@ abstract class AbstractUserAcc
     }
     
     /**
-     * The method sets the data to the session
+     * Sets the data to the session
      * 
      * @param void
      * @return void
@@ -199,8 +199,7 @@ abstract class AbstractUserAcc
     }
 
     /**
-     *
-     * The method tries to retrieve a certain information about the users account
+     * Tries to retrieve a certain information about the users account
      *
      * @param string $field
      * @return mixed It returns NULL if the information is not found or it returns the information as found in the database
@@ -219,7 +218,7 @@ abstract class AbstractUserAcc
     }
     
     /**
-     * The method is used to log a message
+     * Is used to log a message
      * 
      * @param string $type
      * @param string $message
@@ -275,7 +274,7 @@ abstract class AbstractUserAcc
      }
 
     /**
-     * The method builds the password using a salt and a string
+     * Builds the password using a salt and a string
      *
      * @param string $salt
      * @param string $passwd
@@ -330,7 +329,7 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * The method returns the SQL for the getSalt method
+     * Returns the SQL for the getSalt method
      *
      * @param array $data
      * @return string
@@ -488,16 +487,13 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * The method does the login process
+     * Does the login process
      *
      * @param array $data
      * @return mixed false on failure or an user_id on success
      */
     public function doLogin(array $data)
     {
-        // ==== Result variable ==== //
-        $result = true;
-
         // ==== Checking the required fields ==== //
         $result = $this->allowLogin($data);
 
@@ -579,7 +575,7 @@ abstract class AbstractUserAcc
 
     /**
      *
-     * The method build an SQL used for the account info retrieval
+     * Build an SQL used for the account info retrieval
      *
      * @param integer $user_id
      * @return string
@@ -588,7 +584,7 @@ abstract class AbstractUserAcc
 
     /**
      *
-     * The method retrieves info about a user using the given user_id
+     * Retrieves info about a user using the given user_id
      *
      * @param integer $user_id
      * @return mixed false on failure or an array on success
@@ -659,7 +655,7 @@ abstract class AbstractUserAcc
 
     /**
      *
-     * The method updates the local account info
+     * Updates the local account info
      *
      * @param integer $userinfo
      * @return mixed false on failure or an array on success
@@ -670,7 +666,7 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * The method checks if the username exits
+     * Checks if the username exits
      *
      * @param string $username
      * @return boolean
@@ -678,7 +674,7 @@ abstract class AbstractUserAcc
     protected abstract function doesUsenameExist($username);
 
     /**
-     * The method checks if the email exits
+     * Checks if the email exits
      *
      * @param string $email
      * @return boolean
@@ -812,7 +808,7 @@ abstract class AbstractUserAcc
     protected abstract function sqlRegister(array $data);
 
     /**
-     * This method prepares the SQL for the login and the data that is required for the query
+     * Prepares the SQL for the login and the data that is required for the query
      *
      * @param array $data
      * @return string
@@ -849,16 +845,13 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * The method takes care of the registration process
+     * Takes care of the registration process
      *
      * @param array $data
      * @return mixed true on success of an error number on fail
      */
     public function doRegister(array $data)
     {
-        // ==== Result variable ==== //
-        $result = true;
-
         // ==== Checking the required fields ==== //
         $result = $this->allowRegister($data);
 
@@ -904,7 +897,7 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * The method checks the password recovery should be allowed
+     * Password recovery conditions
      *
      * @param array $data
      * @return boolean
@@ -945,7 +938,7 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * The method is used to retrieve the SQL for the retrive password process
+     * Used to retrieve the SQL for the retrive password process
      *
      * @param array $data
      * @return string
@@ -953,7 +946,7 @@ abstract class AbstractUserAcc
     protected abstract function sqlRecovery(array $data);
 
     /**
-     * The function takes care of Stage 1 of the password recovery process
+     * Takes care of Stage 1 of the password recovery process
      *
      * @param array $data
      * @return boolean
@@ -994,7 +987,7 @@ abstract class AbstractUserAcc
     }
 
     /**
-     * Class destructor
+     * Sends debug mail (if debug is active and there is something to send)
      *
      * @param void
      * @return void

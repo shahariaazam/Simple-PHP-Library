@@ -39,22 +39,18 @@ class Autoload
     private static $skip = false;
     
     /**
-     * Sets the skip property
+     * Sets the skip property to true so that no exception is thrown when a file for a class is not found
      * 
-     * @param boolean $skip
+     * @param void
      * @return void
      */
-    public static function setSkip($skip)
+    public static function skipException()
     {
-        // Checking if boolean
-        if(is_bool($skip))
-        {
-            self::$skip = $skip;
-        }
+        self::$skip = true;
     }
 
     /**
-     * Registers the autoload function
+     * Registers the Autoload class as an autoloader
      * 
      * @param void
      * @return void
@@ -75,7 +71,7 @@ class Autoload
     }
     
     /**
-     * Can be used to set the paths manually
+     * Used to add more paths to the ones already got from the include path
      * 
      * @param array $paths
      * @return void

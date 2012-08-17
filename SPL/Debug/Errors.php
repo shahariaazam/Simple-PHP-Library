@@ -49,7 +49,7 @@ class Errors
     private static $email = '';
     
     /**
-     * Sets the email address
+     * Sets the debug email address
      * 
      * @param string $email
      * @return void
@@ -80,7 +80,7 @@ class Errors
     }
     
     /**
-     * The method detects the last error and send the details via mail
+     * Detects the last error and send the details via mail (if one has been set)
      * 
      * @param void
      * @return void

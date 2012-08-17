@@ -56,12 +56,13 @@ class Image
     private $enabled = true;
 
     /**
-     * Class constructor
-     * 
+     * Sets the image file and the provided options
+     *
+     * @param string $image
      * @param array $options
      * @return object
      */
-    public function __construct($image, $options=array())
+    public function __construct($image, array $options = array())
     {
         // ==== Default options ==== //
         $this->options['width']     = '150';       // Width of the new image
@@ -70,7 +71,7 @@ class Image
         $this->options['dir']       = 'images/';   // Directory where to put the image
 
         // ==== Replacing options with custom ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_replace($this->options, $options);
         }
@@ -94,7 +95,7 @@ class Image
 
     /**
      *
-     * The method retrieves the properties about the image
+     * Retrieves the properties about the image
      *
      * @param void
      * @return void
@@ -127,7 +128,7 @@ class Image
 
     /**
      *
-     * The method retrieves a property about the image
+     * Retrieves a property about the image
      *
      * @var string $name
      * @return string The string will be empty if the property is not found
@@ -152,12 +153,12 @@ class Image
     }
 
     /**
-     * This method shows the given image but the resized version
+     * Shows the given image but the resized version
      * 
      * @param string $new_ext The type of image to output
      * @return boolean
      */
-    public function show($new_ext='')
+    public function show($new_ext = '')
     {
         // ==== If the object is disabled just return the failed value ==== //
         if($this->enabled == false)
@@ -222,13 +223,13 @@ class Image
     }
 
     /**
-     * The method writes the given image to the hard drive using a random name. If the name exists it retries 3 times to generate an unique one.
+     * Writes the given image to the hard drive using a random name. If the name exists it retries 3 times to generate an unique one.
      *
      * @param string $new_ext
      * @param boolean $random Flag that determins if the image name is random or not
      * @return false on failure or image name on success
      */
-    public function write($new_ext='', $random=false)
+    public function write($new_ext = '', $random=false)
     {
         // ==== If the object is disabled just return the failed value ==== //
         if($this->enabled == false)
@@ -333,7 +334,7 @@ class Image
     }
 
     /**
-     * The method does the image resizing and returns the new image data.
+     * Resizes the image and returns the image resource
      * 
      * @param string $image
      * @return resource or false

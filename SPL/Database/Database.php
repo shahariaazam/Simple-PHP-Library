@@ -42,12 +42,12 @@ abstract class Database
     private static $instance;
 
     /**
-     * Singleton initiator
+     * Called to create a database object
      *
      * @param void
      * @return object on success or integer on fail: 2 for wrong options, 3 for unsupported database type
      */
-    public static function init(array $options=array(), $new=false)
+    public static function init(array $options = array(), $new = false)
     {
         // ==== Error code ==== //
         $error_code = false;
@@ -95,7 +95,7 @@ abstract class Database
     }
 
     /**
-     * The method checks if the database type is supported
+     * Checks if the database type is supported
      *
      * @param string $type
      * @return boolean

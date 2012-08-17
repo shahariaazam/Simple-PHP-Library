@@ -44,20 +44,20 @@ class Paging
     private $rows=0;
 
     /**
-     * Class constructor
+     * Sets the URL object and the provided options
      *
      * @param object $url
      * @param array $options
      * @return void
      */
-    public function __construct(URL\URL $url, $options=array())
+    public function __construct(URL\URL $url, array $options = array())
     {
         // ==== Default options ==== //
         $this->options['ipp'] = 10;
         $this->options['pages'] = 5;
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_replace($this->options, $options);
         }
@@ -67,7 +67,7 @@ class Paging
     }
 
     /**
-     * The method calculates the offset for the query
+     * Calculates the offset for the query
      *
      * @param void
      * @return integer
@@ -90,7 +90,7 @@ class Paging
     }
 
     /**
-     * The method executes the query limiting it to a number of rows
+     * Executes the query limiting it to a number of rows
      *
      * @param db_module $db
      * @param string $query
@@ -157,7 +157,7 @@ class Paging
     }
 
     /**
-     * The method is used when instead of a query we have an array of elements
+     * Used when instead of a query we have an array of elements
      *
      * @param array $array
      * @return array
@@ -186,7 +186,7 @@ class Paging
     }
 
     /**
-     * The method returns the prper URL
+     * Returns the proper URL
      *
      * @param integer $pagenr
      * @return string
@@ -207,12 +207,12 @@ class Paging
     }
 
     /**
-     * Paging method that prints out the pages
+     * Prints the pages
      *
      * @param boolean $default_layout
      * @return void
      */
-    public function show($default_layout=false)
+    public function show($default_layout = false)
     {
         // ==== Array that holds the data about the links ==== //
         $links = array();
@@ -387,4 +387,3 @@ class Paging
         }
     }
 }
-?>

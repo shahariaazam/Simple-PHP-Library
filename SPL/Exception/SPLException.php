@@ -20,7 +20,7 @@ namespace SPL\Exception;
 class SPLException extends \Exception
 {
     /**
-     * Construct the exception
+     * Constructs the exception and prints it in a more readable format
      * 
      * @param $message [optional]
      * @param $code [optional]

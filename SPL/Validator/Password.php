@@ -25,7 +25,7 @@ class Password
     private $options = array();
     
     /**
-     * Class constructor
+     * Sets the class options
      * 
      * @param array $options
      * @return void
@@ -46,7 +46,7 @@ class Password
     }
     
     /**
-     * Setter method
+     * Used to set additional options
      * 
      * @param string $name
      * @param string $value
@@ -62,7 +62,7 @@ class Password
     }
     
     /**
-     * The function checks the complexity of a password
+     * Checks if the password is valid according to the options provided (aka it checks the complexity using the given options)
      *
      * @param string $passwd
      * @param boolean $bypass

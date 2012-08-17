@@ -54,7 +54,7 @@ class Headers
     }
     
     /**
-     * The method replaces or adds header data
+     * Replaces or adds header data
      *
      * @param array $headers
      * @param boolean $assoc
@@ -80,7 +80,7 @@ class Headers
     }
     
     /**
-     * The method retrieves the request headers
+     * Retrieves the request headers
      *
      * @param void
      * @return array
