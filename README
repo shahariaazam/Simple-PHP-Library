@@ -31,8 +31,13 @@ If you are using CodeIgniter for example and you want the class to not throw an 
 Autoload::setSkip(true);
 
 
-Class documentation:
+Usage documentation:
 
 Partial documentation can be found here: https://brian.hopto.org/wiki/hypermvc/category/library/
 
 I will update the class and function documentation after deciding if I will move the remaining function to some classes.
+
+
+API Documentation:
+
+https://brian.hopto.org/docs/hypermvc/library/
