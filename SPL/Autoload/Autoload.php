@@ -2,45 +2,47 @@
 
 /**
  * Autoloader class
- * 
+ *
  * @author Brian
  * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
- * 
+ *
  * @name Autoload
  * @version 1.1
- * 
+ *
  */
 
 namespace SPL\Autoload;
+
+use SPL\Exception\SPLException as SPLException;
 
 class Autoload
 {
     /**
      * Stores the loaded classes
-     * 
+     *
      * @var array
      */
     private static $loaded = array();
-    
+
     /**
      * Stores a list of paths (usually the ones from the include path
-     * 
+     *
      * @var array
      */
     private static $paths = array();
-    
+
     /**
      * Flag that determines if the an exception is thrown or not when a class file is not found
-     * 
+     *
      * @var boolean
      */
     private static $skip = false;
-    
+
     /**
      * Sets the skip property to true so that no exception is thrown when a file for a class is not found
-     * 
+     *
      * @param void
      * @return void
      */
@@ -51,7 +53,7 @@ class Autoload
 
     /**
      * Registers the Autoload class as an autoloader
-     * 
+     *
      * @param void
      * @return void
      */
@@ -59,20 +61,20 @@ class Autoload
     {
         // Getting the include paths
         self::$paths = explode(PATH_SEPARATOR, get_include_path());
-        
+
         // Registering the autoload function
         $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'load'));
-        
+
         // Checking if the autoload class was loaded or not
         if($registered == false)
         {
             throw new \Exception('Unable to register the autoload function');
         }
     }
-    
+
     /**
      * Used to add more paths to the ones already got from the include path
-     * 
+     *
      * @param array $paths
      * @return void
      */
@@ -81,10 +83,10 @@ class Autoload
         // Adding the new paths
         self::$paths = array_merge(self::$paths, $paths);
     }
-    
+
     /**
      * Loads a requested class
-     * 
+     *
      * @param string $class_name
      * @return void
      */
@@ -115,11 +117,11 @@ class Autoload
                     require $file_path;
                 }
             }
-            
+
             // Checking if the class file was loaded
             if(!isset(self::$loaded[$class_name]) && self::$skip === false)
             {
-                throw new \SPL\Exception\SPLException('No file was found for class ' . $class_name);
+                throw new SPLException('No file was found for class ' . $class_name);
             }
         }
     }
