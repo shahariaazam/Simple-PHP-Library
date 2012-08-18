@@ -15,7 +15,7 @@
 
 namespace SPL\Autoload;
 
-use SPL\Exception\SPLException as SPLException;
+use SPL\Exception\Exception as Exception;
 
 class Autoload
 {
@@ -66,9 +66,10 @@ class Autoload
         $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'load'));
 
         // Checking if the autoload class was loaded or not
-        if($registered == false)
+        if($registered === false)
         {
-            throw new \Exception('Unable to register the autoload function');
+            echo '<pre>';
+            throw new \RuntimeException('Unable to register the autoload function');
         }
     }
 
@@ -121,7 +122,7 @@ class Autoload
             // Checking if the class file was loaded
             if(!isset(self::$loaded[$class_name]) && self::$skip === false)
             {
-                throw new SPLException('No file was found for class ' . $class_name);
+                throw new Exception('No file was found for class ' . $class_name);
             }
         }
     }

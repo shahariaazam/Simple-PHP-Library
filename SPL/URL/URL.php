@@ -15,7 +15,7 @@
 
 namespace SPL\URL;
 
-use SPL\Exception\SPLException as SPLException;
+use SPL\Exception\Exception as Exception;
 
 class URL
 {
@@ -165,7 +165,7 @@ class URL
             // == If invalid == //
             if(\SPL\Validator\URL::isValid($this->options['site_root'], false) === false)
             {
-                throw new SPLException('Invalid site root URL. URL: ' . $this->options['site_root']);
+                throw new Exception('Invalid site root URL. URL: ' . $this->options['site_root']);
             }
             else
             {
@@ -179,7 +179,7 @@ class URL
         else
         {
             // ==== Triggering error ==== //
-            throw new SPLException('The site root is not set.');
+            throw new Exception('The site root is not set.');
         }
     }
 
@@ -450,7 +450,7 @@ class URL
         }
         else
         {
-            throw new SPLException('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
+            throw new Exception('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
         }
     }
 

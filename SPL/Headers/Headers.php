@@ -11,16 +11,18 @@
  *
  * @name User
  * @version 1.0
- * 
+ *
  */
 
 namespace SPL\Headers;
+
+use SPL\Exception\Exception as Exception;
 
 class Headers
 {
     /**
      * Returns an associative or numeric array with the headers of the provided URL
-     * 
+     *
      * @param string $url
      * @param boolean $assoc
      * @return array
@@ -29,7 +31,7 @@ class Headers
     {
         // Headers array
         $headers = array();
-        
+
         // Checking if the required function exists
         if(function_exists('get_headers'))
         {
@@ -46,13 +48,13 @@ class Headers
         else
         {
             // Throwing an exception
-            throw new \SPL\Exception\SPLException('I cannot seem to find the get_headers function. This function is required for the SPL\Headers\Headers::getUrlHeader method.');
+            throw new Exception('I cannot seem to find the get_headers function. This function is required for the SPL\Headers\Headers::getUrlHeader method.');
         }
-        
+
         // Returning the result
         return $headers;
     }
-    
+
     /**
      * Replaces or adds header data
      *
@@ -62,7 +64,7 @@ class Headers
      */
     public static function set(array $headers, $assoc = true)
     {
-        // Checking 
+        // Checking
         if($assoc === true) // Associative array
         {
             foreach ($headers as $header => $value)
@@ -78,7 +80,7 @@ class Headers
             }
         }
     }
-    
+
     /**
      * Retrieves the request headers
      *
