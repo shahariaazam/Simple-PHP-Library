@@ -16,7 +16,7 @@
 namespace SPL\URL;
 
 use SPL\Exception\SPLException as SPLException;
-use SPL\Validator as Validator;
+use SPL\Validator as \Validator;
 
 class URL
 {
