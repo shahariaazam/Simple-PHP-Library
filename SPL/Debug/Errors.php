@@ -7,22 +7,22 @@
  * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
- * 
+ *
  * @name Errors
  * @version 1.1
- * 
+ *
  */
 
 namespace SPL\Debug;
 
-use SPL\URL;
+use SPL\URL\URL as URL;
 
 class Errors
 {
     /**
      *
      * Error types
-     * 
+     *
      * @var array
      */
     private static $err_types = array(
@@ -40,17 +40,17 @@ class Errors
         E_STRICT => 'E_STRICT',
         E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR'
     );
-    
+
     /**
      * Email to send to
-     * 
+     *
      * @var string
      */
     private static $email = '';
-    
+
     /**
      * Sets the debug email address
-     * 
+     *
      * @param string $email
      * @return void
      */
@@ -66,10 +66,10 @@ class Errors
             throw new \Exception('The provided email for the Errors debug class is invalid.');
         }
     }
-    
+
     /**
      * Registers the error handler function
-     * 
+     *
      * @param void
      * @return void
      */
@@ -78,10 +78,10 @@ class Errors
         // Registering the error handler function
         register_shutdown_function(array('\SPL\Debug\Errors', 'getError'));
     }
-    
+
     /**
      * Detects the last error and send the details via mail (if one has been set)
-     * 
+     *
      * @param void
      * @return void
      */
@@ -126,7 +126,7 @@ class Errors
 
                 // ==== Message ==== //
                 $message = '';
-                $message .= '<b>URL:</b> ' . URL\URL::getFullURL() . '<hr><br /><br />';
+                $message .= '<b>URL:</b> ' . URL::getFullURL() . '<hr><br /><br />';
                 $message .= '<b>MESSAGE:</b> ' . $error['message'] . '<br />';
                 $message .= '<b>FILE:</b> ' . $error['file'] . '<br />';
                 $message .= '<b>LINE:</b> ' . $error['line'] . '<br />';
