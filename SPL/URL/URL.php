@@ -16,7 +16,7 @@
 namespace SPL\URL;
 
 use SPL\Exception\SPLException as SPLException;
-use SPL\Validator as \Validator;
+use \SPL\Validator as Validator;
 
 class URL
 {
@@ -164,7 +164,7 @@ class URL
             }
 
             // == If invalid == //
-            if(\Validator\URL::isValid($this->options['site_root']) === false)
+            if(Validator\URL::isValid($this->options['site_root']) === false)
             {
                 throw new SPLException('Invalid site root URL. URL: ' . $this->url);
             }
