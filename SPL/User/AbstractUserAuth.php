@@ -62,13 +62,14 @@
  *
  * 500 - Internal class error (used to signal the UserAcc class that an error has occured)
  * 501 - Could not insert authentication info into the database
- * 
+ *
  */
 
 namespace SPL\User;
 
 use SPL\URL;
 use SPL\Headers\Headers as Headers;
+use SPL\Security\Vault as Vault;
 
 abstract class AbstractUserAuth
 {
@@ -113,10 +114,10 @@ abstract class AbstractUserAuth
      * @var Vault
      */
     protected $vault;
-    
+
     /**
      * Local session array
-     * 
+     *
      * @var array
      */
     protected $session;
@@ -151,7 +152,7 @@ abstract class AbstractUserAuth
      * @param array $options
      * @return void
      */
-    public function __construct($db, AbstractUserAcc $userAcc, \Vault $vault, array $options=array())
+    public function __construct($db, AbstractUserAcc $userAcc, Vault $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';
@@ -163,7 +164,7 @@ abstract class AbstractUserAuth
         $this->options['cookie_domain']   = '';
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }
@@ -206,10 +207,10 @@ abstract class AbstractUserAuth
     {
         return $this->errors;
     }
-    
+
     /**
      * Retrieves the data from the session
-     * 
+     *
      * @param void
      * @return void
      */
@@ -217,10 +218,10 @@ abstract class AbstractUserAuth
     {
         $this->session = &$_SESSION;
     }
-    
+
     /**
      * Sets the data to the session
-     * 
+     *
      * @param void
      * @return void
      */
@@ -228,10 +229,10 @@ abstract class AbstractUserAuth
     {
         $_SESSION = array_merge($_SESSION, $this->session);
     }
-    
+
     /**
      * Logs a message
-     * 
+     *
      * @param string $type
      * @param string $message
      * @param string $location
@@ -252,7 +253,7 @@ abstract class AbstractUserAuth
                 {
                     $this->errors[] = $number;
                 }
-            
+
                 // ==== Checking if debug is active ==== //
                 if($this->options['debug'])
                 {
@@ -261,9 +262,9 @@ abstract class AbstractUserAuth
                     $this->log .= '<b>QUERY:</b>' . $extra1 . '<br />';
                     $this->log .= '<b>SQL ERROR:</b>' . $extra2 . '<br /><br />';
                 }
-                
+
                 break;
-                
+
             // ERROR
             case 'error':
                 // ==== Error ==== //
@@ -271,14 +272,14 @@ abstract class AbstractUserAuth
                 {
                     $this->errors[] = $number;
                 }
-                
+
             // LOG
             case 'log':
                 $this->log .= '<hr><hr><strong>' . $location . '</strong><hr><br />';
                 $this->log .= $message;
-                
+
                 break;
-                
+
             // INVALID TYPE
             default:
                 break;
@@ -365,7 +366,7 @@ abstract class AbstractUserAuth
             $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
             $log .= 'Data: '.print_array($data, 1).'<br />';
             $log .= '<br /><br />';
-            
+
             // ==== Adding log ==== //
             $this->log_message('log', $log, __METHOD__);
         }
@@ -415,10 +416,10 @@ abstract class AbstractUserAuth
                     {
                         // ==== Executing the SQL ==== //
                         $this->db->query($sql);
-        
+
                         // ==== Getting the SQL error ==== //
                         $sql_error = $this->db->error();
-        
+
                         // ==== Checking if an error occured ==== //
                         if($sql_error == '')
                         {
@@ -441,7 +442,7 @@ abstract class AbstractUserAuth
                         }
                     }
                     else
-                    {                       
+                    {
                         // ==== Adding the error ==== //
                         $this->log_message('error', 'Internal class error (used to signal the UserAcc class that an error has occured)', __METHOD__, 500);
                     }
@@ -471,7 +472,7 @@ abstract class AbstractUserAuth
                 {
                     $log = 'User ID: ' . $user_id . '<br />';
                     $log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
-                    
+
                     // ==== Adding the error ==== //
                     $this->log_message('log', $log, __METHOD__);
                 }
@@ -485,7 +486,7 @@ abstract class AbstractUserAuth
             if($this->options['debug'])
             {
                 $log = '<strong>NOTICE:</strong> User already logged in.<br /><br />';
-                
+
                 // ==== Adding the error ==== //
                 $this->log_message('log', $log, __METHOD__);
             }
@@ -548,7 +549,7 @@ abstract class AbstractUserAuth
                 $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
                 $log .= 'Data: '.print_array($data, 1).'<br />';
                 $log .= '<br /><br />';
-                
+
                 // ==== Adding the error ==== //
                 $this->log_message('log', $log, __METHOD__);
             }
@@ -559,7 +560,7 @@ abstract class AbstractUserAuth
             if($this->options['debug'])
             {
                 $log = '<strong>ERROR:</strong> The required data for the prepareAuth method is not present. Required: authentication cookie.<br /><br />';
-                
+
                 // ==== Adding the error ==== //
                 $this->log_message('log', $log, __METHOD__);
             }
@@ -606,7 +607,7 @@ abstract class AbstractUserAuth
                     {
                         // ==== Executing the SQL ==== //
                         $this->db->query($sql);
-        
+
                         // ==== Getting the SQL error ==== //
                         $sql_error = $this->db->error();
 
@@ -621,7 +622,7 @@ abstract class AbstractUserAuth
                                 $log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
                                 $log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
                                 $log .= '<br /><br />';
-                                
+
                                 // ==== Adding the error ==== //
                                 $this->log_message('log', $log, __METHOD__);
                             }
@@ -645,7 +646,7 @@ abstract class AbstractUserAuth
                             if($this->options['debug'])
                             {
                                 $log = '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
-                                
+
                                 // ==== Adding the error ==== //
                                 $this->log_message('log', $log, __METHOD__);
                             }
@@ -667,7 +668,7 @@ abstract class AbstractUserAuth
                 if($this->options['debug'])
                 {
                     $log = '<strong>Info:</strong> Skipped db check.<br /><br />';
-                    
+
                     // ==== Adding the error ==== //
                     $this->log_message('log', $log, __METHOD__);
                 }
@@ -712,7 +713,7 @@ abstract class AbstractUserAuth
                 $log .= 'Skipped database authentication<br /><br />';
                 $log .= 'User info: '.print_array($userinfo, 1).'<br />';
                 $log .= '<br /><br />';
-                
+
                 // ==== Adding the error ==== //
                 $this->log_message('log', $log, __METHOD__);
             }
@@ -725,7 +726,7 @@ abstract class AbstractUserAuth
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Function arguments: <pre>' . print_r(func_get_args(), true) . '</pre><br /><br />';
                 $log .= '<br /><br />';
-                
+
                 // ==== Adding the error ==== //
                 $this->log_message('log', $log, __METHOD__);
             }
@@ -740,7 +741,7 @@ abstract class AbstractUserAuth
         {
             $isOk = false;
         }
-        
+
         // ==== Saving the session info ==== //
         $this->setSession();
 
@@ -762,7 +763,7 @@ abstract class AbstractUserAuth
             $log = '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
             $log .= '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true?'yes':'no') . '<br />';
             $log .= '<br /><br />';
-            
+
             // ==== Adding the error ==== //
             $this->log_message('log', $log, __METHOD__);
         }

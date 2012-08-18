@@ -9,19 +9,19 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @uses Password validator object
- * 
+ *
  * @name AbstractUserAcc
  * @version 2.3
  *
- * 
+ *
  * Internal errors:
  *
  * ========= Login data errors =========
- * 
+ *
  * 1 - Username empty
  * 5 - Password empty
  * 15 - User inactive
- * 
+ *
  *
  * ========= Register data errors =========
  *
@@ -46,7 +46,7 @@
  * ========= Salt errors =========
  *
  * 150 - Data required for salt retrieval is not present
- * 
+ *
  *
  * ========= Recover password data errors =========
  *
@@ -57,7 +57,7 @@
  * ========= User handling =========
  *
  * 200 - No info found in the database for the given account ID
- * 
+ *
  */
 
 namespace SPL\User;
@@ -65,6 +65,7 @@ namespace SPL\User;
 use SPL\URL;
 use SPL\Validator;
 use SPL\Headers\Headers as Headers;
+use SPL\Security\Vault as Vault;
 
 abstract class AbstractUserAcc
 {
@@ -109,10 +110,10 @@ abstract class AbstractUserAcc
      * @var Vault
      */
     protected $vault;
-    
+
     /**
      * Local session array
-     * 
+     *
      * @var array
      */
     protected $session;
@@ -133,7 +134,7 @@ abstract class AbstractUserAcc
      * @param array $options
      * @return void
      */
-    public function __construct($db, \Vault $vault, array $options=array())
+    public function __construct($db, Vault $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';
@@ -141,7 +142,7 @@ abstract class AbstractUserAcc
         $this->options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(is_array($options))
+        if(count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }
@@ -160,7 +161,7 @@ abstract class AbstractUserAcc
 
         // ==== Getting the vault object ==== //
         $this->vault = $vault;
-        
+
         // ==== Getting the session data ==== //
         $this->getSession();
     }
@@ -175,10 +176,10 @@ abstract class AbstractUserAcc
     {
         return $this->errors;
     }
-    
+
     /**
      * Retrieves the data from the session
-     * 
+     *
      * @param void
      * @return void
      */
@@ -186,10 +187,10 @@ abstract class AbstractUserAcc
     {
         $this->session = &$_SESSION;
     }
-    
+
     /**
      * Sets the data to the session
-     * 
+     *
      * @param void
      * @return void
      */
@@ -216,10 +217,10 @@ abstract class AbstractUserAcc
             return NULL;
         }
     }
-    
+
     /**
      * Is used to log a message
-     * 
+     *
      * @param string $type
      * @param string $message
      * @param string $location
@@ -240,7 +241,7 @@ abstract class AbstractUserAcc
                 {
                     $this->errors[] = $number;
                 }
-            
+
                 // ==== Checking if debug is active ==== //
                 if($this->options['debug'])
                 {
@@ -249,9 +250,9 @@ abstract class AbstractUserAcc
                     $this->log .= '<b>QUERY:</b>' . $extra1 . '<br />';
                     $this->log .= '<b>SQL ERROR:</b>' . $extra2 . '<br /><br />';
                 }
-                
+
                 break;
-                
+
             // ERROR
             case 'error':
                 // ==== Error ==== //
@@ -259,14 +260,14 @@ abstract class AbstractUserAcc
                 {
                     $this->errors[] = $number;
                 }
-                
+
             // LOG
             case 'log':
                 $this->log .= '<hr><hr><strong>' . $location . '</strong><hr><br />';
                 $this->log .= $message;
-                
+
                 break;
-                
+
             // INVALID TYPE
             default:
                 break;
@@ -315,7 +316,7 @@ abstract class AbstractUserAcc
         /////////////////////////////////////////////////
         // == Username == //
         if(empty($data['username']))
-        {         
+        {
             // ==== Adding the error ==== //
             $this->log_message('error', 'Data required for salt retrieval is not present', __METHOD__, 150);
             $result = false;
@@ -370,7 +371,7 @@ abstract class AbstractUserAcc
                 {
                     // ==== Failed ==== //
                     $result = false;
-                    
+
                     // ==== Adding the error ==== //
                     $this->log_message('error', 'Salt could not be retrieved from the database because it could not be found', __METHOD__, 101);
                 }
@@ -514,7 +515,7 @@ abstract class AbstractUserAcc
 
                 // ==== Getting the SQL error ==== //
                 $sql_error = $this->db->error();
-                
+
                 // ==== Checking if an error occured ==== //
                 if($sql_error == '')
                 {
@@ -537,7 +538,7 @@ abstract class AbstractUserAcc
                         {
                             // ==== Failed ==== //
                             $result = false;
-                            
+
                             // ==== Adding the error ==== //
                             $this->log_message('error', 'User inactive', __METHOD__, 15);
                         }
@@ -546,7 +547,7 @@ abstract class AbstractUserAcc
                     {
                         // ==== Failed ==== //
                         $result = false;
-                        
+
                         // ==== Adding the error ==== //
                         $this->log_message('error', 'User with the given login data not found', __METHOD__, 100);
                     }
@@ -555,7 +556,7 @@ abstract class AbstractUserAcc
                 {
                     // ==== Failed ==== //
                     $result = false;
-                                       
+
                     // ==== Adding the error ==== //
                     $this->log_message('sql', 'Could not do login because query failed', __METHOD__, 103, $sql, $sql_error);
                 }
@@ -628,13 +629,13 @@ abstract class AbstractUserAcc
                     $result = &$row;
                 }
                 else
-                {                  
+                {
                     // ==== Adding the error ==== //
                     $this->log_message('error', 'No info found in the database for the given account ID', __METHOD__, 200);
                 }
             }
             else
-            {              
+            {
                 // ==== Adding the error ==== //
                 $this->log_message('error', 'Could not retrieve the account info for the given account id', __METHOD__, 104);
 
@@ -748,7 +749,7 @@ abstract class AbstractUserAcc
         {
             // ==== Password complexity options ==== //
             $options = array();
-            
+
             // Creating the password validator object
             $passwdValidator = new Validator\Password();
 
@@ -784,7 +785,7 @@ abstract class AbstractUserAcc
             {
                 // ==== Checking if email exists ==== //
                 if($this->doesEmailExist($data['email']))
-                {                   
+                {
                     // ==== Adding the error ==== //
                     $this->log_message('error', 'Email exists', __METHOD__, 29);
                     $result = false;
@@ -875,7 +876,7 @@ abstract class AbstractUserAcc
 
                 // ==== Checking if an error occured ==== //
                 if($sql_error != '')
-                {                   
+                {
                     // ==== Adding the error ==== //
                     $this->log_message('sql', 'Could not register account because query failed', __METHOD__, 102, $sql, $sql_error);
                 }
@@ -925,7 +926,7 @@ abstract class AbstractUserAcc
         // ==== Email ==== //
         if(empty($data['email']))
         {
-            // ==== Adding the error ==== //            
+            // ==== Adding the error ==== //
             $this->log_message('error', 'Data required for password recovery is not present', __METHOD__, 160);
             $result = false;
         }
@@ -961,10 +962,10 @@ abstract class AbstractUserAcc
         {
             // ===== Getting the SQL ===== //
             $sql = $this->sqlRecovery($data);
-            
+
             // ==== Getting the last error (if any) ==== //
             $sql_error = $this->db->error();
-            
+
             // ==== Checking if an error occured ==== //
             if($sql_error == '') // No error
             {
@@ -972,7 +973,7 @@ abstract class AbstractUserAcc
                 $info = $this->db->fetch_assoc();
             }
             else
-            {               
+            {
                 // ==== Adding the error ==== //
                 $this->log_message('sql', 'An error occured while trying to recover your password', __METHOD__, 161, $sql, $sql_error);
             }
@@ -993,7 +994,7 @@ abstract class AbstractUserAcc
      * @return void
      */
     public function __destruct()
-    {        
+    {
         // ==== Debug ==== //
         if($this->options['debug'] && $this->log != '')
         {
