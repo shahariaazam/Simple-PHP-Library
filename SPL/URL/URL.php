@@ -164,7 +164,7 @@ class URL
             }
 
             // == If invalid == //
-            if(Validator\URL::isValid($this->options['site_root']) === false)
+            if(\Validator\URL::isValid($this->options['site_root']) === false)
             {
                 throw new SPLException('Invalid site root URL. URL: ' . $this->url);
             }
