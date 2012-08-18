@@ -450,8 +450,43 @@ class URL
         }
         else
         {
-            throw new Exception('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
+            throw new SPLException('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
         }
+    }
+
+    /**
+     * Gets a parameter from the URL
+     *
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getParam($name, $default = null)
+    {
+        // Checking if the parameter exists
+        if(isset($this->url_params[$name]))
+        {
+            return $this->url_params[$name];
+        }
+
+        // Returning null if the parameter does not exist
+        return $default;
+    }
+
+    /**
+     * Sets a parameter
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return object
+     */
+    public function setParam($name, $value)
+    {
+        // Setting the parameters value
+        $this->url_params[$name] = $value;
+
+        // Returning the current object
+        return $this;
     }
 
     /**
