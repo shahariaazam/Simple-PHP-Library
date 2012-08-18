@@ -10,10 +10,12 @@
  *
  * @name URL
  * @version 2.8
- * 
+ *
  */
 
 namespace SPL\URL;
+
+use SPL\Exception\SPLException as SPLException;
 
 class URL
 {
@@ -37,7 +39,7 @@ class URL
      * @var string
      */
     protected $site_root;
-    
+
     /**
      * Temporary site root for SSL URL generation
      *
@@ -53,18 +55,18 @@ class URL
     protected $page;
 
     /**
-     * Hold the pattern for the rewrite
-     *
-     * @var string
-     */
-    protected $pattern;
-
-    /**
      * Array of params that the object will automatically load
      *
      * @var array
      */
-    protected $params = array();
+    protected $persistent_params = array();
+
+    /**
+     * URL params (holds the params found in the URL
+     *
+     * @var array
+     */
+    private $url_params = array();
 
     /**
      * Rewrite active or not
@@ -72,10 +74,10 @@ class URL
      * @var boolean
      */
     protected $rewrite;
-    
+
     /**
      * CodeIgniter object
-     * 
+     *
      * @var CodeIgniter
      */
     protected $CI;
@@ -89,35 +91,47 @@ class URL
     public function __construct(array $options = array())
     {
         // ==== Default options ==== //
-        $this->options['site_root']      = '';
-        $this->options['site_root_ssl']  = '';
-        $this->options['page_token']     = 'goto';
-        $this->options['index_page']     = 'index';
-        $this->options['get_params']     = array();
-        $this->options['rewrite']        = false;
-        $this->options['secure']         = false;
-        $this->options['code_igniter']   = false;
+        $this->options['site_root']         = '';
+        $this->options['site_root_ssl']     = '';
+        $this->options['page_param']        = 'goto';
+        $this->options['action_param']      = 'index';
+        $this->options['index_page']        = 'index';
+        $this->options['persistent_params'] = array();
+        $this->options['rewrite']           = false;
+        $this->options['secure']            = false;
+        $this->options['code_igniter']      = false;
+        $this->options['mvc_style']         = false; // URL format similar to the ones used by a MVC
 
         // ==== Replacing options with custom ones ==== //
         if(count($options) > 0)
         {
             $this->options = array_replace($this->options, $options);
         }
-        
+
         // ==== Checking if the CodeIgniter support is enabled ==== //
         if($this->options['code_igniter'])
         {
             $this->CI = &get_instance();
-            
+
+            // Getting the site_root
+            if (strpos($this->CI->config->item('base_url'), 'http') === 0)
+            {
+                $this->options['site_root'] = $this->CI->config->item('base_url');
+            }
+            else
+            {
+                $this->options['site_root'] = 'http://' . $this->CI->config->item('base_url');
+            }
+
             // ==== Getting some options from CodeIgniter ==== //
-            $this->options['site_root']     = $this->CI->config->item('base_url'); // SITE ROOT
-            $this->options['site_root_ssl'] = 'https://' . str_replace('http://', '', $this->options['site_root']); // SITE ROOT SSL
-            $this->options['controller']    = $this->CI->config->item('controller_trigger'); // CONTROLLER TRIGGER
-            $this->options['method']        = $this->CI->config->item('function_trigger'); // FUNCTION TRIGGER
-            $this->options['index_page']    = $this->CI->config->item('default_controller'); // INDEX PAGE
-            $this->options['page_token']    = $this->options['controller']; // BACKWARD COMPATIBILITY
+            $this->options['site_root_ssl'] = str_replace('http://', 'https://', $this->options['site_root']);  // SITE ROOT SSL
+            $this->options['controller']    = $this->CI->config->item('controller_trigger');                    // CONTROLLER TRIGGER
+            $this->options['action_param']  = $this->CI->config->item('function_trigger');                      // FUNCTION TRIGGER
+            $this->options['index_page']    = $this->CI->config->item('default_controller');                    // INDEX PAGE
+            $this->options['page_param']    = $this->options['controller'];                                     // BACKWARD COMPATIBILITY
+            $this->options['mvc_style']     = true;                                                             // ACTIVATING THE MVC STYLE FORMAT
         }
-        
+
         // ==== Checking if the site_root option has been set ==== //
         if(!empty($this->options['site_root']))
         {
@@ -134,7 +148,7 @@ class URL
             }
 
             // ==== Correcting the URL ==== //
-            if($this->rewrite && strlen($this->url) > (strrpos($this->url, '/')+1) && strpos($this->url, '?'.$this->options['page_token'].'=') === false)
+            if($this->rewrite && strlen($this->url) > (strrpos($this->url, '/')+1) && strpos($this->url, '?'.$this->options['page_param'].'=') === false)
             {
                 $this->url .= '/';
             }
@@ -147,14 +161,11 @@ class URL
             {
                 $this->enableSSL();
             }
-            
-            // ==== Determining if the site root URL is valid ==== //
-            $is_valid = filter_var($this->options['site_root'], FILTER_VALIDATE_URL);
 
             // == If invalid == //
-            if($is_valid === false)
+            if(SPL\Validator\URL::isValid($this->options['site_root']) === false)
             {
-                trigger_error('Invalid site root URL. URL: ' . $this->url, E_USER_WARNING);
+                throw new SPLException('Invalid site root URL. URL: ' . $this->url);
             }
             else
             {
@@ -168,10 +179,10 @@ class URL
         else
         {
             // ==== Triggering error ==== //
-            exit('The site root is not set.');
+            throw new SPLException('The site root is not set.');
         }
     }
-    
+
     /**
      *
      * Returns the current url (everything in the URL bar)
@@ -184,10 +195,30 @@ class URL
         $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
         $domain = $_SERVER['SERVER_NAME'];
         $request_uri = $_SERVER['REQUEST_URI'];
-    
+
         $full_url = $protocol . $domain . $request_uri;
-    
+
         return $full_url;
+    }
+
+    /**
+     * Reverses the effect of parse_url
+     *
+     * @param array $comps
+     * @return string
+     */
+    public static function deparse_url($comps)
+    {
+        // Building the URL from the components
+        $url = (isset($comps['scheme']) ? $comps['scheme'] : '') . '://' .  // Protocol
+               (isset($comps['host']) ? $comps['host'] : '') .              // Host
+               (isset($comps['port']) ? ':' . $comps['port'] : '') .        // Port
+               (isset($comps['path']) ? $comps['path'] : '') .              // Path
+               (isset($comps['query']) ? '?' . $comps['query'] : '') .      // Query string
+               (isset($comps['fragment']) ? $comps['fragment'] : '');       // Anchor
+
+        // Returning the URL
+        return $url;
     }
 
     /**
@@ -199,10 +230,10 @@ class URL
     protected function initParams()
     {
         // ==== Checking if the get params option has some info in it ==== //
-        if(count($this->options['get_params']) > 0)
+        if(count($this->options['persistent_params']) > 0)
         {
             // ==== Going through the $_GET params ==== //
-            foreach($this->options['get_params'] as $name)
+            foreach($this->options['persistent_params'] as $name)
             {
                 // ==== Checking if the parameter exists ==== //
                 if(isset($_GET[$name]))
@@ -213,7 +244,7 @@ class URL
                     // ==== Adding parameter to the class parameters ==== //
                     if(!empty($value))
                     {
-                        $this->params[$name] = $value;
+                        $this->persistent_params[$name] = $value;
                     }
                 }
             }
@@ -229,9 +260,9 @@ class URL
     protected function getURLData()
     {
         // ==== Setting some default values ==== //
-        if(!isset($_GET[$this->options['page_token']]))
+        if(!isset($_GET[$this->options['page_param']]))
         {
-            $_GET[$this->options['page_token']] = $this->options['index_page'];
+            $_GET[$this->options['page_param']] = $this->options['index_page'];
 
             // ==== Setting the current page var ==== //
             $this->page = $this->options['index_page'];
@@ -271,7 +302,7 @@ class URL
 
                 // ==== Updating the site root ==== //
                 $this->options['site_root'] = $site_root;
-            }            
+            }
 
             // ==== Removing the site root from the URL ==== //
             $data = str_replace($site_root, '', $this->url, $found_site_root);
@@ -289,7 +320,7 @@ class URL
                     if(trim($data[count($data) - 1]) == '')
                     {
                         array_pop($data);
-                    }   
+                    }
                 }
 
                 // ==== Checking if CodeIgniter support is enabled ==== //
@@ -306,22 +337,22 @@ class URL
                         ///////////////////////////////////////////////////////////////
                         // ==== Temporary get holder ==== //
                         $get = array();
-                        
+
                         // ==== Getting the controller ==== //
                         $_GET[$this->options['controller']] = $data[0];
-                        
+
                         // Removing from data
                         unset($data[0]);
-                        
+
                         // ==== Getting the method ==== //
                         if(isset($data[1]))
                         {
-                            $_GET[$this->options['method']] = $data[1];
-                            
+                            $_GET[$this->options['action_param']] = $data[1];
+
                             // Removing from data
                             unset($data[1]);
                         }
-                        
+
                         // ==== Getting the page ==== //
                         $this->page = $_GET[$this->options['controller']];
 
@@ -330,7 +361,7 @@ class URL
                         {
                             // Counter
                             $count = 0;
-                            
+
                             // ==== Going through the data ==== //
                             foreach($data as $idx => $value)
                             {
@@ -341,7 +372,7 @@ class URL
                                 }
                             }
                         }
-    
+
                         // ==== Merging the $_GET array with the $get array ==== //
                         $_GET = array_merge($_GET, $get);
                     }
@@ -351,9 +382,9 @@ class URL
                         //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
                         ///////////////////////////////////////////////////////////////
                         // ==== Getting the current page ==== //
-                        if(isset($_GET[$this->options['page_token']]))
+                        if(isset($_GET[$this->options['page_param']]))
                         {
-                            $this->page = $_GET[$this->options['page_token']];
+                            $this->page = $_GET[$this->options['page_param']];
                         }
                     }
                 }
@@ -361,7 +392,7 @@ class URL
                 {
                     ////////////////////////////////////////////////////////////////
                     //    CODEIGNITER SUPPORT DISABLED
-                    ///////////////////////////////////////////////////////////////                    
+                    ///////////////////////////////////////////////////////////////
                     // ==== Checking if there is any data to process ==== //
                     if(is_array($data) && count($data) > 0)
                     {
@@ -370,16 +401,16 @@ class URL
                         ///////////////////////////////////////////////////////////////
                         // ==== Temporary get holder ==== //
                         $get = array();
-    
+
                         // ==== Getting the page ==== //
                         $this->page = $data[0];
-    
+
                         // ==== Putting the current page in $_GET ==== //
-                        $_GET[$this->options['page_token']] = $this->page;
-    
+                        $_GET[$this->options['page_param']] = $this->page;
+
                         // ==== Removing the page from the data array ==== //
                         unset($data[0]);
-    
+
                         // ==== The data should contain an even number of elements ==== //
                         if(count($data)%2 == 0)
                         {
@@ -393,7 +424,7 @@ class URL
                                 }
                             }
                         }
-    
+
                         // ==== Merging the $_GET array with the $get array ==== //
                         $_GET = array_merge($_GET, $get);
                     }
@@ -403,9 +434,9 @@ class URL
                         //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
                         ///////////////////////////////////////////////////////////////
                         // ==== Getting the current page ==== //
-                        if(isset($_GET[$this->options['page_token']]))
+                        if(isset($_GET[$this->options['page_param']]))
                         {
-                            $this->page = $_GET[$this->options['page_token']];
+                            $this->page = $_GET[$this->options['page_param']];
                         }
                     }
                 }
@@ -467,7 +498,7 @@ class URL
         {
             // ==== Triggering an error ==== //
             trigger_error('To switch to SSL you need to set the site_root_ssl option.', E_USER_WARNING);
-        }        
+        }
     }
 
     /**
@@ -544,7 +575,7 @@ class URL
         {
             $url = $this->_site_root;
         }
- 
+
         // ==== Checking if a page has actualy been requested ==== //
         if(empty($page)) // Base link to the same page without the given params
         {
@@ -582,15 +613,15 @@ class URL
             }
 
             // ==== Adding default params ==== //
-            $params = self::array_append($params, $this->params);
+            $params = self::array_append($params, $this->persistent_params);
         }
 
         // ==== Removing the page token from the params ==== //
-        if(isset($params[$this->options['page_token']]))
+        if(isset($params[$this->options['page_param']]))
         {
-            unset($params[$this->options['page_token']]);
+            unset($params[$this->options['page_param']]);
         }
-       
+
         // ==== Failsafes for when CI support is enabled ==== //
         if($this->options['code_igniter'])
         {
@@ -599,14 +630,14 @@ class URL
             {
                 $params[$this->options['controller']] = $page;
             }
-            
+
             // Adding the default params only if params count is higher then 1
             if(count($params) > 1)
             {
                 // Method param
-                if(!isset($params[$this->options['method']]))
+                if(!isset($params[$this->options['action_param']]))
                 {
-                    $params[$this->options['method']] = 'index';
+                    $params[$this->options['action_param']] = 'index';
                 }
             }
         }
@@ -622,27 +653,27 @@ class URL
             {
                 // ==== Building the firs part of the URL ==== //
                 $url .= $params[$this->options['controller']] . '/';
-                
+
                 // ==== Checking for the rest of the params ==== //
-                if(isset($params[$this->options['method']]))
+                if(isset($params[$this->options['action_param']]))
                 {
-                     $url .= $params[$this->options['method']] . '/';
+                     $url .= $params[$this->options['action_param']] . '/';
                 }
-                
+
                 // ==== Building the omit array ==== //
                 $omit_array = array(
                     $this->options['controller'],
-                    $this->options['method']
+                    $this->options['action_param']
                 );
             }
             else
             {
                 // ==== Adding the requested page to the URL ==== //
                 $url .= $page.'/';
-                
+
                 // ==== Building the omit array ==== //
                 $omit_array = array(
-                    $this->options['page_token']
+                    $this->options['page_param']
                 );
             }
 
@@ -673,27 +704,27 @@ class URL
                 // ==== Building the firs part of the URL ==== //
                 $url .= '?' . $this->options['controller'] . '=' . $params[$this->options['controller']];
 
-                
+
                 // ==== Checking for the rest of the params ==== //
-                if(isset($params[$this->options['method']]))
+                if(isset($params[$this->options['action_param']]))
                 {
-                    $url .= '&' . $this->options['method'] . '=' . $params[$this->options['method']];
+                    $url .= '&' . $this->options['action_param'] . '=' . $params[$this->options['action_param']];
                 }
-                
+
                 // ==== Building the omit array ==== //
                 $omit_array = array(
                     $this->options['controller'],
-                    $this->options['method']
+                    $this->options['action_param']
                 );
             }
             else
             {
                 // ==== Adding the requested page to the URL ==== //
-                $url .= '?'.$this->options['page_token'].'='.$page;
-                
+                $url .= '?'.$this->options['page_param'].'='.$page;
+
                 // ==== Building the omit array ==== //
                 $omit_array = array(
-                    $this->options['page_token']
+                    $this->options['page_param']
                 );
             }
 
@@ -715,26 +746,6 @@ class URL
         }
 
         // ==== Returning result ==== //
-        return $url;
-    }
-    
-    /**
-     * Reverses the effect of parse_url
-     *
-     * @param array $comps
-     * @return string
-     */
-    public static function deparse_url($comps)
-    {
-        // Building the URL from the components
-        $url = (isset($comps['scheme']) ? $comps['scheme'] : '') . '://' .  // Protocol
-               (isset($comps['host']) ? $comps['host'] : '') .              // Host
-               (isset($comps['port']) ? ':' . $comps['port'] : '') .        // Port
-               (isset($comps['path']) ? $comps['path'] : '') .              // Path
-               (isset($comps['query']) ? '?' . $comps['query'] : '') .      // Query string
-               (isset($comps['fragment']) ? $comps['fragment'] : '');       // Anchor
-
-        // Returning the URL
         return $url;
     }
 }
