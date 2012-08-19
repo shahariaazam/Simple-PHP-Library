@@ -39,18 +39,18 @@ class URL
     protected $site_root;
 
     /**
-     * Temporary site root for SSL URL generation
+     * Flag that determins if SSL should be used or not
      *
-     * @var string
+     * @var boolean
      */
-    protected $site_root_tmp = false;
+    protected $use_ssl = false;
 
     /**
-     * What page is the user in
+     * Flag used to trigger SSL usage only once
      *
-     * @var string
+     * @var boolean
      */
-    protected $page;
+    protected $tmp_ssl = false;
 
     /**
      * Array of params that the object will automatically load
@@ -223,6 +223,30 @@ class URL
     }
 
     /**
+     * Gets the site root
+     *
+     * @param void
+     * @return string
+     */
+    private function getSiteRoot()
+    {
+        // Default site root
+        $site_root = $this->options['site_root'];
+
+        // Parsing the URL
+        $parsed_url = parse_url($this->url);
+
+        // Checking if the local site root should be modified
+        if($parsed_url['scheme'] == 'https')
+        {
+            $site_root = $this->options['site_root_ssl'];
+        }
+
+        // Returing the site root
+        return $site_root;
+    }
+
+    /**
      * Loads the GET params
      *
      * @param void
@@ -243,37 +267,7 @@ class URL
         }
     }
 
-    /**
-     * Initializes the parameters that must be passed along in the URL, with the values found in the URL
-     *
-     * @param void
-     * @return void
-     */
-    protected function initParams()
-    {
-        // ==== Checking if the get params option has some info in it ==== //
-        if(count($this->options['persistent_params']) > 0)
-        {
-            // ==== Going through the $_GET params ==== //
-            foreach($this->options['persistent_params'] as $name)
-            {
-                // ==== Checking if the parameter exists ==== //
-                if($this->getParam($name) !== null)
-                {
-                    // ==== Trimming down the param ==== //
-                    $value = $this->getParam($name);
-
-                    // ==== Adding parameter to the class parameters ==== //
-                    if(!empty($value))
-                    {
-                        $this->persistent_params[$name] = $value;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
+/**
      * Retrieves data from the URL string
      *
      * @throws Exception
@@ -288,43 +282,13 @@ class URL
         }
 
         // ==== Processing the URL only if it's not the site root ==== //
-        if($this->site_root != $this->url)
+        if($this->getSiteRoot() != $this->url)
         {
-            // ==== Site root matches ==== //
-            $matches = array();
-
             // ==== Check variable to see if site root was found ==== //
             $found_site_root = 0;
 
             // ==== Creating a local site root copy to be able to handle the decoding of the URL ==== //
-            $site_root = $this->site_root;
-
-            // Parsing the URL
-            $parsed_url = parse_url(self::getFullURL());
-
-            // ==== Getting the protocol used to access the site ==== //
-            $protocol = &$parsed_url['scheme'] . '://';
-
-            // ==== Getting the protocol used for the site root ==== //
-            preg_match('((http://)|(https://))', $site_root, $matches); // SITE ROOT
-
-            /////////////////////////////////////////////////////////////////////////////////////////
-            //  Adjusting the site root protocol to match the protocol used to access the site
-            ////////////////////////////////////////////////////////////////////////////////////////
-            // ==== Making sure that a match was made ==== //
-            if(!empty($matches[0]))
-            {
-                // ==== Replacing the site root protocol with the actual protocol so that we can remove the site root from the URL ==== //
-                $site_root = str_replace($matches[0], $protocol, $site_root);
-            }
-            else
-            {
-                // ==== Creating the correct site root ==== //
-                $site_root = $protocol . $site_root;
-
-                // ==== Updating the site root ==== //
-                $this->options['site_root'] = $site_root;
-            }
+            $site_root = $this->getSiteRoot();
 
             // ==== Removing the site root from the URL ==== //
             $data = str_replace($site_root, '', $this->url, $found_site_root);
@@ -384,6 +348,36 @@ class URL
                     if($this->options['use_get_array'] === true)
                     {
                         $_GET = array_merge($_GET, $this->url_params);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Initializes the parameters that must be passed along in the URL, with the values found in the URL
+     *
+     * @param void
+     * @return void
+     */
+    protected function initParams()
+    {
+        // ==== Checking if the get params option has some info in it ==== //
+        if(count($this->options['persistent_params']) > 0)
+        {
+            // ==== Going through the $_GET params ==== //
+            foreach($this->options['persistent_params'] as $name)
+            {
+                // ==== Checking if the parameter exists ==== //
+                if($this->getParam($name) !== null)
+                {
+                    // ==== Trimming down the param ==== //
+                    $value = $this->getParam($name);
+
+                    // ==== Adding parameter to the class parameters ==== //
+                    if(!empty($value))
+                    {
+                        $this->persistent_params[$name] = $value;
                     }
                 }
             }
@@ -481,75 +475,66 @@ class URL
      * Changes the site root to the SSL one
      *
      * @param void
-     * @return void
+     * @return object
      */
     public function enableSSL()
     {
         // ==== Checking if the SSL site root is even set ==== //
         if(!empty($this->options['site_root_ssl']))
         {
-            $this->site_root = $this->options['site_root_ssl'];
+            $this->use_ssl = true;
         }
         else
         {
             // ==== Triggering an error ==== //
-            trigger_error('To switch to SSL you need to set the site_root_ssl option.', E_USER_WARNING);
+            Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
         }
+
+        return $this;
     }
 
     /**
      * Changes the site root to the non-SSL one
      *
      * @param void
-     * @return void
+     * @return object
      */
     public function disableSSL()
     {
         // ==== Checking if the SSL site root is even set ==== //
         if(!empty($this->options['site_root']))
         {
-            $this->site_root = $this->options['site_root'];
+            $this->use_ssl = false;
         }
         else
         {
             // ==== Triggering an error ==== //
-            trigger_error('To switch to non-SSL you need to set the site_root option.', E_USER_WARNING);
+            throw new Exception\RuntimeException('To switch to non-SSL you need to set the site_root option.');
         }
+
+        return $this;
     }
 
     /**
-     * Builds the HTTPS URL using the provided params
+     * Used to trigger the temporary SSL (when you want SSL for a single link)
      *
-     * @param string $page Page to link to
-     * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
-     * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
-     * @return string
+     * @param void
+     * @return object
      */
-    public function get_ssl($page = '', array $params = array(), $merge_get = false)
+    public function ssl()
     {
         // ==== Checking if the SSL site root is even set ==== //
         if(!empty($this->options['site_root_ssl']))
         {
-            // ==== Setting the temporary site root ==== //
-            $this->site_root_tmp = $this->options['site_root_ssl'];
-
-            // ==== Getting the URL ==== //
-            $url = $this->get($page, $params, $merge_get);
-
-            // ==== Resetting the temporary site root ==== //
-            $this->site_root_tmp = false;
+            $this->tmp_ssl = true;
         }
         else
         {
-            // ==== Dummy URL ==== //
-            $url = '#no_ssl_found';
-
             // ==== Triggering an error ==== //
-            trigger_error('To generate an URL using the SSL site root you need to set the site_root_ssl option.', E_USER_WARNING);
+            Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
         }
 
-        // ==== Returning the URL ==== //
-        return $url;
+        return $this;
     }
 
     /**
@@ -562,14 +547,16 @@ class URL
      */
     public function get($page = '', array $params = array(), $merge_get = false)
     {
-        // ==== Default URL (actually it's the site root) ==== //
-        if($this->site_root_tmp !== false)
+        // Default site root to use
+        $url = $this->options['site_root'];
+
+        // ==== Getting the SSL site root if required ==== //
+        if($this->use_ssl === true || $this->tmp_ssl === true)
         {
-            $url = $this->site_root_tmp;
-        }
-        else
-        {
-            $url = $this->site_root;
+            $url = $this->options['site_root_ssl'];
+
+            // Disabing the temporary SSL
+            $this->tmp_ssl = false;
         }
 
         // Link to the same page but with different params (this includes the $_GET params)
