@@ -96,6 +96,7 @@ class URL
         $this->options['index_page']        = 'index';
         $this->options['persistent_params'] = array();
         $this->options['rewrite']           = false;
+        $this->options['use_get_array']     = true;
         $this->options['secure']            = false;
         $this->options['code_igniter']      = false;
         $this->options['mvc_style']         = false; // URL format similar to the ones used by a MVC
@@ -167,6 +168,9 @@ class URL
             }
             else
             {
+                // Loading the params in $_GET
+                $this->loadGetParams();
+
                 // ==== Getting the URL data ==== //
                 $this->getURLData();
 
@@ -220,6 +224,27 @@ class URL
     }
 
     /**
+     * Loads the GET params
+     *
+     * @param void
+     * @return void
+     */
+    private function loadGetParams()
+    {
+        // Going through the elements in the $_GET array
+        foreach($_GET as $index => $value)
+        {
+            $this->setParam($index, rawurldecode(trim($value)));
+        }
+
+        // Resseting the $_GET array if we should not use it
+        if($this->options['use_get_array'] === false)
+        {
+            $_GET = array();
+        }
+    }
+
+    /**
      * Initializes the parameters that must be passed along in the URL, with the values found in the URL
      *
      * @param void
@@ -234,10 +259,10 @@ class URL
             foreach($this->options['persistent_params'] as $name)
             {
                 // ==== Checking if the parameter exists ==== //
-                if(isset($_GET[$name]))
+                if($this->getParam($name) !== null)
                 {
                     // ==== Trimming down the param ==== //
-                    $value = trim($_GET[$name]);
+                    $value = $this->getParam($name);
 
                     // ==== Adding parameter to the class parameters ==== //
                     if(!empty($value))
@@ -258,9 +283,9 @@ class URL
     protected function getURLData()
     {
         // ==== Setting some default values ==== //
-        if(!isset($_GET[$this->options['page_param']]))
+        if($this->getParam($this->options['page_param']) === null)
         {
-            $_GET[$this->options['page_param']] = $this->options['index_page'];
+            $this->setParam($this->options['page_param'], $this->options['index_page']);
 
             // ==== Setting the current page var ==== //
             $this->page = $this->options['index_page'];
@@ -269,6 +294,9 @@ class URL
         // ==== Processing the URL only if it's not the site root ==== //
         if($this->site_root != $this->url)
         {
+            // Flag to determine if rewrite was found
+            $rewrite = false;
+
             // ==== Site root matches ==== //
             $matches = array();
 
@@ -336,8 +364,11 @@ class URL
                         // ==== Temporary get holder ==== //
                         $get = array();
 
+                        // Setting the flag
+                        $rewrite = true;
+
                         // ==== Getting the controller ==== //
-                        $_GET[$this->options['controller']] = $data[0];
+                        $this->setParam($this->options['controller'], $data[0]);
 
                         // Removing from data
                         unset($data[0]);
@@ -345,44 +376,33 @@ class URL
                         // ==== Getting the method ==== //
                         if(isset($data[1]))
                         {
-                            $_GET[$this->options['action_param']] = $data[1];
+                            $this->setParam($this->options['action_param'], $data[1]);
 
                             // Removing from data
                             unset($data[1]);
                         }
 
                         // ==== Getting the page ==== //
-                        $this->page = $_GET[$this->options['controller']];
+                        $this->page = $this->getParam($this->options['controller']);
 
                         // ==== The data should contain an even number of elements ==== //
                         if(count($data)%2 == 0)
                         {
-                            // Counter
-                            $count = 0;
-
                             // ==== Going through the data ==== //
                             foreach($data as $idx => $value)
                             {
                                 // ==== Checking if this should be skipped ==== //
                                 if($idx%2 == 0)
                                 {
-                                    $get[$value] = $data[$idx+1];
+                                    $this->setParam($value, $data[$idx+1]);
                                 }
                             }
                         }
 
-                        // ==== Merging the $_GET array with the $get array ==== //
-                        $_GET = array_merge($_GET, $get);
-                    }
-                    else
-                    {
-                        ////////////////////////////////////////////////////////////////
-                        //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
-                        ///////////////////////////////////////////////////////////////
-                        // ==== Getting the current page ==== //
-                        if(isset($_GET[$this->options['page_param']]))
+                        // ==== Merging the $_GET array with the $url_params array ==== //
+                        if($this->options['use_get_array'] === true)
                         {
-                            $this->page = $_GET[$this->options['page_param']];
+                            $_GET = array_merge($_GET, $this->url_params);
                         }
                     }
                 }
@@ -400,11 +420,14 @@ class URL
                         // ==== Temporary get holder ==== //
                         $get = array();
 
+                        // Setting the flag
+                        $rewrite = true;
+
                         // ==== Getting the page ==== //
                         $this->page = $data[0];
 
                         // ==== Putting the current page in $_GET ==== //
-                        $_GET[$this->options['page_param']] = $this->page;
+                        $this->setParam($this->options['page_param'], $this->page);
 
                         // ==== Removing the page from the data array ==== //
                         unset($data[0]);
@@ -418,37 +441,32 @@ class URL
                                 // ==== Checking if this should be skipped ==== //
                                 if($idx%2 != 0)
                                 {
-                                    $get[$value] = $data[$idx+1];
+                                    $this->setParam($value, $data[$idx+1]);
                                 }
                             }
                         }
 
                         // ==== Merging the $_GET array with the $get array ==== //
-                        $_GET = array_merge($_GET, $get);
-                    }
-                    else
-                    {
-                        ////////////////////////////////////////////////////////////////
-                        //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
-                        ///////////////////////////////////////////////////////////////
-                        // ==== Getting the current page ==== //
-                        if(isset($_GET[$this->options['page_param']]))
+                        if($this->options['use_get_array'] === true)
                         {
-                            $this->page = $_GET[$this->options['page_param']];
+                            $_GET = array_merge($_GET, $this->url_params);
                         }
                     }
                 }
-            }
-        }
 
-        // ==== Defining the CURRENT_PAGE constant ==== //
-        if(!defined('CURRENT_PAGE'))
-        {
-            define('CURRENT_PAGE', $this->page);
-        }
-        else
-        {
-            throw new Exception\RuntimeException('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
+                // Checking if rewrite was not found
+                if($rewrite === false)
+                {
+                    ////////////////////////////////////////////////////////////////
+                    //    PROCESSING THE URL - REWRITE DISABLED/NOT FOUND
+                    ///////////////////////////////////////////////////////////////
+                    // ==== Getting the current page ==== //
+                    if($this->getParam($this->options['page_param']) !== null)
+                    {
+                        $this->page = $this->getParam($this->options['page_param']);
+                    }
+                }
+            }
         }
     }
 
@@ -481,10 +499,32 @@ class URL
     public function setParam($name, $value)
     {
         // Setting the parameters value
-        $this->url_params[$name] = $value;
+        $this->url_params[$name] = rawurlencode(trim($value));
 
         // Returning the current object
         return $this;
+    }
+
+    /**
+     * Retrieves all the URL paramters
+     *
+     * @param void
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->url_params;
+    }
+
+    /**
+     * Retrieves the current page
+     *
+     * @param void
+     * @return string
+     */
+    public function getCurrentPage()
+    {
+        return $this->page;
     }
 
     /**
@@ -609,40 +649,19 @@ class URL
             $url = $this->_site_root;
         }
 
-        // ==== Checking if a page has actualy been requested ==== //
-        if(empty($page)) // Base link to the same page without the given params
-        {
-            // ==== Defaulting to the current page ==== //
-            $page = $this->page;
-
-            // ==== Parameters should be present in order to remove them from the URL ==== //
-            if(count($params) > 0)
-            {
-                // ==== If a blank page was given then the given params will be removed ==== //
-                foreach($params as $param)
-                {
-                    // ==== Removing the parameter URL ==== //
-                    if(isset($_GET[$param]))
-                    {
-                        unset($_GET[$param]);
-                    }
-                }
-
-                // ==== Adding the parameters from $_GET ==== //
-                $params = $_GET;
-            }
-        }
-        elseif($page == $this->page && $merge_get === true) // Link to the same page but with different params (this includes the $_GET params)
+        // Link to the same page but with different params (this includes the $_GET params)
+        if($page == $this->page && $merge_get === true)
         {
             // ==== If the page is exactly the same as the one the user is on then take all the $_GET parameters ==== //
-            $params = self::array_append($_GET, $params);
+            $params = self::array_append($this->getParams(), $params);
         }
-        else // New page with params that must be automaticaly loaded
+        // New page with params that must be automaticaly loaded
+        else
         {
             // ===== Checking if we should merge the GET ==== //
             if($merge_get === true)
             {
-                $params = self::array_append($_GET, $params);
+                $params = self::array_append($this->getParams(), $params);
             }
 
             // ==== Adding default params ==== //
