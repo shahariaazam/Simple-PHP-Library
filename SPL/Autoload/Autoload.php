@@ -15,8 +15,6 @@
 
 namespace SPL\Autoload;
 
-use SPL\Exception\Exception as Exception;
-
 class Autoload
 {
     /**
@@ -122,7 +120,7 @@ class Autoload
             // Checking if the class file was loaded
             if(!isset(self::$loaded[$class_name]) && self::$skip === false)
             {
-                throw new Exception('No file was found for class ' . $class_name);
+                throw new Exception\RuntimeException('No file was found for class ' . $class_name);
             }
         }
     }
