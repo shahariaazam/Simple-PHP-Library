@@ -10,10 +10,12 @@
  *
  * @name Language
  * @version 3.7.1
- * 
+ *
  */
 
 namespace SPL\Language;
+
+use SPL\URL\URL as URL;
 
 class Language
 {
@@ -52,17 +54,17 @@ class Language
      * @var array
      */
     private $mopt;
-    
+
     /**
-     * Array that will hold elements from $_GET
-     * 
-     * @var array
+     * URL object
+     *
+     * @var SPL\URL\URL
      */
-    protected $get;
-    
+    protected $url;
+
     /**
      * CodeIgniter object
-     * 
+     *
      * @var CodeIgniter
      */
      private $CI;
@@ -70,10 +72,11 @@ class Language
     /**
      * Sets class options
      *
+     * @param URL $url
      * @param array $options
      * @return void
      */
-    public function __construct(array $options = array())
+    public function __construct(URL $url, array $options = array())
     {
         // ==== Default options ==== //
         $this->options['default_language']  = 'en';
@@ -93,29 +96,26 @@ class Language
         {
             $this->options = array_merge($this->options, $options);
         }
-        
+
         // ==== Getting the Code Igniter object instance if the class has the support activated for it ==== //
         if($this->options['code_igniter'])
         {
             $this->CI = &get_instance();
-            
-            // ==== Getting stuff from GET ==== //
-            $this->get = $this->CI->input->get();
-            
+
             // ==== Getting the cookie domain ==== //
             $this->options['cookie_domain'] = $this->CI->config->item('cookie_domain');
         }
         else
         {
-            // ==== Getting stuff from GET ==== //
-            $this->get = $_GET;
-            
             // ==== Checking for session initialization ==== //
             if(session_id() == '')
             {
                 trigger_error('The Language class requires sessions to work properly.', E_USER_WARNING);
             }
         }
+
+        // Getting the URL object
+        $this->url = $url;
 
         // ==== Setting up mail options ==== //
         $this->mopt['to']         = $this->options['mail'];
@@ -140,9 +140,9 @@ class Language
     public function getLanguage()
     {
         // ==== Checking the possible locations for a language ==== //
-        if(isset($this->get['lang'])) // LANG PARAM IN GET
+        if($this->url->getParam('lang') !== null) // LANG PARAM IN GET
         {
-            $lang = $this->get['lang'];
+            $lang = $this->url->getParam('lang');
         }
         elseif(isset($_SESSION['lang_' . $this->uq])) // LANGUAGE ID FROM SESSION
         {
@@ -203,7 +203,7 @@ class Language
         // ==== Intializing or overwriting the session variable ===== //
         if($this->options['code_igniter'] == true)
         {
-            $this->CI->session->set_userdata('lang_' . $this->uq, $lang);   
+            $this->CI->session->set_userdata('lang_' . $this->uq, $lang);
         }
         else
         {
