@@ -114,7 +114,7 @@ class URL
             }
 
             // ==== Changing to SSL if requested ==== //
-            if($this->options['require_ssl'] == true)
+            if($this->options['require_ssl'] === true)
             {
                 $this->enableSSL();
             }
