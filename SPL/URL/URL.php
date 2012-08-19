@@ -499,7 +499,10 @@ class URL
     public function setParam($name, $value)
     {
         // Setting the parameters value
-        $this->url_params[$name] = rawurlencode(trim($value));
+        if(!empty($value))
+        {
+            $this->url_params[$name] = rawurlencode(trim($value));
+        }
 
         // Returning the current object
         return $this;
