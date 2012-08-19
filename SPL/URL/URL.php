@@ -32,13 +32,6 @@ class URL
     protected $url;
 
     /**
-     * Site root
-     *
-     * @var string
-     */
-    protected $site_root;
-
-    /**
      * Flag that determins if SSL should be used or not
      *
      * @var boolean
@@ -74,13 +67,6 @@ class URL
     protected $rewrite;
 
     /**
-     * CodeIgniter object
-     *
-     * @var CodeIgniter
-     */
-    protected $CI;
-
-    /**
      * Class constructor. It also validates the URL
      *
      * @param array $options
@@ -97,8 +83,7 @@ class URL
         $this->options['persistent_params'] = array();
         $this->options['rewrite']           = false;
         $this->options['use_get_array']     = true;
-        $this->options['secure']            = false;
-        $this->options['code_igniter']      = false;
+        $this->options['require_ssl']       = false;
         $this->options['mvc_style']         = false; // URL format similar to the ones used by a MVC
 
         // ==== Replacing options with custom ones ==== //
@@ -107,34 +92,11 @@ class URL
             $this->options = array_replace($this->options, $options);
         }
 
-        // ==== Checking if the CodeIgniter support is enabled ==== //
-        if($this->options['code_igniter'])
-        {
-            $this->CI = &get_instance();
-
-            // Getting the site_root
-            if (strpos($this->CI->config->item('base_url'), 'http') === 0)
-            {
-                $this->options['site_root'] = $this->CI->config->item('base_url');
-            }
-            else
-            {
-                $this->options['site_root'] = 'http://' . $this->CI->config->item('base_url');
-            }
-
-            // ==== Getting some options from CodeIgniter ==== //
-            $this->options['site_root_ssl'] = str_replace('http://', 'https://', $this->options['site_root']);  // SITE ROOT SSL
-            $this->options['controller']    = $this->CI->config->item('controller_trigger');                    // CONTROLLER TRIGGER
-            $this->options['action']        = $this->CI->config->item('function_trigger');                      // FUNCTION TRIGGER
-            $this->options['index_page']    = $this->CI->router->routes['default_controller'];                  // INDEX PAGE
-            $this->options['mvc_style']     = true;                                                             // ACTIVATING THE MVC STYLE FORMAT
-        }
-
         // ==== Checking if the site_root option has been set ==== //
         if(!empty($this->options['site_root']))
         {
             // ==== Setting rewrite property ==== //
-            $this->rewrite = $this->options['rewrite'];
+            $this->rewrite = &$this->options['rewrite'];
 
             // ==== Getting URL ==== //
             $this->url = self::getFullURL();
@@ -151,11 +113,8 @@ class URL
                 $this->url .= '/';
             }
 
-            // ==== Getting the site URL ==== //
-            $this->site_root = &$this->options['site_root'];
-
-            // ==== Changing to SSL if that's the case ==== //
-            if($this->options['secure'] == true)
+            // ==== Changing to SSL if requested ==== //
+            if($this->options['require_ssl'] == true)
             {
                 $this->enableSSL();
             }
