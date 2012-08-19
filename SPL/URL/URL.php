@@ -15,8 +15,6 @@
 
 namespace SPL\URL;
 
-use SPL\Exception\Exception as Exception;
-
 class URL
 {
     /**
@@ -165,7 +163,7 @@ class URL
             // == If invalid == //
             if(\SPL\Validator\URL::isValid($this->options['site_root'], false) === false)
             {
-                throw new Exception('Invalid site root URL. URL: ' . $this->options['site_root']);
+                throw new Exception\InvalidArgumentException('Invalid site root URL. URL: ' . $this->options['site_root']);
             }
             else
             {
@@ -179,7 +177,7 @@ class URL
         else
         {
             // ==== Triggering error ==== //
-            throw new Exception('The site root is not set.');
+            throw new Exception\InvalidArgumentException('The site root parameter is not set.');
         }
     }
 
