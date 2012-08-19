@@ -448,7 +448,7 @@ class URL
         }
         else
         {
-            throw new Exception('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
+            throw new Exception\RuntimeException('The constant "CURRENT_PAGE" is already defined. This constant must be declared only by the URL class.');
         }
     }
 
