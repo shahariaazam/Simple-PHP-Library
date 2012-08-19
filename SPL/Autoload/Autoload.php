@@ -66,7 +66,6 @@ class Autoload
         // Checking if the autoload class was loaded or not
         if($registered === false)
         {
-            echo '<pre>';
             throw new \RuntimeException('Unable to register the autoload function');
         }
     }
