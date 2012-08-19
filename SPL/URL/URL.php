@@ -333,13 +333,16 @@ class URL
                     // ==== The data should contain an even number of elements ==== //
                     if(count($data)%2 == 0)
                     {
-                        // ==== Going through the data ==== //
-                        foreach($data as $idx => $value)
+                        // Reindexing the array
+                        $data = array_values($data);
+
+                        // ==== Going through the names and building the URL params array ==== //
+                        foreach($data as $key => $value)
                         {
-                            // ==== Checking if this should be skipped ==== //
-                            if($idx%2 != 0)
+                            // Adding the parameter data to the URL params array
+                            if($key % 2 == 0)
                             {
-                                $this->setParam($value, $data[$idx+1]);
+                                $this->setParam($data[$key], $data[$key + 1]);
                             }
                         }
                     }
