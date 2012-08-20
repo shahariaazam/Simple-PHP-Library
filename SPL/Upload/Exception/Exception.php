@@ -13,6 +13,6 @@
  *
  */
 
-namespace SPL\Autoload\Exception;
+namespace SPL\Upload\Exception;
 
 interface Exception {}

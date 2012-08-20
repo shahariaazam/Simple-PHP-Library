@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The class can be used to upload files to the server
  *
@@ -8,14 +9,15 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Uploader
- * @version 1.5
- * 
+ * @version 1.7
+ *
  */
 
 namespace SPL\Upload;
 
 class Uploader
 {
+
     /**
      * Internal log of problems
      *
@@ -63,81 +65,69 @@ class Uploader
      *
      * @param array $options
      * @return void
+     * @throws SPL\Upload\Exception\RuntimeException
      */
     public function __construct(array $options = array())
     {
         // ==== Initializing default values ==== //
-        $this->log      = '';
-        $this->errors   = array();
+        $this->log    = '';
+        $this->errors = array();
 
         // ==== Default $options ==== //
-        $this->options['debug']         = false;
-        $this->options['mail']          = 'webmaster@' . $_SERVER['HTTP_HOST'];
-        $this->options['uploads_dir']   = 'uploads/';
-        $this->options['extension']     = 'keys'; // Available values: keys, values
-        $this->options['extensions']    = array(
-
+        $this->options['debug']       = false;
+        $this->options['mail']        = 'webmaster@' . $_SERVER['HTTP_HOST'];
+        $this->options['uploads_dir'] = 'uploads/';
+        $this->options['extension']   = 'keys'; // Available values: keys, values
+        $this->options['extensions']  = array(
             //Office
-            "doc"   => "Microsoft Word 2003 Document",
-            "docx"  => "Microsoft Word 2007 Document",
-            "xls"   => "Microsoft Excel 2003 Workbook",
-            "xlsx"  => "Microsoft Excel 2007 Workbook",
-
+            "doc"  => "Microsoft Word 2003 Document",
+            "docx" => "Microsoft Word 2007 Document",
+            "xls"  => "Microsoft Excel 2003 Workbook",
+            "xlsx" => "Microsoft Excel 2007 Workbook",
             // Database
-            "db"    => "Database File",
-            "dbf"   => "FoxPro Database File",
-
+            "db"  => "Database File",
+            "dbf" => "FoxPro Database File",
             // text
-            "txt"	=> "Text File",
-            "rtf"   => "Rich Text Format",
-            "ini"   => "Ini file",
-
+            "txt" => "Text File",
+            "rtf" => "Rich Text Format",
+            "ini" => "Ini file",
             // C++
-            "cpps"	=> "C++ Source File",
-            "cpph"	=> "C++ Header File",
-
+            "cpps" => "C++ Source File",
+            "cpph" => "C++ Header File",
             // Java
-            "javas"	=> "Java Source File",
-            "javac"	=> "Java Class File",
-
+            "javas" => "Java Source File",
+            "javac" => "Java Class File",
             // Pascal
-            "pas"	=> "Pascal File",
-
+            "pas" => "Pascal File",
             // images
-            "gif"	=> "GIF Picture",
-            "jpg"	=> "JPG Picture",
-            "bmp"	=> "BMP Picture",
-            "png"	=> "PNG Picture",
-
+            "gif" => "GIF Picture",
+            "jpg" => "JPG Picture",
+            "bmp" => "BMP Picture",
+            "png" => "PNG Picture",
             // compressed
-            "zip"	=> "ZIP Archive",
-            "tar"	=> "TAR Archive",
-            "gzip"	=> "GZIP Archive",
-            "bzip2"	=> "BZIP2 Archive",
-            "rar"	=> "RAR Archive",
-
+            "zip"   => "ZIP Archive",
+            "tar"   => "TAR Archive",
+            "gzip"  => "GZIP Archive",
+            "bzip2" => "BZIP2 Archive",
+            "rar"   => "RAR Archive",
             // music
-            "mp3"	=> "MP3 Audio File",
-            "wav"	=> "WAV Audio File",
-            "midi"	=> "MIDI Audio File",
-            "real"	=> "RealAudio File",
-            "mp4"   => "Music/Video File (.mp4)",
-            "pls"   => ".pls Playlist",
-            "m3u"   => ".m3u Playlist",
-
+            "mp3"  => "MP3 Audio File",
+            "wav"  => "WAV Audio File",
+            "midi" => "MIDI Audio File",
+            "real" => "RealAudio File",
+            "mp4"  => "Music/Video File (.mp4)",
+            "pls"  => ".pls Playlist",
+            "m3u"  => ".m3u Playlist",
             // movie
-            "mpg"	=> "MPG Video File",
-            "mov"	=> "Movie File",
-            "avi"	=> "AVI Video File",
-            "flash"	=> "Flash Movie File",
+            "mpg"   => "MPG Video File",
+            "mov"   => "Movie File",
+            "avi"   => "AVI Video File",
+            "flash" => "Flash Movie File",
             "mkv"   => "Movie File (.mkv)",
-
             // Micosoft / Adobe
-            "pdf"	=> "PDF File",
-
+            "pdf" => "PDF File",
             //Disc Image
-            "iso"   => "Disc Image (.iso)"
-            
+            "iso" => "Disc Image (.iso)"
         );
 
         // ==== Replacing the internal values with the external ones ==== //
@@ -147,16 +137,24 @@ class Uploader
         }
 
         // ==== Setting up mail options ==== //
-        $this->mopt['to']       = $this->options['mail'];
-        $this->mopt['subject']  = '[DEBUG] ' . __CLASS__ . ' Class '.$_SERVER['HTTP_HOST'];
-        $this->mopt['msg']      = '';
-        $this->mopt['headers']  = 'MIME-Version: 1.0' . "\r\n";
-        $this->mopt['headers'] .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+        $this->mopt['to']      = $this->options['mail'];
+        $this->mopt['subject'] = '[DEBUG] ' . __CLASS__ . ' Class ' . $_SERVER['HTTP_HOST'];
+        $this->mopt['msg']     = '';
+        $this->mopt['headers'] = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=UTF-8' . "\r\n";
 
         // ==== Checking if the upload directory exists == we create it if not ==== //
         if(!is_dir($this->options['uploads_dir']))
         {
-            mkdir($this->options['uploads_dir']);
+            // Checking if we can create the directory
+            if(is_writeable($this->options['uploads_dir']))
+            {
+                // Creating the directory
+                mkdir($this->options['uploads_dir']);
+            }
+            else
+            {
+                throw new Exception\RuntimeException('The uploads directory must be writable.');
+            }
         }
     }
 
@@ -196,7 +194,7 @@ class Uploader
         if(self::isFileValid($filename))
         {
             // ==== Getting file extension ==== //
-            $extension = substr($filename, strrpos($filename, '.')+1, strlen($filename));
+            $extension = substr($filename, strrpos($filename, '.') + 1, strlen($filename));
 
             // ==== Checking if the extension is allowed ==== //
             if($this->options['extension'] == 'values') // Checking the values of the array
@@ -247,29 +245,32 @@ class Uploader
                 if($this->isExtensionAllowed($filename))
                 {
                     // ==== Checking if the file has been uploaded successfully ==== ///
-                    if(move_uploaded_file($file, $this->options['uploads_dir'].$filename) == false)
+                    if(move_uploaded_file($file, $this->options['uploads_dir'] . $filename) == false)
                     {
                         // ==== Adding log data ==== //
                         if($this->options['debug'])
                         {
-                            $this->log .= '<b>ERROR:</b> Failed to upload file: '.$filename.'<br /><br />';
+                            $this->log .= '<b>ERROR:</b> Failed to upload file: ' . $filename . '<br /><br />';
                         }
 
                         // ==== Adding error data ==== //
-                        $this->errors[$filename]['upload'] = true;
+                        $this->errors[$filename][] = 'Failed to upload file';
 
                         $isOk = false;
                     }
                     else
                     {
                         // ==== Adding the file (with path) to the files array ==== //
-                        $this->file_list[] = $this->options['uploads_dir'].$filename;
+                        $this->file_list[] = array(
+                            'filename' => $filename,
+                            'filepath' => $this->options['uploads_dir'] . $filename,
+                        );
                     }
                 }
                 else
                 {
                     // ==== Adding error data ==== //
-                    $this->errors[$filename]['extension'] = true;
+                    $this->errors[$filename][] = 'The files extension is not allowed';
 
                     $isOk = false;
                 }
@@ -284,22 +285,33 @@ class Uploader
             if($this->isExtensionAllowed($filename))
             {
                 // ==== Checking if the file has been uploaded successfully ==== ///
-                if(move_uploaded_file($this->files[$index]['tmp_name'], $this->options['uploads_dir'].$filename) == false)
+                if(move_uploaded_file($this->files[$index]['tmp_name'], $this->options['uploads_dir'] . $filename) == false)
                 {
                     // ==== Adding log data ==== //
                     if($this->options['debug'])
                     {
-                        $this->log .= '<b>ERROR:</b> Failed to upload file: '.$filename.'<br /><br />';
+                        $this->log .= '<b>ERROR:</b> Failed to upload file: ' . $filename . '<br /><br />';
                     }
 
                     // ==== Adding error data ==== //
-                    $this->errors[$filename]['upload'] = true;
+                    $this->errors[$filename][] = 'Failed to upload file';
 
                     $isOk = false;
+                }
+                else
+                {
+                    // ==== Adding the file (with path) to the files array ==== //
+                    $this->file_list[] = array(
+                        'filename' => $filename,
+                        'filepath' => $this->options['uploads_dir'] . $filename,
+                    );
                 }
             }
             else
             {
+                // ==== Adding error data ==== //
+                $this->errors[$filename][] = 'The files extension is not allowed';
+
                 $isOk = false;
             }
         }
@@ -334,10 +346,13 @@ class Uploader
      * Used to upload the files
      *
      * @param mixed Array or string $indexes
-     * @return mixed Array on success or false on failure
+     * @return boolean
      */
     public function upload($index)
     {
+        // Result
+        $success = true;
+
         // ==== The indexes variable can be either a string or array ==== //
         if(is_array($index)) // Array
         {
@@ -347,7 +362,14 @@ class Uploader
                 // ==== Checking if the index is valid ==== //
                 if(isset($this->files[$name]))
                 {
-                    $this->doUpload($name);
+                    // Getting the result of the upload
+                    $result = $this->doUpload($name);
+
+                    // Checking the result
+                    if($result === false)
+                    {
+                        $success = false;
+                    }
                 }
             }
         }
@@ -356,12 +378,48 @@ class Uploader
             // ==== Checking if the index is valid ==== //
             if(isset($this->files[$index]))
             {
-                $this->doUpload($index);
+                // Getting the result of the upload
+                $result = $this->doUpload($index);
+
+                // Checking the result
+                if($result === false)
+                {
+                    $success = false;
+                }
             }
         }
 
-        // ===== Returning the list of files ==== //
-        return $this->getFileList();
+        // Checking the success status
+        if($success === false)
+        {
+            // Rolling back the upload to avoid stray files
+            $this->rollback();
+        }
+
+        // Return success status
+        return $success;
+    }
+
+    /**
+     * The method removes all the uploaded files
+     *
+     * @param void
+     * @return void
+     */
+    public function rollback()
+    {
+        // Going through the filelist
+        foreach($this->file_list as $info)
+        {
+            // Removing the file
+            $removed = unlink($info['filepath']);
+
+            // Checking if the file was not successfully removed
+            if($removed === false)
+            {
+                $this->errors[$info['filename']][] = 'Could not remove the file with name ' . $info['filename'] . 'from path ' . $info['filepath'] . '.';
+            }
+        }
     }
 
     /**
@@ -418,4 +476,5 @@ class Uploader
             mail($this->mopt['to'], $this->mopt['subject'], $this->mopt['msg'], $this->mopt['headers']);
         }
     }
+
 }

@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Exception Interface
+ * Exception for the Uploader class
  *
  * @author Brian
  * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name Exception
+ * @name RuntimeException
  * @version 1.0
  *
  */
 
-namespace SPL\Autoload\Exception;
+namespace SPL\Upload\Exception;
 
-interface Exception {}
+class RuntimeException extends \RuntimeException implements Exception {}
