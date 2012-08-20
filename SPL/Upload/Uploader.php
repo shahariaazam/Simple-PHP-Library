@@ -42,7 +42,14 @@ class Uploader
      *
      * @var array
      */
-    private $files=array();
+    private $file_list = array();
+
+    /**
+     * Array with files data
+     *
+     * @var array
+     */
+    private $files = array();
 
     /**
      * Error codes
@@ -228,13 +235,13 @@ class Uploader
         $isOk = true;
 
         // ==== The files uploaded could be array or string ==== //
-        if(is_array($_FILES[$index]['tmp_name'])) // Array
+        if(is_array($this->files[$index]['tmp_name'])) // Array
         {
             // ==== Going through the files ==== //
-            foreach($_FILES[$index]['tmp_name'] as $nr => $file)
+            foreach($this->files[$index]['tmp_name'] as $nr => $file)
             {
                 // ==== Getting the filename of the original file ==== //
-                $filename = $_FILES[$index]['name'][$nr];
+                $filename = $this->files[$index]['name'][$nr];
 
                 // ==== Checking if the extension is allowed ==== //
                 if($this->isExtensionAllowed($filename))
@@ -256,7 +263,7 @@ class Uploader
                     else
                     {
                         // ==== Adding the file (with path) to the files array ==== //
-                        $this->files[] = $this->options['uploads_dir'].$filename;
+                        $this->file_list[] = $this->options['uploads_dir'].$filename;
                     }
                 }
                 else
@@ -271,13 +278,13 @@ class Uploader
         else // String
         {
             // ==== Getting the filename of the original file ==== //
-            $filename = $_FILES[$index]['name'];
+            $filename = $this->files[$index]['name'];
 
             // ==== Checking if the extension is allowed ==== //
             if($this->isExtensionAllowed($filename))
             {
                 // ==== Checking if the file has been uploaded successfully ==== ///
-                if(move_uploaded_file($_FILES[$index]['tmp_name'], $this->options['uploads_dir'].$filename) == false)
+                if(move_uploaded_file($this->files[$index]['tmp_name'], $this->options['uploads_dir'].$filename) == false)
                 {
                     // ==== Adding log data ==== //
                     if($this->options['debug'])
@@ -302,6 +309,28 @@ class Uploader
     }
 
     /**
+     * Sets the array of files to upload
+     *
+     * @param array $files
+     * @return object
+     */
+    public function setFiles(array $files = array())
+    {
+        // Checking if some files were provided
+        if(count($files) > 0)
+        {
+            $this->files = $files;
+        }
+        // Fallback to $_FILES array
+        else if(isset($_FILES) && count($_FILES) > 0)
+        {
+            $this->files = $_FILES;
+        }
+
+        return $this;
+    }
+
+    /**
      * Used to upload the files
      *
      * @param mixed Array or string $indexes
@@ -316,7 +345,7 @@ class Uploader
             foreach($index as $name)
             {
                 // ==== Checking if the index is valid ==== //
-                if(isset($_FILES[$name]))
+                if(isset($this->files[$name]))
                 {
                     $this->doUpload($name);
                 }
@@ -325,7 +354,7 @@ class Uploader
         else // String
         {
             // ==== Checking if the index is valid ==== //
-            if(isset($_FILES[$index]))
+            if(isset($this->files[$index]))
             {
                 $this->doUpload($index);
             }
@@ -361,13 +390,13 @@ class Uploader
      */
     public function getFileList()
     {
-        if(count($this->files) == 0)
+        if(count($this->file_list) == 0)
         {
             return false;
         }
         else
         {
-            return $this->files;
+            return $this->file_list;
         }
     }
 
