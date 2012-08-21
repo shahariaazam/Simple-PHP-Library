@@ -417,7 +417,7 @@ class Uploader
             // Checking if the file was not successfully removed
             if($removed === false)
             {
-                $this->errors[$info['filename']][] = 'Could not remove the file with name ' . $info['filename'] . 'from path ' . $info['filepath'] . '.';
+                $this->errors[$info['filename']][] = 'Could not remove the file with name <em>' . $info['filename'] . '</em> from path <em>' . $info['filepath'] . '</em>.';
             }
         }
     }
