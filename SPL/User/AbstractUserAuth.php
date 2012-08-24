@@ -334,6 +334,7 @@ abstract class AbstractUserAuth
     /**
      * Login SQL
      *
+     * @param $user_id
      * @param array $data
      * @return string
      */
@@ -577,7 +578,7 @@ abstract class AbstractUserAuth
      * @param boolean $via_db
      * @return boolean
      */
-    public function doAuth($user_id=0, $via_db=true)
+    public function doAuth($user_id = 0, $via_db = true)
     {
         // ==== Check variable ==== //
         $isOk = true;
