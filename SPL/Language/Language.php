@@ -174,7 +174,7 @@ class Language
     protected function loadLanguage()
     {
         // ==== Generating unique identifier ==== //
-        $salt = (defined('__SITE_ROOT__') ? __SITE_ROOT__ : dirname(__FILE__));
+        $salt = realpath(dirname(__FILE__));
 
         // ==== Hashing unique ID ==== //
         $this->uq = sha1($salt);
