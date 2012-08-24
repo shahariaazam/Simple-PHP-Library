@@ -760,8 +760,7 @@ abstract class AbstractUserAuth
         // ==== Adding log data ==== //
         if($this->options['debug'])
         {
-            $log = '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
-            $log .= '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true?'yes':'no') . '<br />';
+            $log = '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true?'yes':'no') . '<br />';
             $log .= '<br /><br />';
 
             // ==== Adding the error ==== //
