@@ -10,7 +10,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name PayPal
- * @version 1.0
+ * @version 1.2
  *
  */
 
@@ -21,10 +21,16 @@ abstract class PayPal
     /**
      * Environment constants
      *
-     * @var constant
      */
     const ENV_PRODUCTION = 1;
     const ENV_TESTING = 2;
+
+    /**
+     * Platform constatns
+     *
+     */
+    const PLATFORM_DESKTOP = 1;
+    const PLATFORM_MOBILE = 2;
 
     /**
      * Returns the image for the PayPal ExpressCheckout button

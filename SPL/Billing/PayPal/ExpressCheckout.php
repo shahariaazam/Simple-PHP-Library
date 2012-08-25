@@ -10,7 +10,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ExpressCheckout
- * @version 1.0
+ * @version 1.5
  *
  * ----------------------------------------------------------
  * ERROR CODES
@@ -304,18 +304,13 @@ class ExpressCheckout extends PayPal
     /**
      * Used to initiate the payment flow and redirect to PayPal if the operation was successful
      *
-     * @param string $item The name of the item
-     * @param string $description The description of the item
-     * @param number $price
-     * @param string $quantity
-     * @param string $currency
-     * @param string $category Can be either Digital or Physical
+     * @param Items\Items $items
      * @param string $returnUrl
      * @param string $cancelUrl
      * @return mixed String to take the user to on success or an error code on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
-    public function SetExpressCheckout($item, $description, $price, $quantity, $currency, $category, $returnUrl, $cancelUrl)
+    public function SetExpressCheckout(Items\Items $items, $returnUrl, $cancelUrl)
     {
         // Status
         $result = true;
@@ -323,26 +318,27 @@ class ExpressCheckout extends PayPal
         // Local log
         $log = '';
 
+        // Price
+        $price = $items->getPrice();
+
         // Checking the required vars
         if(!empty($this->options['username'])
                 && !empty($this->options['password'])
                 && !empty($this->options['signature'])
-                && !empty($item)
-                && !empty($description)
-                && !empty($price)
-                && !empty($currency)
-                && !empty($category) && in_array($category, array('Digital', 'Physical'))
-                && !empty($quantity)
+                && is_numeric($price)
+                && !empty($items->currency)
+                && !empty($items->category) && in_array($items->category, array('Digital', 'Physical'))
                 && !empty($returnUrl)
                 && !empty($cancelUrl)
             )
         {
             // Checking if the currency is supported by PayPal
-            if($this->isCurrencySupported($currency))
+            if($this->isCurrencySupported($items->currency))
             {
-                // Encoding the URLs
+                // Encoding
                 $returnUrl = urlencode($returnUrl);
                 $cancelUrl = urlencode($cancelUrl);
+                $price     = urlencode($price);
 
                 // Request string
                 $request = 'METHOD=SetExpressCheckout'
@@ -350,16 +346,21 @@ class ExpressCheckout extends PayPal
                         . '&USER=' . $this->options['username']
                         . '&PWD=' . $this->options['password']
                         . '&SIGNATURE=' . $this->options['signature']
-                        . '&L_PAYMENTREQUEST_0_NAME0=' . $item
-                        . '&L_PAYMENTREQUEST_0_DESC0=' . $description
-                        . '&L_PAYMENTREQUEST_0_AMT0=' . $price
-                        . '&L_PAYMENTREQUEST_0_QTY0=' . $quantity
-                        . '&L_PAYMENTREQUEST_0_ITEMCATEGORY0=' . $category
-                        . '&PAYMENTREQUEST_0_CURRENCYCODE=' . $currency
+                        . '&PAYMENTREQUEST_0_ITEMCATEGORY=' . $items->category
+                        . '&PAYMENTREQUEST_0_CURRENCYCODE=' . $items->currency
                         . '&PAYMENTREQUEST_0_AMT=' . $price
+                        . '&PAYMENTREQUEST_0_PAYMENTACTION=Sale'
                         . '&RETURNURL=' . $returnUrl
-                        . '&CANCELURL=' . $cancelUrl
-                        . '&PAYMENTREQUEST_0_PAYMENTACTION=Sale';
+                        . '&CANCELURL=' . $cancelUrl;
+
+                // Building the rest of the request using the items object
+                foreach($items->getItems() as $index => $item)
+                {
+                    $request .= '&L_PAYMENTREQUEST_0_NAME' . $index . '=' . urlencode($item->name)
+                            . '&L_PAYMENTREQUEST_0_DESC' . $index . '=' . urlencode($item->desc)
+                            . '&L_PAYMENTREQUEST_0_AMT' . $index . '=' . urlencode($item->price)
+                            . '&L_PAYMENTREQUEST_0_QTY' . $index . '=' . urlencode($item->quantity);
+                }
 
                 // More request options depending on platform
                 if($this->platform === self::PLATFORM_MOBILE)
@@ -402,7 +403,7 @@ class ExpressCheckout extends PayPal
                 $result = 20;
 
                 // Logging
-                $this->log('error', 'The provided currency (' . $currency . ') is not supported by PayPal', $result);
+                $this->log('error', 'The provided currency (' . $items->currency . ') is not supported by PayPal', $result);
             }
         }
         else
@@ -453,7 +454,7 @@ class ExpressCheckout extends PayPal
                     . '&USER=' . $this->options['username']
                     . '&PWD=' . $this->options['password']
                     . '&SIGNATURE=' . $this->options['signature']
-                    . '&TOKEN=' . $this->getToken();
+                    . '&TOKEN=' . $token;
 
             // Request URL
             $url = $this->getEndpointUrl('request');
@@ -503,18 +504,20 @@ class ExpressCheckout extends PayPal
     /**
      * Used to complete an Express Checkout transaction
      *
-     * @param number $price
-     * @param string $currency
+     * @param Items\Items $items
      * @return mixed Array with response info or an error code on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
-    public function DoExpressCheckoutPayment($price, $currency)
+    public function DoExpressCheckoutPayment(Items\Items $items)
     {
         // Status
         $result = true;
 
         // Local log
         $log = '';
+
+        // Price
+        $price = $items->getPrice();
 
         // Token
         $token = $this->getToken();
@@ -526,52 +529,66 @@ class ExpressCheckout extends PayPal
         if(!empty($this->options['username'])
                 && !empty($this->options['password'])
                 && !empty($this->options['signature'])
-                && !empty($price)
-                && !empty($currency)
+                && is_numeric($price)
+                && !empty($items->currency)
                 && !empty($token)
                 && !empty($payerId)
             )
         {
-            // Request string
-            $request = 'METHOD=DoExpressCheckoutPayment'
-                    . '&VERSION=' . $this->version
-                    . '&USER=' . $this->options['username']
-                    . '&PWD=' . $this->options['password']
-                    . '&SIGNATURE=' . $this->options['signature']
-                    . '&TOKEN=' . $token
-                    . '&PAYERID=' . $payerId
-                    . '&PAYMENTREQUEST_0_AMT=' . $price
-                    . '&PAYMENTREQUEST_0_CURRENCYCODE=' . $currency
-                    . '&PAYMENTREQUEST_0_PAYMENTACTION=Sale';
-
-            // Request URL
-            $url = $this->getEndpointUrl('request');
-
-            // Getting the response
-            $response = $this->post($url, $request);
-
-            // Logging
-            $log .= '<strong>Request URL:</strong> ' . $url . '<br /><br />';
-            $log .= '<strong>Response:</strong> <pre>' . print_r($response, 1) . '</pre><br /><br />';
-
-            try{
-
-                // Checking the response
-                $isResponseOk = $this->checkResponse($response);
-
-            } catch (Exception\InvalidArgumentException $e) {
-
-                throw new Exception\RuntimeException('The response could not be checked', 0, $e);
-            }
-
-            // Verifying
-            if($isResponseOk === true)
+            // Checking if the currency is supported by PayPal
+            if($this->isCurrencySupported($items->currency))
             {
-                $result = &$response;
+                // Encoding
+                $price = urlencode($price);
+
+                // Request string
+                $request = 'METHOD=DoExpressCheckoutPayment'
+                        . '&VERSION=' . $this->version
+                        . '&USER=' . $this->options['username']
+                        . '&PWD=' . $this->options['password']
+                        . '&SIGNATURE=' . $this->options['signature']
+                        . '&TOKEN=' . $token
+                        . '&PAYERID=' . $payerId
+                        . '&PAYMENTREQUEST_0_AMT=' . $price
+                        . '&PAYMENTREQUEST_0_CURRENCYCODE=' . $items->currency
+                        . '&PAYMENTREQUEST_0_PAYMENTACTION=Sale';
+
+                // Request URL
+                $url = $this->getEndpointUrl('request');
+
+                // Getting the response
+                $response = $this->post($url, $request);
+
+                // Logging
+                $log .= '<strong>Request URL:</strong> ' . $url . '<br /><br />';
+                $log .= '<strong>Response:</strong> <pre>' . print_r($response, 1) . '</pre><br /><br />';
+
+                try{
+
+                    // Checking the response
+                    $isResponseOk = $this->checkResponse($response);
+
+                } catch (Exception\InvalidArgumentException $e) {
+
+                    throw new Exception\RuntimeException('The response could not be checked', 0, $e);
+                }
+
+                // Verifying
+                if($isResponseOk === true)
+                {
+                    $result = &$response;
+                }
+                else
+                {
+                    $result = 30;
+                }
             }
             else
             {
-                $result = 30;
+                $result = 20;
+
+                // Logging
+                $this->log('error', 'The provided currency (' . $items->currency . ') is not supported by PayPal', $result);
             }
         }
         else
