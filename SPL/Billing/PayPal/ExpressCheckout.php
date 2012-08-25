@@ -90,12 +90,8 @@ class ExpressCheckout extends PayPal
             throw new Exception\InvalidArgumentException('The options parameter for the SPL\Billing\PayPal\ExpressCheckout class must be an array.');
         }
 
-        // Checking the environment variable
-        if(in_array($environment, array(self::ENV_PRODUCTION, self::ENV_TESTING)))
-        {
-            $this->environment = $environment;
-        }
-        else
+        // Checking the environment param to see if it's valid
+        if(!in_array($environment, array(self::ENV_PRODUCTION, self::ENV_TESTING)))
         {
             throw new Exception\InvalidArgumentException('The $environment parameter can only be "testing" or "production".');
         }
@@ -114,6 +110,9 @@ class ExpressCheckout extends PayPal
         {
             $this->options = array_merge($this->options, $options);
         }
+
+        // Initializing the environment
+        $this->environment = $environment;
 
         // Initializing the servers
         $this->initServers();
