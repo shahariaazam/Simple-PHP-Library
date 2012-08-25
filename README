@@ -28,7 +28,7 @@ Autoload::registerAutoload();
 If you are using CodeIgniter for example and you want the class to not throw an exception when a file for a class is not found you can use the following method:
 
 // Skips the Exception trigger when no file is found for the requested class
-Autoload::setSkip(true);
+Autoload::skipException();
 
 
 Usage documentation:
