@@ -10,7 +10,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ExpressCheckout
- * @version 1.5
+ * @version 1.6
  *
  * ----------------------------------------------------------
  * ERROR CODES
@@ -307,7 +307,7 @@ class ExpressCheckout extends PayPal
      * @param Items\Items $items
      * @param string $returnUrl
      * @param string $cancelUrl
-     * @return mixed String to take the user to on success or an error code on fail
+     * @return mixed String to take the user to on success or false on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
     public function SetExpressCheckout(Items\Items $items, $returnUrl, $cancelUrl)
@@ -395,23 +395,23 @@ class ExpressCheckout extends PayPal
                 }
                 else
                 {
-                    $result = 30;
+                    $result = false;
                 }
             }
             else
             {
-                $result = 20;
+                $result = false;
 
                 // Logging
-                $this->log('error', 'The provided currency (' . $items->currency . ') is not supported by PayPal', $result);
+                $this->log('error', 'The provided currency (' . $items->currency . ') is not supported by PayPal', 20);
             }
         }
         else
         {
-            $result = 10;
+            $result = false;
 
             // Logging
-            $this->log('error', 'The required parameters for the SetExpressCheckout method where not present', $result);
+            $this->log('error', 'The required parameters for the SetExpressCheckout method where not present', 10);
         }
 
         // Logging
@@ -427,7 +427,7 @@ class ExpressCheckout extends PayPal
      * Used to obtain details about an Express Checkout transaction
      *
      * @param void
-     * @return mixed Array with response info or an error code on fail
+     * @return mixed Array with response info or false on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
     public function GetExpressCheckoutDetails()
@@ -479,19 +479,19 @@ class ExpressCheckout extends PayPal
             // Verifying
             if($isResponseOk === true)
             {
-                $result = &$response;
+                $result = new Response($response);
             }
             else
             {
-                $result = 30;
+                $result = false;
             }
         }
         else
         {
-            $result = 40;
+            $result = false;
 
             // Logging
-            $this->log('error', 'The required parameters for the GetExpressCheckoutDetails method where not present', $result);
+            $this->log('error', 'The required parameters for the GetExpressCheckoutDetails method where not present', 40);
         }
 
         // Logging
@@ -505,7 +505,7 @@ class ExpressCheckout extends PayPal
      * Used to complete an Express Checkout transaction
      *
      * @param Items\Items $items
-     * @return mixed Array with response info or an error code on fail
+     * @return mixed Array with response info or false on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
     public function DoExpressCheckoutPayment(Items\Items $items)
@@ -576,27 +576,27 @@ class ExpressCheckout extends PayPal
                 // Verifying
                 if($isResponseOk === true)
                 {
-                    $result = &$response;
+                    $result = new Response($response);
                 }
                 else
                 {
-                    $result = 30;
+                    $result = false;
                 }
             }
             else
             {
-                $result = 20;
+                $result = false;
 
                 // Logging
-                $this->log('error', 'The provided currency (' . $items->currency . ') is not supported by PayPal', $result);
+                $this->log('error', 'The provided currency (' . $items->currency . ') is not supported by PayPal', 20);
             }
         }
         else
         {
-            $result = 50;
+            $result = false;
 
             // Logging
-            $this->log('error', 'The required parameters for the DoExpressCheckoutPayment method where not present', $result);
+            $this->log('error', 'The required parameters for the DoExpressCheckoutPayment method where not present', 50);
         }
 
         // Logging
