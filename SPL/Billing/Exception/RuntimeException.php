@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Exception for the URL class
+ * RuntimeException
  *
  * @author Brian
  * @link https://github.com/brian978

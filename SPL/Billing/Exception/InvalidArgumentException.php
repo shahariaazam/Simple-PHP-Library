@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Exception for the URL class
+ * InvalidArgumentException
  *
  * @author Brian
  * @link https://github.com/brian978

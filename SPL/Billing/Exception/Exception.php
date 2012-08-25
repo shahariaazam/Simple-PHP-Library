@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Exception Interface for the Exceptions used by the URL class
+ * Exception Interface
  *
  * @author Brian
  * @link https://github.com/brian978
