@@ -61,6 +61,13 @@ class ExpressCheckout extends PayPal
     protected $environment;
 
     /**
+     * Selected platform
+     *
+     * @var string
+     */
+    protected $platform;
+
+    /**
      * Servers for the checkout
      *
      * @var array
@@ -79,21 +86,28 @@ class ExpressCheckout extends PayPal
      *
      * @param array $options
      * @param string $environment
+     * @param string $platform
      * @return ExpressCheckout
      * @throws SPL\Billing\Exception\InvalidArgumentException
      */
-    public function __construct(array $options, $environment = self::ENV_TESTING)
+    public function __construct(array $options, $environment = self::ENV_TESTING, $platform = self::PLATFORM_DESKTOP)
     {
         // Checking the type of the options param
         if(!is_array($options))
         {
-            throw new Exception\InvalidArgumentException('The options parameter for the SPL\Billing\PayPal\ExpressCheckout class must be an array.');
+            throw new Exception\InvalidArgumentException('The $options parameter must be an array.');
         }
 
         // Checking the environment param to see if it's valid
         if(!in_array($environment, array(self::ENV_PRODUCTION, self::ENV_TESTING)))
         {
-            throw new Exception\InvalidArgumentException('The $environment parameter can only be "testing" or "production".');
+            throw new Exception\InvalidArgumentException('The $environment parameter can only be "PayPal::ENV_PRODUCTION" or "PayPal::ENV_TESTING".');
+        }
+
+        // Checking the $platform param to see if it's valid
+        if(!in_array($platform, array(self::PLATFORM_DESKTOP, self::PLATFORM_MOBILE)))
+        {
+            throw new Exception\InvalidArgumentException('The $platform parameter can only be "PayPal::PLATFORM_DESKTOP" or "PayPal::PLATFORM_MOBILE".');
         }
 
         // Class options
@@ -113,6 +127,12 @@ class ExpressCheckout extends PayPal
 
         // Initializing the environment
         $this->environment = $environment;
+
+        // Initializing the platform
+        $this->platform = $platform;
+
+        // Logging
+        $this->log('log', '<strong>Parameters:</strong> <pre>' . print_r(func_get_args(), 1) . '</pre>', __METHOD__);
 
         // Initializing the servers
         $this->initServers();
@@ -145,12 +165,24 @@ class ExpressCheckout extends PayPal
          * -----------------------------------------
          *
          */
-        $this->servers['redirect'] = array(
+        if($this->platform === self::PLATFORM_DESKTOP)
+        {
+            $this->servers['redirect'] = array(
 
-            self::ENV_PRODUCTION => 'https://www.paypal.com/webscr?cmd=_express-checkout&token={token}',
-            self::ENV_TESTING    => 'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token={token}'
+                self::ENV_PRODUCTION => 'https://www.paypal.com/webscr?cmd=_express-checkout&token={token}',
+                self::ENV_TESTING    => 'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token={token}'
 
-        );
+            );
+        }
+        else if($this->platform === self::PLATFORM_MOBILE)
+        {
+            $this->servers['redirect'] = array(
+
+                self::ENV_PRODUCTION => 'https://www.paypal.com/webscr?cmd=_express-checkout-mobile&token={token}',
+                self::ENV_TESTING    => 'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout-mobile&token={token}'
+
+            );
+        }
 
         // Logging
         $this->log('log', '<strong>Servers:</strong> <pre>' . print_r($this->servers, 1) . '</pre>', __METHOD__);
@@ -272,14 +304,18 @@ class ExpressCheckout extends PayPal
     /**
      * Used to initiate the payment flow and redirect to PayPal if the operation was successful
      *
-     * @param number $amount
+     * @param string $item The name of the item
+     * @param string $description The description of the item
+     * @param number $price
+     * @param string $quantity
      * @param string $currency
+     * @param string $category Can be either Digital or Physical
      * @param string $returnUrl
      * @param string $cancelUrl
      * @return mixed String to take the user to on success or an error code on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
-    public function SetExpressCheckout($amount, $currency, $returnUrl, $cancelUrl)
+    public function SetExpressCheckout($item, $description, $price, $quantity, $currency, $category, $returnUrl, $cancelUrl)
     {
         // Status
         $result = true;
@@ -291,8 +327,12 @@ class ExpressCheckout extends PayPal
         if(!empty($this->options['username'])
                 && !empty($this->options['password'])
                 && !empty($this->options['signature'])
-                && !empty($amount)
+                && !empty($item)
+                && !empty($description)
+                && !empty($price)
                 && !empty($currency)
+                && !empty($category) && in_array($category, array('Digital', 'Physical'))
+                && !empty($quantity)
                 && !empty($returnUrl)
                 && !empty($cancelUrl)
             )
@@ -310,11 +350,22 @@ class ExpressCheckout extends PayPal
                         . '&USER=' . $this->options['username']
                         . '&PWD=' . $this->options['password']
                         . '&SIGNATURE=' . $this->options['signature']
-                        . '&PAYMENTREQUEST_0_AMT=' . $amount
+                        . '&L_PAYMENTREQUEST_0_NAME0=' . $item
+                        . '&L_PAYMENTREQUEST_0_DESC0=' . $description
+                        . '&L_PAYMENTREQUEST_0_AMT0=' . $price
+                        . '&L_PAYMENTREQUEST_0_QTY0=' . $quantity
+                        . '&L_PAYMENTREQUEST_0_ITEMCATEGORY0=' . $category
                         . '&PAYMENTREQUEST_0_CURRENCYCODE=' . $currency
+                        . '&PAYMENTREQUEST_0_AMT=' . $price
                         . '&RETURNURL=' . $returnUrl
                         . '&CANCELURL=' . $cancelUrl
                         . '&PAYMENTREQUEST_0_PAYMENTACTION=Sale';
+
+                // More request options depending on platform
+                if($this->platform === self::PLATFORM_MOBILE)
+                {
+                    $request .= '&LANDINGPAGE=Login';
+                }
 
                 // Request URL
                 $url = $this->getEndpointUrl('request');
@@ -452,12 +503,12 @@ class ExpressCheckout extends PayPal
     /**
      * Used to complete an Express Checkout transaction
      *
-     * @param number $amount
+     * @param number $price
      * @param string $currency
      * @return mixed Array with response info or an error code on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
-    public function DoExpressCheckoutPayment($amount, $currency)
+    public function DoExpressCheckoutPayment($price, $currency)
     {
         // Status
         $result = true;
@@ -475,6 +526,8 @@ class ExpressCheckout extends PayPal
         if(!empty($this->options['username'])
                 && !empty($this->options['password'])
                 && !empty($this->options['signature'])
+                && !empty($price)
+                && !empty($currency)
                 && !empty($token)
                 && !empty($payerId)
             )
@@ -487,7 +540,7 @@ class ExpressCheckout extends PayPal
                     . '&SIGNATURE=' . $this->options['signature']
                     . '&TOKEN=' . $token
                     . '&PAYERID=' . $payerId
-                    . '&PAYMENTREQUEST_0_AMT=' . $amount
+                    . '&PAYMENTREQUEST_0_AMT=' . $price
                     . '&PAYMENTREQUEST_0_CURRENCYCODE=' . $currency
                     . '&PAYMENTREQUEST_0_PAYMENTACTION=Sale';
 
@@ -613,11 +666,11 @@ class ExpressCheckout extends PayPal
         if(is_array($response))
         {
             // Checking the ACK
-            if($response['ACK'] === 'Failure')
+            if($response['ACK'] !== 'Success')
             {
                 $status = false;
 
-                $this->log('error', 'The PayPal request failed with code ' . $response['L_ERRORCODE0'] . ' and message "' . $response['L_LONGMESSAGE0'], 30);
+                $this->log('error', 'The PayPal request failed with code ' . $response['L_ERRORCODE0'] . ' and message "' . $response['L_LONGMESSAGE0'] . '"', 30);
             }
         }
         else
