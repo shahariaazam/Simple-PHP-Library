@@ -84,25 +84,10 @@ class ExpressCheckout extends PayPal
      */
     public function __construct(array $options, $environment = self::ENV_TESTING)
     {
-        // Class options
-        $this->options['debug']     = false;
-        $this->options['mail']      = '';
-
-        // API options
-        $this->options['username']  = '';
-        $this->options['password']  = '';
-        $this->options['signature'] = '';
-
         // Checking the type of the options param
         if(!is_array($options))
         {
             throw new Exception\InvalidArgumentException('The options parameter for the SPL\Billing\PayPal\ExpressCheckout class must be an array.');
-        }
-
-        // Overwrite default options
-        if(count($options) > 0)
-        {
-            $this->options = array_merge($this->options, $options);
         }
 
         // Checking the environment variable
@@ -113,6 +98,21 @@ class ExpressCheckout extends PayPal
         else
         {
             throw new Exception\InvalidArgumentException('The $environment parameter can only be "testing" or "production".');
+        }
+
+        // Class options
+        $this->options['debug']     = false;
+        $this->options['mail']      = '';
+
+        // API options
+        $this->options['username']  = '';
+        $this->options['password']  = '';
+        $this->options['signature'] = '';
+
+        // Overwrite default options
+        if(count($options) > 0)
+        {
+            $this->options = array_merge($this->options, $options);
         }
 
         // Initializing the servers
