@@ -10,7 +10,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ExpressCheckout
- * @version 1.6
+ * @version 1.6.1
  *
  * ----------------------------------------------------------
  * ERROR CODES
@@ -244,6 +244,24 @@ class ExpressCheckout extends PayPal
     }
 
     /**
+     * Returns the URL to PayPal
+     *
+     * @param Response $response
+     * @return string
+     */
+    public function getUrl(Response $response)
+    {
+        $url = '#';
+
+        if($response->TOKEN !== null)
+        {
+            $url = $this->getEndpointUrl('redirect', $response->TOKEN);
+        }
+
+        return $url;
+    }
+
+    /**
      * Returns an URL for the request depending on the $type
      *
      * @param string $type
@@ -307,7 +325,7 @@ class ExpressCheckout extends PayPal
      * @param Items\Items $items
      * @param string $returnUrl
      * @param string $cancelUrl
-     * @return mixed String to take the user to on success or false on fail
+     * @return mixed Response object on success or false on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
     public function SetExpressCheckout(Items\Items $items, $returnUrl, $cancelUrl)
@@ -391,7 +409,7 @@ class ExpressCheckout extends PayPal
                 // Verifying
                 if($isResponseOk === true)
                 {
-                    $result = $this->getEndpointUrl('redirect', $response['TOKEN']);
+                    $result = new Response($response);
                 }
                 else
                 {
@@ -416,7 +434,6 @@ class ExpressCheckout extends PayPal
 
         // Logging
         $log .= '<strong>Parameters:</strong> <pre>' . print_r(func_get_args(), 1) . '</pre><br /><br />';
-        $log .= '<strong>Result/URL:</strong> ' . $result . '<br /><br />';
         $this->log('log', $log, __METHOD__);
 
         // Returning the status
@@ -427,7 +444,7 @@ class ExpressCheckout extends PayPal
      * Used to obtain details about an Express Checkout transaction
      *
      * @param void
-     * @return mixed Array with response info or false on fail
+     * @return mixed Response object on success or false on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
     public function GetExpressCheckoutDetails()
@@ -505,7 +522,7 @@ class ExpressCheckout extends PayPal
      * Used to complete an Express Checkout transaction
      *
      * @param Items\Items $items
-     * @return mixed Array with response info or false on fail
+     * @return mixed Response object on success or false on fail
      * @throws SPL\Billing\Exception\RuntimeException
      */
     public function DoExpressCheckoutPayment(Items\Items $items)
