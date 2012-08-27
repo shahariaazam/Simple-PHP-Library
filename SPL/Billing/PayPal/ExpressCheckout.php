@@ -19,6 +19,7 @@
  * 10 - The required parameters for the SetExpressCheckout method where not present
  * 20 - Invalid currency
  * 30 - PayPal request failed
+ * 33 - Could not get response from PayPal
  * 40 - The required parameters for the GetExpressCheckoutDetails method where not present
  * 50 - The required parameters for the DoExpressCheckoutPayment method where not present
  *
@@ -374,10 +375,14 @@ class ExpressCheckout extends PayPal
                 // Building the rest of the request using the items object
                 foreach($items->getItems() as $index => $item)
                 {
-                    $request .= '&L_PAYMENTREQUEST_0_NAME' . $index . '=' . urlencode($item->name)
-                            . '&L_PAYMENTREQUEST_0_DESC' . $index . '=' . urlencode($item->desc)
-                            . '&L_PAYMENTREQUEST_0_AMT' . $index . '=' . urlencode($item->price)
-                            . '&L_PAYMENTREQUEST_0_QTY' . $index . '=' . urlencode($item->quantity);
+                    // Checking if the item data is valid
+                    if(!empty($item->name) && !empty($item->desc) && isset($item->price) && !empty($item->quantity))
+                    {
+                        $request .= '&L_PAYMENTREQUEST_0_NAME' . $index . '=' . urlencode($item->name)
+                                . '&L_PAYMENTREQUEST_0_DESC' . $index . '=' . urlencode($item->desc)
+                                . '&L_PAYMENTREQUEST_0_AMT' . $index . '=' . urlencode($item->price)
+                                . '&L_PAYMENTREQUEST_0_QTY' . $index . '=' . urlencode($item->quantity);
+                    }
                 }
 
                 // More request options depending on platform
@@ -669,17 +674,24 @@ class ExpressCheckout extends PayPal
         // Result var
         $result = array();
 
-        // Decoding and exploding by "&"
-        $response = explode('&', urldecode($response));
+        // Trimming the response string
+        $response = trim($response);
 
-        // Going through the response an building a key => value assoc
-        foreach($response as $keyvalue)
+        // Checking if the response is a string
+        if(is_string($response) && !empty($response))
         {
-            // Separating the key from the value
-            $kv = explode('=', $keyvalue);
+            // Decoding and exploding by "&"
+            $response = explode('&', urldecode($response));
 
-            // Storing
-            $result[$kv[0]] = $kv[1];
+            // Going through the response an building a key => value assoc
+            foreach($response as $keyvalue)
+            {
+                // Separating the key from the value
+                $kv = explode('=', $keyvalue);
+
+                // Storing
+                $result[$kv[0]] = $kv[1];
+            }
         }
 
         return $result;
@@ -699,12 +711,22 @@ class ExpressCheckout extends PayPal
         // Checking if the provided param is an array
         if(is_array($response))
         {
-            // Checking the ACK
-            if($response['ACK'] !== 'Success')
+            // Checking if we have a response in the array
+            if(count($response) > 0)
+            {
+                // Checking the ACK
+                if($response['ACK'] !== 'Success')
+                {
+                    $status = false;
+
+                    $this->log('error', 'The PayPal request failed with code ' . $response['L_ERRORCODE0'] . ' and message "' . $response['L_LONGMESSAGE0'] . '"', 30);
+                }
+            }
+            else
             {
                 $status = false;
 
-                $this->log('error', 'The PayPal request failed with code ' . $response['L_ERRORCODE0'] . ' and message "' . $response['L_LONGMESSAGE0'] . '"', 30);
+                $this->log('error', 'Could not get response from PayPal', 33);
             }
         }
         else
