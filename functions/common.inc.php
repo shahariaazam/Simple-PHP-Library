@@ -9,21 +9,6 @@
  */
 
 /**
- *
- * The function gets the extension of a given filename
- *
- * @param string $file
- * @return string
- */
-function getFileExt($file)
-{
-    $array = explode(".", $file);
-    $ext = $array[count($array) - 1];
-
-    return $ext;
-}
-
-/**
  * The function redirects the user using either the header method or the http_redirect method
  *
  * @param string $url
