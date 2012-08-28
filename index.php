@@ -20,7 +20,7 @@ require 'functions/common.inc.php';
 use SPL\Autoload\Autoload as Autoload;
 
 // Creating the autoload object
-Autoload::registerAutoload();
+Autoload::register();
 
 /////////////////////////////////////////////////////////////////////////////////////
 // AREA 53

@@ -50,12 +50,12 @@ class Autoload
     }
 
     /**
-     * Registers the Autoload class as an autoloader
+     * Registers the Autoload class as the __autoload() implementation
      *
      * @param void
      * @return void
      */
-    public static function registerAutoload()
+    public static function register()
     {
         // Getting the include paths
         self::$paths = explode(PATH_SEPARATOR, get_include_path());

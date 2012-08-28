@@ -22,7 +22,7 @@ require 'SPL/Autoload/Autoload.php';
 use SPL\Autoload\Autoload as Autoload;
 
 // Creating the autoload object
-Autoload::registerAutoload();
+Autoload::register();
 
 
 If you are using CodeIgniter for example and you want the class to not throw an exception when a file for a class is not found you can use the following method:
