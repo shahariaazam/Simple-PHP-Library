@@ -17,7 +17,6 @@ namespace SPL\Upload;
 
 class Uploader
 {
-
     /**
      * Internal log of problems
      *
@@ -74,11 +73,12 @@ class Uploader
         $this->errors = array();
 
         // ==== Default $options ==== //
-        $this->options['debug']       = false;
-        $this->options['mail']        = 'webmaster@' . $_SERVER['HTTP_HOST'];
-        $this->options['uploads_dir'] = 'uploads/';
-        $this->options['extension']   = 'keys'; // Available values: keys, values
-        $this->options['extensions']  = array(
+        $this->options['debug']          = false;
+        $this->options['mail']           = '';
+        $this->options['uploads_dir']    = 'uploads/';
+        $this->options['autocreate_dir'] = true;
+        $this->options['extension']      = 'keys'; // Available values: keys, values
+        $this->options['extensions']     = array(
             //Office
             "doc"  => "Microsoft Word 2003 Document",
             "docx" => "Microsoft Word 2007 Document",
@@ -143,7 +143,7 @@ class Uploader
         $this->mopt['headers'] = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=UTF-8' . "\r\n";
 
         // ==== Checking if the upload directory exists == we create it if not ==== //
-        if(!is_dir($this->options['uploads_dir']))
+        if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true)
         {
             // Checking if we can create the directory
             if(is_writeable($this->options['uploads_dir']))
@@ -156,6 +156,43 @@ class Uploader
                 throw new Exception\RuntimeException('The uploads directory must be writable.');
             }
         }
+    }
+
+    /**
+     * Sets options
+     *
+     * @param array $options
+     * @return void
+     * @throws SPL\Upload\Exception\InvalidArgumentException
+     */
+    public function setOptions($options = array())
+    {
+        if(is_array($options))
+        {
+            $this->options = array_merge($this->options, $options);
+        }
+        else
+        {
+            throw new Exception\InvalidArgumentException('The $options parameter must be an array.');
+        }
+    }
+
+    /**
+     * Gets an entry from the options array
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        $value = null;
+
+        if(isset($this->options[$name]))
+        {
+            $value = $this->options[$name];
+        }
+
+        return $value;
     }
 
     /**
@@ -238,41 +275,50 @@ class Uploader
             // ==== Going through the files ==== //
             foreach($this->files[$index]['tmp_name'] as $nr => $file)
             {
-                // ==== Getting the filename of the original file ==== //
-                $filename = $this->files[$index]['name'][$nr];
-
-                // ==== Checking if the extension is allowed ==== //
-                if($this->isExtensionAllowed($filename))
+                // Checking if any errors occured
+                if($isOk === true)
                 {
-                    // ==== Checking if the file has been uploaded successfully ==== ///
-                    if(move_uploaded_file($file, $this->options['uploads_dir'] . $filename) == false)
+                    // ==== Getting the filename of the original file ==== //
+                    $filename = $this->files[$index]['name'][$nr];
+
+                    // ==== Checking if the extension is allowed ==== //
+                    if($this->isExtensionAllowed($filename))
                     {
-                        // ==== Adding log data ==== //
-                        if($this->options['debug'])
+                        // ==== Checking if the file has been uploaded successfully ==== ///
+                        if(move_uploaded_file($file, $this->options['uploads_dir'] . $filename) == false)
                         {
-                            $this->log .= '<b>ERROR:</b> Failed to upload file: ' . $filename . '<br /><br />';
+                            // ==== Adding log data ==== //
+                            if($this->options['debug'])
+                            {
+                                $this->log .= '<b>ERROR:</b> Failed to upload file: ' . $filename . '<br /><br />';
+                            }
+
+                            // ==== Adding error data ==== //
+                            $this->errors[$filename][] = 'Failed to upload file';
+
+                            $isOk = false;
                         }
-
-                        // ==== Adding error data ==== //
-                        $this->errors[$filename][] = 'Failed to upload file';
-
-                        $isOk = false;
+                        else
+                        {
+                            // ==== Adding the file (with path) to the files array ==== //
+                            $this->file_list[] = array(
+                                'filename' => $filename,
+                                'filepath' => $this->options['uploads_dir'] . $filename,
+                            );
+                        }
                     }
                     else
                     {
-                        // ==== Adding the file (with path) to the files array ==== //
-                        $this->file_list[] = array(
-                            'filename' => $filename,
-                            'filepath' => $this->options['uploads_dir'] . $filename,
-                        );
+                        // ==== Adding error data ==== //
+                        $this->errors[$filename][] = 'The files extension is not allowed';
+
+                        $isOk = false;
                     }
                 }
                 else
                 {
-                    // ==== Adding error data ==== //
-                    $this->errors[$filename][] = 'The files extension is not allowed';
-
-                    $isOk = false;
+                    // Exiting the loop
+                    break;
                 }
             }
         }
@@ -359,17 +405,26 @@ class Uploader
             // ==== Going through each index ==== //
             foreach($index as $name)
             {
-                // ==== Checking if the index is valid ==== //
-                if(isset($this->files[$name]))
+                // Triggering the upload only if no errors occured
+                if($success === true)
                 {
-                    // Getting the result of the upload
-                    $result = $this->doUpload($name);
-
-                    // Checking the result
-                    if($result === false)
+                    // ==== Checking if the index is valid ==== //
+                    if(isset($this->files[$name]))
                     {
-                        $success = false;
+                        // Getting the result of the upload
+                        $result = $this->doUpload($name);
+
+                        // Checking the result
+                        if($result === false)
+                        {
+                            $success = false;
+                        }
                     }
+                }
+                else
+                {
+                    // Exiting
+                    break;
                 }
             }
         }
@@ -469,6 +524,11 @@ class Uploader
         // ==== Sending debug if on ==== //
         if($this->options['debug'] && $this->log != '')
         {
+            // Adding more stuff to the log
+            $this->log .= '<strong>' . __METHOD__ . '</strong><br /><br />';
+            $this->log .= '$this->file_list: <pre>' . print_r($this->file_list, 1) . '</pre><br /><br />';
+            $this->log .= '$this->errors: <pre>' . print_r($this->errors, 1) . '</pre><hr><br /><br />';
+
             // ==== Adding log to message ==== //
             $this->mopt['msg'] = $this->log;
 
@@ -476,5 +536,4 @@ class Uploader
             mail($this->mopt['to'], $this->mopt['subject'], $this->mopt['msg'], $this->mopt['headers']);
         }
     }
-
 }
