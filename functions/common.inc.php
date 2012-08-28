@@ -9,51 +9,6 @@
  */
 
 /**
- * The function redirects the user using either the header method or the http_redirect method
- *
- * @param string $url
- * @param string $method
- * @param array $settings // Optional but only for http_redirect method
- * @return void
- */
-function redirect($url, $method = 'header', $settings = array())
-{
-    // ==== Decoding the URL ==== //
-    $url = urldecode($url);
-
-    switch($method)
-    {
-        default:
-            header('Location: ' . $url . '');
-            exit();
-            break;
-
-        case 'http_redirect':
-            // ==== Default http_redirect parameters ==== //
-            $params['params'] = array();
-            $params['session'] = false;
-            $params['status'] = 0;
-
-            // ==== Merging arrays ==== //
-            if(is_array($settings) && count($settings) > 0)
-            {
-                $params = array_replace($params, $settings);
-            }
-
-            if(function_exists('http_redirect'))
-            {
-                http_redirect($url, $params['params'], $params['session'], $params['status']);
-                exit();
-            }
-            else
-            {
-                trigger_error('You need PECL extension to use the http_redirect function. <br />Please install the PECL extension or switch to header redirect.', E_USER_ERROR);
-            }
-            break;
-    }
-}
-
-/**
  * The function cuts a string to size similar to substr but it also checks for html entities to avoid
  * cutting a html entity in half
  *

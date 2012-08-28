@@ -2,21 +2,19 @@
 
 /**
  *
- * The object created with this class identifies a user
+ * The class handles headers
  *
  * @author Brian
  * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name User
+ * @name Headers
  * @version 1.0
  *
  */
 
-namespace SPL\Headers;
-
-use SPL\Exception\Exception as Exception;
+namespace SPL\Http;
 
 class Headers
 {
@@ -26,6 +24,7 @@ class Headers
      * @param string $url
      * @param boolean $assoc
      * @return array
+     * @throws SPL\Http\Exception\RuntimeException
      */
     public static function getForUrl($url, $assoc = true)
     {
@@ -48,7 +47,7 @@ class Headers
         else
         {
             // Throwing an exception
-            throw new Exception('I cannot seem to find the get_headers function. This function is required for the SPL\Headers\Headers::getUrlHeader method.');
+            throw new Exception\RuntimeException('I cannot seem to find the "get_headers" function. This function is required for the ' . __METHOD__ . ' method.');
         }
 
         // Returning the result
