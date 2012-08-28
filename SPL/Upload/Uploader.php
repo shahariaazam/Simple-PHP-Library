@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Uploader
- * @version 1.7
+ * @version 1.8
  *
  */
 
