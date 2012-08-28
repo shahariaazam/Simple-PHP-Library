@@ -326,10 +326,8 @@ class Vault
             // ==== Returning result ==== //
             return trim($encrypted);
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /**
@@ -357,10 +355,8 @@ class Vault
             // ==== Returning result ==== //
             return trim($decrypted);
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /**

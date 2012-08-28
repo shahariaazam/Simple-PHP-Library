@@ -26,7 +26,7 @@ class File
      */
     public static function getExtension($file)
     {
-        $array = explode(".", $file);
+        $array = explode('.', $file);
         $ext = $array[count($array) - 1];
 
         return $ext;

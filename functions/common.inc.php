@@ -75,10 +75,8 @@ function cutstr($string, $from, $length, $more_entities = array())
     {
         return cutstr($string, $from, $length, $more_entities);
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 /**
@@ -196,14 +194,13 @@ function secure_download($file)
         header('Content-Disposition: attachment; filename=' . basename($file));
         header('Content-Transfer-Encoding: binary');
         header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        @header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Pragma: public');
         header('Content-Length: ' . filesize($file));
         readfile($file);
         exit();
     }
 }
-
 
 /**
  * The function properly prints an array
@@ -219,8 +216,6 @@ function print_array($array, $return = false)
     {
         return $str;
     }
-    else
-    {
-        echo $str;
-    }
+
+    echo $str;
 }

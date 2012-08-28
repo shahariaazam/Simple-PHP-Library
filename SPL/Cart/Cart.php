@@ -133,10 +133,8 @@ class Cart
 
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /**
@@ -157,11 +155,9 @@ class Cart
             // ==== Returning result ==== //
             return true;
         }
-        else
-        {
-            // ==== Returning result ==== //
-            return false;
-        }
+
+        // ==== Returning result ==== //
+        return false;
     }
 
     /**
@@ -236,8 +232,8 @@ class Cart
 
         // ==== Returning result ==== //
         return array(
-            "icount"      => $icount,
-            "total_price" => $total_price
+            'icount'      => $icount,
+            'total_price' => $total_price
         );
     }
 
@@ -251,7 +247,6 @@ class Cart
     {
         return $this->items;
     }
-
 
     /**
      * Is used to empty the contents of the cart
@@ -272,10 +267,9 @@ class Cart
 
             return true;
         }
-        else
-            return false;
-    }
 
+        return false;
+    }
 
     /**
      * Saves the cart contents if the Cart::emptyCart method hasn't been called

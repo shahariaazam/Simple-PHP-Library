@@ -146,10 +146,8 @@ class Image
         {
             return $this->properties[$name];
         }
-        else
-        {
-            return '';
-        }
+
+        return '';
     }
 
     /**
