@@ -345,7 +345,7 @@ class Uploader
     }
 
     /**
-     * Does the actual uploading using the index given to it
+     * Processes the files that need to be uploaded
      *
      * @param string $index
      * @return boolean
@@ -391,7 +391,7 @@ class Uploader
     }
 
     /**
-     * Method uploads a file with a given filename
+     * Uploads a file with a given filename
      *
      * @param string $source The source of the file
      * @param string $filename The name of the file. This is how it will be written on the hard drive
