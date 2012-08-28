@@ -59,9 +59,8 @@ class Redirect
             http_redirect($url, $params['params'], $params['session'], $params['status']);
             exit();
         }
-        else
-        {
-            throw new Exception\RuntimeException('You need the "pecl_http" PECL extension to use the "http_redirect" function.');
-        }
+
+        // Throwing the exception
+        throw new Exception\RuntimeException('You need the "pecl_http" PECL extension to use the "http_redirect" function.');
     }
 }
