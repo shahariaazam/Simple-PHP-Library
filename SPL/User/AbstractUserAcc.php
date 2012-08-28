@@ -64,7 +64,7 @@ namespace SPL\User;
 
 use SPL\URL;
 use SPL\Validator;
-use SPL\Headers\Headers as Headers;
+use SPL\Http\Headers as Headers;
 use SPL\Security\Vault as Vault;
 
 abstract class AbstractUserAcc
