@@ -1,13 +1,12 @@
-If you use the library DO NOT modify/remove the links to this page.
-
-
-Requirements:
+Requirements
+------------------------------------------
 PHP 5.3 or higher
 
 
-Documentation:
+Getting started
+-----------------------------------------
 
-To use the library you need to add the following code to your application:
+Note: The following example assumes that you put this in the index.php file and that both the library and the index.php file reside in the site root
 
 // Sets the paths where the autoloader class will look for the classes
 set_include_path(implode(PATH_SEPARATOR, array(
@@ -15,29 +14,31 @@ set_include_path(implode(PATH_SEPARATOR, array(
     realpath(dirname(__FILE__) . '/SPL'),
 )));
 
-// Here we include the autoloader
+// We include the autoloader
 require 'SPL/Autoload/Autoload.php';
 
 // Namespace alias
 use SPL\Autoload\Autoload as Autoload;
 
-// Creating the autoload object
+// Registering the autoloader
 Autoload::register();
 
 
-If you are using CodeIgniter for example and you want the class to not throw an exception when a file for a class is not found you can use the following method:
+If you don't want the class to throw an Exception when no file for a class is found then also add the following line:
 
 // Skips the Exception trigger when no file is found for the requested class
 Autoload::skipException();
 
 
-Usage documentation:
+Documentation
+-----------------------------------------
 
-Partial documentation can be found here: https://brian.hopto.org/wiki/hypermvc/category/library/
+- Usage documentation:
 
-I will update the class and function documentation after deciding if I will move the remaining function to some classes.
+https://brian.hopto.org/wiki/hypermvc/category/library/
 
 
-API Documentation:
+
+- API Documentation:
 
 https://brian.hopto.org/docs/hypermvc/library/
