@@ -70,6 +70,7 @@ namespace SPL\User;
 use SPL\URL;
 use SPL\Http\Headers as Headers;
 use SPL\Security\Vault as Vault;
+use SPL\Variable\Variable as Variable;
 
 abstract class AbstractUserAuth
 {
@@ -365,7 +366,7 @@ abstract class AbstractUserAuth
         {
             $log = '<strong>Info:</strong><br />';
             $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-            $log .= 'Data: '.SPL\Variable\Variable::print_array($data, 1).'<br />';
+            $log .= 'Data: '.Variable::print_array($data, 1).'<br />';
             $log .= '<br /><br />';
 
             // ==== Adding log ==== //
@@ -548,7 +549,7 @@ abstract class AbstractUserAuth
             {
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-                $log .= 'Data: '.SPL\Variable\Variable::print_array($data, 1).'<br />';
+                $log .= 'Data: '.Variable::print_array($data, 1).'<br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //
@@ -620,8 +621,8 @@ abstract class AbstractUserAuth
                             {
                                 $log = '<strong>Info:</strong><br />';
                                 $log .= 'Authentication falied.<br /><br />';
-                                $log .= '$_SESSION: '.SPL\Variable\Variable::print_array($_SESSION, 1).'<br />';
-                                $log .= '$_COOKIE: '.SPL\Variable\Variable::print_array($_COOKIE, 1).'<br />';
+                                $log .= '$_SESSION: '.Variable::print_array($_SESSION, 1).'<br />';
+                                $log .= '$_COOKIE: '.Variable::print_array($_COOKIE, 1).'<br />';
                                 $log .= '<br /><br />';
 
                                 // ==== Adding the error ==== //
@@ -712,7 +713,7 @@ abstract class AbstractUserAuth
             {
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Skipped database authentication<br /><br />';
-                $log .= 'User info: '.SPL\Variable\Variable::print_array($userinfo, 1).'<br />';
+                $log .= 'User info: '.Variable::print_array($userinfo, 1).'<br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //
