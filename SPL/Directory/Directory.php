@@ -8,7 +8,7 @@
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name Cut
+ * @name Directory
  * @version 1.0
  *
  */
