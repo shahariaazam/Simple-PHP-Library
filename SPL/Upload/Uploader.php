@@ -534,22 +534,26 @@ class Uploader
      */
     public function rollback()
     {
-        // Going through the filelist
-        foreach($this->file_list as $info)
+        // Checking if the simulation is active or not
+        if($this->options['simulate'] === false)
         {
-            // Checking if the file exists
-            if(is_file(unlink($info['filepath'])))
+            // Going through the filelist
+            foreach($this->file_list as $info)
             {
-                // Removing the file
-                $removed = unlink($info['filepath']);
-
-                // Checking if the file was not successfully removed
-                if($removed === false)
+                // Checking if the file exists
+                if(is_file(unlink($info['filepath'])))
                 {
-                    // ==== Adding log data ==== //
-                    if($this->options['debug'])
+                    // Removing the file
+                    $removed = unlink($info['filepath']);
+
+                    // Checking if the file was not successfully removed
+                    if($removed === false)
                     {
-                        $this->log .= '<strong>ERROR</strong> Could not remove the file with name <em>' . $info['filename'] . '</em> from path <em>' . $info['filepath'] . '</em>.';
+                        // ==== Adding log data ==== //
+                        if($this->options['debug'])
+                        {
+                            $this->log .= '<strong>ERROR</strong> Could not remove the file with name <em>' . $info['filename'] . '</em> from path <em>' . $info['filepath'] . '</em>.';
+                        }
                     }
                 }
             }
