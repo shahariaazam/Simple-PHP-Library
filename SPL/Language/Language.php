@@ -58,7 +58,7 @@ class Language
     /**
      * URL object
      *
-     * @var SPL\URL\URL
+     * @var \SPL\URL\URL
      */
     protected $url;
 

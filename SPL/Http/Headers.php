@@ -24,7 +24,7 @@ class Headers
      * @param string $url
      * @param boolean $assoc
      * @return array
-     * @throws SPL\Http\Exception\RuntimeException
+     * @throws \SPL\Http\Exception\RuntimeException
      */
     public static function getForUrl($url, $assoc = true)
     {

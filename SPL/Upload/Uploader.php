@@ -64,7 +64,7 @@ class Uploader
      *
      * @param array $options
      * @return void
-     * @throws SPL\Upload\Exception\RuntimeException
+     * @throws \SPL\Upload\Exception\RuntimeException
      */
     public function __construct(array $options = array())
     {
@@ -158,7 +158,7 @@ class Uploader
      *
      * @param array $options
      * @return void
-     * @throws SPL\Upload\Exception\InvalidArgumentException
+     * @throws \SPL\Upload\Exception\InvalidArgumentException
      */
     public function setOptions($options = array())
     {

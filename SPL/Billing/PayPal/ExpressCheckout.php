@@ -89,7 +89,7 @@ class ExpressCheckout extends PayPal
      * @param string $environment
      * @param string $platform
      * @return ExpressCheckout
-     * @throws SPL\Billing\Exception\InvalidArgumentException
+     * @throws \SPL\Billing\Exception\InvalidArgumentException
      */
     public function __construct(array $options, $environment = self::ENV_TESTING, $platform = self::PLATFORM_DESKTOP)
     {
@@ -327,7 +327,7 @@ class ExpressCheckout extends PayPal
      * @param string $returnUrl
      * @param string $cancelUrl
      * @return mixed Response object on success or false on fail
-     * @throws SPL\Billing\Exception\RuntimeException
+     * @throws \SPL\Billing\Exception\RuntimeException
      */
     public function SetExpressCheckout(Items\Items $items, $returnUrl, $cancelUrl)
     {
@@ -450,7 +450,7 @@ class ExpressCheckout extends PayPal
      *
      * @param void
      * @return mixed Response object on success or false on fail
-     * @throws SPL\Billing\Exception\RuntimeException
+     * @throws \SPL\Billing\Exception\RuntimeException
      */
     public function GetExpressCheckoutDetails()
     {
@@ -528,7 +528,7 @@ class ExpressCheckout extends PayPal
      *
      * @param Items\Items $items
      * @return mixed Response object on success or false on fail
-     * @throws SPL\Billing\Exception\RuntimeException
+     * @throws \SPL\Billing\Exception\RuntimeException
      */
     public function DoExpressCheckoutPayment(Items\Items $items)
     {
@@ -702,7 +702,7 @@ class ExpressCheckout extends PayPal
      *
      * @param array $response
      * @return boolean
-     * @throws SPL\Billing\Exception\InvalidArgumentException
+     * @throws \SPL\Billing\Exception\InvalidArgumentException
      */
     protected function checkResponse($response)
     {

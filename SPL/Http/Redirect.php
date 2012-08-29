@@ -39,7 +39,7 @@ class Redirect
      * @param string $url
      * @param array $options
      * @return void
-     * @throws SPL\Http\Exception\RuntimeException
+     * @throws \SPL\Http\Exception\RuntimeException
      */
     public static function http($url, $options = array())
     {
