@@ -365,7 +365,7 @@ abstract class AbstractUserAuth
         {
             $log = '<strong>Info:</strong><br />';
             $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-            $log .= 'Data: '.print_array($data, 1).'<br />';
+            $log .= 'Data: '.SPL\Variable\Variable::print_array($data, 1).'<br />';
             $log .= '<br /><br />';
 
             // ==== Adding log ==== //
@@ -548,7 +548,7 @@ abstract class AbstractUserAuth
             {
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-                $log .= 'Data: '.print_array($data, 1).'<br />';
+                $log .= 'Data: '.SPL\Variable\Variable::print_array($data, 1).'<br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //
@@ -620,8 +620,8 @@ abstract class AbstractUserAuth
                             {
                                 $log = '<strong>Info:</strong><br />';
                                 $log .= 'Authentication falied.<br /><br />';
-                                $log .= '$_SESSION: '.print_array($_SESSION, 1).'<br />';
-                                $log .= '$_COOKIE: '.print_array($_COOKIE, 1).'<br />';
+                                $log .= '$_SESSION: '.SPL\Variable\Variable::print_array($_SESSION, 1).'<br />';
+                                $log .= '$_COOKIE: '.SPL\Variable\Variable::print_array($_COOKIE, 1).'<br />';
                                 $log .= '<br /><br />';
 
                                 // ==== Adding the error ==== //
@@ -712,7 +712,7 @@ abstract class AbstractUserAuth
             {
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Skipped database authentication<br /><br />';
-                $log .= 'User info: '.print_array($userinfo, 1).'<br />';
+                $log .= 'User info: '.SPL\Variable\Variable::print_array($userinfo, 1).'<br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //
