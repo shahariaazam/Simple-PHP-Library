@@ -136,21 +136,6 @@ class Uploader
         {
             $this->options = array_merge($this->options, $options);
         }
-
-        // ==== Checking if the upload directory exists == we create it if not ==== //
-        if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true)
-        {
-            // Checking if we can create the directory
-            if(is_writeable($this->options['uploads_dir']))
-            {
-                // Creating the directory
-                mkdir($this->options['uploads_dir']);
-            }
-            else
-            {
-                throw new Exception\RuntimeException('The uploads directory must be writable.');
-            }
-        }
     }
 
     /**
@@ -464,6 +449,21 @@ class Uploader
         if($this->set_files === false)
         {
             $this->setFiles();
+        }
+
+        // ==== Checking if the upload directory exists == we create it if not ==== //
+        if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true)
+        {
+            // Checking if we can create the directory
+            if(is_writeable($this->options['uploads_dir']))
+            {
+                // Creating the directory
+                mkdir($this->options['uploads_dir']);
+            }
+            else
+            {
+                throw new Exception\RuntimeException('The uploads directory must be writable.');
+            }
         }
 
         // ==== The indexes variable can be either a string or array ==== //
