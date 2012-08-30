@@ -257,7 +257,7 @@ class Uploader
      * @param string $filename
      * @return boolean
      */
-    private static function isFileValid($filename)
+    protected static function isFileValid($filename)
     {
         if(trim($filename) == '.' || trim($filename) == '..')
         {
@@ -275,7 +275,7 @@ class Uploader
      * @param mixed $value
      * @return boolean
      */
-    public static function isEmpty($value)
+    protected static function isEmpty($value)
     {
         $result = false;
 
