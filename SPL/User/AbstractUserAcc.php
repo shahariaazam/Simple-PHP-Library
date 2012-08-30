@@ -91,13 +91,6 @@ abstract class AbstractUserAcc
     protected $log;
 
     /**
-     * Mail options
-     *
-     * @var array
-     */
-    protected $mopt;
-
-    /**
      * Database object
      *
      * @var db_module
@@ -146,12 +139,6 @@ abstract class AbstractUserAcc
         {
             $this->options = array_merge($this->options, $options);
         }
-
-        // ==== Setting up mail options ==== //
-        $this->mopt['to']        = $this->options['mail'];
-        $this->mopt['subject']   = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
-        $this->mopt['headers']   = 'MIME-Version: 1.0' . "\r\n";
-        $this->mopt['headers']  .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
         // ==== Getting default values ==== //
         $this->log = '';
@@ -493,13 +480,13 @@ abstract class AbstractUserAcc
      * @param array $data
      * @return mixed false on failure or an user_id on success
      */
-    public function doLogin(array $data)
+    public function checkLogin(array $data)
     {
         // ==== Checking the required fields ==== //
         $result = $this->allowLogin($data);
 
         // ==== Checking if the required fields are present ==== //
-        if($result == true)
+        if($result === true)
         {
             // ==== Getting the SQL ==== //
             $data = $this->prepareLogin($data);
@@ -532,7 +519,7 @@ abstract class AbstractUserAcc
                             $this->userinfo = $row;
 
                             // ==== Getting the account ID ==== //
-                            $result = &$row['user_id'];
+                            $result = $this->userinfo['user_id'];
                         }
                         else
                         {
@@ -590,7 +577,7 @@ abstract class AbstractUserAcc
      * @param integer $user_id
      * @return mixed false on failure or an array on success
      */
-    public function getUserInfo($user_id=0)
+    public function getUserInfo($user_id = 0)
     {
         // ==== Result var ==== //
         $result = false;
@@ -1009,8 +996,13 @@ abstract class AbstractUserAcc
             $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(Headers::request(), true).'<br /><br />';
             $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
 
+            // Mail options
+            $to      = $this->options['mail'];
+            $subject = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
+            $headers = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+
             // ==== Sending debug mail ==== //
-            mail($this->mopt['to'], $this->mopt['subject'], $this->log, $this->mopt['headers']);
+            mail($to, $subject, $this->log, $headers);
         }
     }
 }

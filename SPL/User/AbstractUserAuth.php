@@ -96,13 +96,6 @@ abstract class AbstractUserAuth
     protected $log;
 
     /**
-     * Mail options
-     *
-     * @var array
-     */
-    protected $mopt;
-
-    /**
      * Database object
      *
      * @var db_module
@@ -170,12 +163,6 @@ abstract class AbstractUserAuth
             $this->options = array_merge($this->options, $options);
         }
 
-        // ==== Setting up mail options ==== //
-        $this->mopt['to']        = $this->options['mail'];
-        $this->mopt['subject']   = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
-        $this->mopt['headers']   = 'MIME-Version: 1.0' . "\r\n";
-        $this->mopt['headers']  .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-
         // ==== Initializing default values ==== //
         $this->log = '';
 
@@ -198,40 +185,7 @@ abstract class AbstractUserAuth
         $this->doAuth();
     }
 
-    /**
-     * Retrieve the errors
-     *
-     * @param void
-     * @return array Empty array when no errors present or an array of error numbers
-     */
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    /**
-     * Retrieves the data from the session
-     *
-     * @param void
-     * @return void
-     */
-    protected function getSession()
-    {
-        $this->session = &$_SESSION;
-    }
-
-    /**
-     * Sets the data to the session
-     *
-     * @param void
-     * @return void
-     */
-    protected function setSession()
-    {
-        $_SESSION = array_merge($_SESSION, $this->session);
-    }
-
-    /**
+/**
      * Logs a message
      *
      * @param string $type
@@ -288,6 +242,63 @@ abstract class AbstractUserAuth
      }
 
     /**
+     * Retrieve the errors
+     *
+     * @param void
+     * @return array Empty array when no errors present or an array of error numbers
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Retrieves the data from the session
+     *
+     * @param void
+     * @return void
+     */
+    protected function getSession()
+    {
+        $this->session = &$_SESSION;
+    }
+
+    /**
+     * Sets the data to the session
+     *
+     * @param void
+     * @return void
+     */
+    protected function setSession()
+    {
+        $_SESSION = array_merge($_SESSION, $this->session);
+    }
+
+    /**
+     * Regenerates the session ID
+     *
+     * @param void
+     * @return void
+     */
+    protected function regenerateSession()
+    {
+        session_regenerate_id();
+    }
+
+    /**
+     * Destroys the session
+     *
+     * @param void
+     * @return void
+     */
+    protected function killSession()
+    {
+        // ==== Destroying the session ===== //
+        session_unset();
+        session_destroy();
+    }
+
+    /**
      * Generates an unredable cookie name
      *
      * @param void
@@ -318,7 +329,12 @@ abstract class AbstractUserAuth
      */
     protected function createCookie()
     {
-        setcookie($this->options['cookie_name'], $this->cookie, time()+$this->options['cookie_expire'], $this->options['cookie_path'], $this->options['cookie_domain']);
+        $expire = time() + $this->options['cookie_expire'];
+
+        // ==== Logging the expire time ==== //
+        $this->log_message('log', 'Cookie expire: ' . $expire . '<br /><br />', __METHOD__);
+
+        setcookie($this->options['cookie_name'], $this->cookie, $expire, $this->options['cookie_path'], $this->options['cookie_domain']);
     }
 
     /**
@@ -329,17 +345,13 @@ abstract class AbstractUserAuth
      */
     protected function deleteCookie()
     {
-        setcookie($this->options['cookie_name'], $this->cookie, time()-$this->options['cookie_expire'], $this->options['cookie_path'], $this->options['cookie_domain']);
-    }
+        $expire = time() - $this->options['cookie_expire'];
 
-    /**
-     * Login SQL
-     *
-     * @param $user_id
-     * @param array $data
-     * @return string
-     */
-    protected abstract function sqlLogin($user_id, array $data);
+        // ==== Logging the expire time ==== //
+        $this->log_message('log', 'Cookie expire: ' . $expire . '<br /><br />', __METHOD__);
+
+        setcookie($this->options['cookie_name'], $this->cookie, $expire, $this->options['cookie_path'], $this->options['cookie_domain']);
+    }
 
     /**
      * Prepares the login data
@@ -378,6 +390,15 @@ abstract class AbstractUserAuth
     }
 
     /**
+     * Login SQL
+     *
+     * @param number $user_id
+     * @param array $data
+     * @return string
+     */
+    protected abstract function sqlLogin($user_id, array $data);
+
+    /**
      * Does the user loginprocess
      *
      * @param array $data
@@ -387,13 +408,13 @@ abstract class AbstractUserAuth
     public function doLogin(array $data, $remember = false)
     {
         // ==== Default result ==== //
-        $result = false;
+        $result = true;
 
         // ==== Checking if the user is not already authenticated ==== //
         if(!$this->authenticated)
         {
             // ==== Doing the login via the UserAcc object ==== //
-            $user_id = $this->userAcc->doLogin($data);
+            $user_id = $this->userAcc->checkLogin($data);
 
             // ==== Checking if the login went OK ==== //
             if($user_id !== false)
@@ -429,12 +450,12 @@ abstract class AbstractUserAuth
                             $this->createCookie();
 
                             // ==== Authenticating ==== //
-                            $success = $this->doAuth($user_id, false);
+                            $success = $this->doAuth($user_id, true);
 
                             // ==== Checking if the authentication went ok ==== //
-                            if($success == true)
+                            if($success === false)
                             {
-                                $result = true;
+                                $result = false;
                             }
                         }
                         else
@@ -455,12 +476,12 @@ abstract class AbstractUserAuth
                     // NON-PERSISTENT LOGIN
                     ///////////////////////////////////////////////////////////////
                     // ==== Authenticating ==== //
-                    $success = $this->doAuth($user_id, false);
+                    $success = $this->doAuth($user_id, true);
 
                     // ==== Checking if the authentication went ok ==== //
-                    if($success == true)
+                    if($success === false)
                     {
-                        $result = true;
+                        $result = false;
                     }
                 }
             }
@@ -482,8 +503,6 @@ abstract class AbstractUserAuth
         }
         else
         {
-            $result = true;
-
             // ==== Adding log data ==== //
             if($this->options['debug'])
             {
@@ -527,22 +546,13 @@ abstract class AbstractUserAuth
             $data['ip_addr'] = $_SERVER['REMOTE_ADDR'];
 
             // ==== Getting the cookie ==== //
-            $data['cookie']  = $_COOKIE[$this->options['cookie_name']];
+            $data['cookie']  = $this->db->escape_string($_COOKIE[$this->options['cookie_name']]);
 
             // ==== Getting all the headers ==== //
             $headers = Headers::request();
 
             // ==== Getting the headers ==== //
             $data['headers'] = base64_encode(serialize($headers['HTTP_USER_AGENT']));
-
-            //////////////////////////////////////////////////
-            // BEGIN INPUT SANITIZATION
-            /////////////////////////////////////////////////
-            // == cookie == //
-            $data['cookie'] = $this->db->escape_string($data['cookie']);
-            //////////////////////////////////////////////////
-            // END INPUT SANITIZATION
-            /////////////////////////////////////////////////
 
             // ==== Adding log data ==== //
             if($this->options['debug'])
@@ -573,95 +583,109 @@ abstract class AbstractUserAuth
     }
 
     /**
+     * Checks if the user is authenticated
+     *
+     * @param void
+     * @return mixed False on failure or the user ID on success
+     */
+    protected function checkAuth()
+    {
+        // ==== Check var ==== //
+        $user_id = false;
+
+        // ==== Preparing the auth data ==== //
+        $data = $this->prepareAuth();
+
+        // ==== Checking the data ==== //
+        if($data != false)
+        {
+            // ===== Getting the SQL ==== //
+            $sql = $this->sqlAuth($data);
+
+            // ==== Checking the SQL ==== //
+            if($sql != '')
+            {
+                // ==== Executing the SQL ==== //
+                $this->db->query($sql);
+
+                // ==== Getting the SQL error ==== //
+                $sql_error = $this->db->error();
+
+                // ==== Checking if something found ==== //
+                if($sql_error != '' || $this->db->num_rows() != 1)
+                {
+                    // ==== Adding log data ==== //
+                    if($this->options['debug'])
+                    {
+                        $log = '<strong>Info:</strong><br />';
+                        $log .= 'Authentication falied.<br /><br />';
+                        $log .= '$this->session: '.Variable::print_array($this->session, 1).'<br />';
+                        $log .= '$_COOKIE: '.Variable::print_array($_COOKIE, 1).'<br />';
+                        $log .= '<br /><br />';
+
+                        // ==== Adding the error ==== //
+                        $this->log_message('log', $log, __METHOD__);
+                    }
+                }
+                else
+                {
+                    // ==== Getting the row info ==== //
+                    $row = $this->db->fetch_assoc();
+
+                    // ==== Getting the account ID ==== //
+                    $user_id = &$row['user_id'];
+
+                    // ==== Adding log data ==== //
+                    if($this->options['debug'])
+                    {
+                        $log = '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
+
+                        // ==== Adding the error ==== //
+                        $this->log_message('log', $log, __METHOD__);
+                    }
+                }
+            }
+        }
+
+        // ==== Result ==== //
+        return $user_id;
+    }
+
+    /**
      * Authenticates the user
      *
      * @param integer $user_id
-     * @param boolean $via_db
+     * @param boolean $bypass_db
      * @return boolean
      */
-    public function doAuth($user_id = 0, $via_db = true)
+    protected function doAuth($user_id = 0, $bypass_db = false)
     {
         // ==== Check variable ==== //
-        $isOk = true;
+        $success = true;
 
         // ==== Skipping if already authenticated ==== //
-        if($user_id > 0
-                || (isset($this->session['auth']) && $this->session['auth'] != true && !empty($_COOKIE[$this->options['cookie_name']]))
-                || (!isset($this->session['auth']) && !empty($_COOKIE[$this->options['cookie_name']]))
+        if($user_id > 0 // provided by doLogin
+                || (isset($this->session['auth'])
+                        && $this->session['auth'] !== true
+                        && !empty($_COOKIE[$this->options['cookie_name']])
+                        )
+                || (!isset($this->session['auth'])
+                        && !empty($_COOKIE[$this->options['cookie_name']])
+                        )
           )
         {
             //////////////////////////////////////////////////////////
             // BEGIN DB CHECK ONLY WHEN AUTHENTICATING VIA COOKIE
             /////////////////////////////////////////////////////////
-            if($via_db === true)
+            if($bypass_db === false)
             {
-                // ==== Preparing the auth data ==== //
-                $data = $this->prepareAuth();
+                // ==== Checking if authenticated ==== //
+                $user_id = $this->checkAuth();
 
-                // ==== Checking the data ==== //
-                if($data != false)
+                // ==== Checking if the user_id was retrieved ==== //
+                if($user_id === false)
                 {
-                    // ===== Getting the SQL ==== //
-                    $sql = $this->sqlAuth($data);
-
-                    // ==== Checking the SQL ==== //
-                    if($sql != '')
-                    {
-                        // ==== Executing the SQL ==== //
-                        $this->db->query($sql);
-
-                        // ==== Getting the SQL error ==== //
-                        $sql_error = $this->db->error();
-
-                        // ==== Checking if something found ==== //
-                        if($sql_error != '' || $this->db->num_rows() != 1)
-                        {
-                            // ==== Adding log data ==== //
-                            if($this->options['debug'])
-                            {
-                                $log = '<strong>Info:</strong><br />';
-                                $log .= 'Authentication falied.<br /><br />';
-                                $log .= '$_SESSION: '.Variable::print_array($_SESSION, 1).'<br />';
-                                $log .= '$_COOKIE: '.Variable::print_array($_COOKIE, 1).'<br />';
-                                $log .= '<br /><br />';
-
-                                // ==== Adding the error ==== //
-                                $this->log_message('log', $log, __METHOD__);
-                            }
-
-                            // ==== Removing the cookie ==== //
-                            $this->deleteCookie();
-
-
-                            // No error handling
-                            $isOk = false;
-                        }
-                        else
-                        {
-                            // ==== Getting the row info ==== //
-                            $row = $this->db->fetch_assoc();
-
-                            // ==== Getting the account ID ==== //
-                            $user_id = &$row['user_id'];
-
-                            // ==== Adding log data ==== //
-                            if($this->options['debug'])
-                            {
-                                $log = '<strong>Info:</strong> Authenticated user successfully.<br /><br />';
-
-                                // ==== Adding the error ==== //
-                                $this->log_message('log', $log, __METHOD__);
-                            }
-                        }
-                    }
-                    else // Error handling in sqlAuth
-                    {
-                        $isOk = false;
-                    }
-                }
-                else // Error handling in prepareAuth
-                {
-                    $isOk = false;
+                    $success = false;
                 }
             }
             else
@@ -680,13 +704,13 @@ abstract class AbstractUserAuth
             /////////////////////////////////////////////////////////
 
             // ==== Checking if the authentication process went OK ==== //
-            if($isOk == true)
+            if($success == true)
             {
                 // ==== Getting the userinfo ==== //
                 $userinfo = $this->userAcc->getUserInfo($user_id);
 
                 // ==== Regenerating the session ==== //
-                session_regenerate_id();
+                $this->regenerateSession();
 
                 // ==== Setting the authentication flag ==== //
                 $this->session['auth'] = true;
@@ -700,7 +724,8 @@ abstract class AbstractUserAuth
                 $this->session['auth'] = false;
             }
         }
-        elseif(isset($this->session['auth']) && $this->session['auth'] == true)
+        // Authenticated
+        else if(isset($this->session['auth']) && $this->session['auth'] == true)
         {
             // ==== Getting the userinfo from the session ==== //
             $userinfo = unserialize($this->vault->decrypt($this->session['userinfo']));
@@ -720,6 +745,7 @@ abstract class AbstractUserAuth
                 $this->log_message('log', $log, __METHOD__);
             }
         }
+        // Fail safe
         else
         {
             // ==== Adding log data ==== //
@@ -741,14 +767,14 @@ abstract class AbstractUserAuth
         }
         else
         {
-            $isOk = false;
+            $success = false;
         }
 
         // ==== Saving the session info ==== //
         $this->setSession();
 
         // ===== Result ==== //
-        return $isOk;
+        return $success;
     }
 
     /**
@@ -790,7 +816,7 @@ abstract class AbstractUserAuth
     public function doLogout()
     {
         // ==== Deleting the cookie ==== //
-        setcookie($this->options['cookie_name'], '', -10);
+        $this->deleteCookie();
 
         // ==== Preparing the data ==== //
         $data = $this->prepareAuth();
@@ -805,9 +831,8 @@ abstract class AbstractUserAuth
             $this->db->query($sql);
         }
 
-        // ==== Destroying the session ===== //
-        session_unset();
-        session_destroy();
+        // Killing the session
+        $this->killSession();
     }
 
     /**
@@ -832,8 +857,13 @@ abstract class AbstractUserAuth
             $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(Headers::request(), true).'<br /><br />';
             $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
 
+            // Mail options
+            $to      = $this->options['mail'];
+            $subject = '[DEBUG] ' . __CLASS__ . ' Class ' . $this->options['unique_mail'];
+            $headers = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+
             // ==== Sending debug mail ==== //
-            mail($this->mopt['to'], $this->mopt['subject'], $this->log, $this->mopt['headers']);
+            mail($to, $subject, $this->log, $headers);
         }
     }
 }
