@@ -88,10 +88,8 @@ abstract class Database
         {
             return self::$instance;
         }
-        else
-        {
-            return $error_code;
-        }
+
+        return $error_code;
     }
 
     /**
@@ -106,10 +104,8 @@ abstract class Database
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
 }

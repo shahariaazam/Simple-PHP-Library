@@ -105,55 +105,49 @@ class Paging
             // ==== Returning result ==== //
             return false;
         }
-        else
+
+        // ==== Is this a complex search ==== //
+        if(!$complex)
         {
-            // ==== Is this a complex search ==== //
-            if(!$complex)
-            {
-                $this->rows = $db->num_rows();
+				 $this->rows = $db->num_rows();
 
-                // ==== Getting offset ==== //
-                $offset = $this->getOffset();
+				 // ==== Getting offset ==== //
+				 $offset = $this->getOffset();
 
-                // ==== Bulding query with LIMIT statement ==== //
-                $query .= " LIMIT ".$offset.", ".$this->options['ipp']."";
+				 // ==== Bulding query with LIMIT statement ==== //
+				 $query .= " LIMIT ".$offset.", ".$this->options['ipp']."";
 
-                // ==== Executing query ==== //
-                $db->query($query);
+				 // ==== Executing query ==== //
+				 $db->query($query);
 
-                // ==== Returning result ==== //
-                return true;
-            }
-            else
-            {
-                // ==== Array which will store the data ==== //
-                $data = array();
-
-                // ==== Getting data ==== //
-                if($db->numrows() != 0)
-                {
-                    // == Adding data from query to the data array == //
-                    while($data[] = $db->fetch_assoc());
-
-                    // == Getting number of rows == //
-                    $this->rows = $db->num_rows();
-
-                    // ==== Getting offset ==== //
-                    $offset = $this->getOffset();
-
-                    // ==== Slicing the $data array ==== //
-                    $data = array_slice($data, $offset, $this->options['ipp']);
-
-                    // == Returning result == //
-                    return $data;
-                }
-                else
-                {
-                    // ==== Returning result ==== //
-                    return 0;
-                }
-            }
+				 // ==== Returning result ==== //
+				 return true;
         }
+
+        // ==== Array which will store the data ==== //
+        $data = array();
+
+        // ==== Getting data ==== //
+        if($db->numrows() != 0)
+        {
+				  // == Adding data from query to the data array == //
+				  while($data[] = $db->fetch_assoc());
+
+				  // == Getting number of rows == //
+				  $this->rows = $db->num_rows();
+
+				  // ==== Getting offset ==== //
+				  $offset = $this->getOffset();
+
+				  // ==== Slicing the $data array ==== //
+				  $data = array_slice($data, $offset, $this->options['ipp']);
+
+				  // == Returning result == //
+				  return $data;
+        }
+
+        // ==== Returning result ==== //
+        return 0;
     }
 
     /**

@@ -173,10 +173,8 @@ class Benchmark
         {
             return $results;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /**
@@ -210,7 +208,7 @@ class Benchmark
                 $file = $backtrace[0]['file'];
 
                 // ==== Adding debug data ==== //
-                $this->log .= '<b>Notice:</b> You tried to start a benchmark with an existing ID (' . $id . ') at line ' . $line . ' in file ' . $file . '<br /><br />';
+                $this->log .= "<b>Notice:</b> You tried to start a benchmark with an existing ID ({$id}) at line {$line} in file {$file}<br /><br />";
             }
         }
     }
@@ -255,7 +253,7 @@ class Benchmark
                 $file = $backtrace[0]['file'];
 
                 // ==== Adding debug data ==== //
-                $this->log .= '<b>Notice:</b> You tried to stop a benchmark with an nonexistent ID (' . $id . ') at line ' . $line . ' in file ' . $file . '<br /><br />';
+                $this->log .= "<b>Notice:</b> You tried to stop a benchmark with an nonexistent ID ({$id}) at line {$line} in file {$file}<br /><br />";
             }
         }
     }
