@@ -64,7 +64,6 @@ class Uploader
      *
      * @param array $options
      * @return void
-     * @throws \SPL\Upload\Exception\RuntimeException
      */
     public function __construct(array $options = array())
     {
@@ -439,6 +438,7 @@ class Uploader
      *
      * @param mixed Array or string $indexes
      * @return boolean
+     * @throws \SPL\Upload\Exception\RuntimeException
      */
     public function upload($index)
     {
