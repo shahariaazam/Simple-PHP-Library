@@ -455,7 +455,7 @@ class Uploader
         if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true)
         {
             // Checking if we can create the directory
-            if(is_writeable($this->options['uploads_dir']))
+            if(is_writable($this->options['uploads_dir']))
             {
                 // Creating the directory
                 mkdir($this->options['uploads_dir']);
