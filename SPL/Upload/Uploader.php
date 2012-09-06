@@ -570,7 +570,7 @@ class Uploader
     public function __destruct()
     {
         // ==== Sending debug if on ==== //
-        if($this->options['debug'])
+        if($this->options['debug'] && ($this->log !== '' || count($this->file_list) > 0 || count($this->errors) > 0))
         {
             // Adding more stuff to the log
             $this->log .= '<strong>' . __METHOD__ . '</strong><br /><br />';
