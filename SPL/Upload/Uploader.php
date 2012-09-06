@@ -64,7 +64,6 @@ class Uploader
      *
      * @param array $options
      * @return void
-     * @throws \SPL\Upload\Exception\RuntimeException
      */
     public function __construct(array $options = array())
     {
@@ -439,6 +438,7 @@ class Uploader
      *
      * @param mixed Array or string $indexes
      * @return boolean
+     * @throws \SPL\Upload\Exception\RuntimeException
      */
     public function upload($index)
     {
@@ -452,16 +452,17 @@ class Uploader
         }
 
         // ==== Checking if the upload directory exists == we create it if not ==== //
-        if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true)
+        if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true && $this->options['simulate'] === false)
         {
             // Checking if we can create the directory
-            if(is_writeable($this->options['uploads_dir']))
+            if(mkdir($this->options['uploads_dir'], 0777, true) === false)
             {
-                // Creating the directory
-                mkdir($this->options['uploads_dir']);
-            }
-            else
-            {
+                // ==== Adding log data ==== //
+                if($this->options['debug'])
+                {
+                    $this->log .= "<strong>ERROR:</strong> The folder {$this->options['uploads_dir']} is not writable.<br /><br />";
+                }
+
                 throw new Exception\RuntimeException('The uploads directory must be writable.');
             }
         }
@@ -569,7 +570,7 @@ class Uploader
     public function __destruct()
     {
         // ==== Sending debug if on ==== //
-        if($this->options['debug'])
+        if($this->options['debug'] && ($this->log !== '' || count($this->file_list) > 0 || count($this->errors) > 0))
         {
             // Adding more stuff to the log
             $this->log .= '<strong>' . __METHOD__ . '</strong><br /><br />';
