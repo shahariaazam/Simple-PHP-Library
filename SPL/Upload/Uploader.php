@@ -462,6 +462,12 @@ class Uploader
             }
             else
             {
+                // ==== Adding log data ==== //
+                if($this->options['debug'])
+                {
+                    $this->log .= "<strong>ERROR:</strong> The folder {$this->options['uploads_dir']} is not writable.<br /><br />";
+                }
+
                 throw new Exception\RuntimeException('The uploads directory must be writable.');
             }
         }
