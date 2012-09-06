@@ -455,12 +455,7 @@ class Uploader
         if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true)
         {
             // Checking if we can create the directory
-            if(is_writable($this->options['uploads_dir']))
-            {
-                // Creating the directory
-                mkdir($this->options['uploads_dir']);
-            }
-            else
+            if(mkdir($this->options['uploads_dir'], 0777, true) === false)
             {
                 // ==== Adding log data ==== //
                 if($this->options['debug'])
@@ -468,7 +463,7 @@ class Uploader
                     $this->log .= "<strong>ERROR:</strong> The folder {$this->options['uploads_dir']} is not writable.<br /><br />";
                 }
 
-                throw new Exception\RuntimeException('The uploads directory must be writable.');
+                throw new RuntimeException('The uploads directory must be writable.');
             }
         }
 
