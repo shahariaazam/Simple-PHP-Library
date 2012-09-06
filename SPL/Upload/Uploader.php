@@ -452,7 +452,7 @@ class Uploader
         }
 
         // ==== Checking if the upload directory exists == we create it if not ==== //
-        if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true)
+        if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true && $this->options['simulate'] === false)
         {
             // Checking if we can create the directory
             if(mkdir($this->options['uploads_dir'], 0777, true) === false)
