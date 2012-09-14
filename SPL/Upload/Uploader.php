@@ -414,6 +414,7 @@ class Uploader
                     $this->file_list[$filename] = array(
                         'filename' => $filename,
                         'filepath' => $this->options['uploads_dir'] . $filename,
+                        'filetmp'  => $source
                     );
                 }
                 else
