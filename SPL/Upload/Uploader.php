@@ -243,7 +243,7 @@ class Uploader
      */
     protected static function isFileValid($filename)
     {
-        if(trim($filename) == '.' || trim($filename) == '..')
+        if($filename === null || trim($filename) == '.' || trim($filename) == '..')
         {
             return false;
         }
@@ -282,13 +282,19 @@ class Uploader
      * @param string $file
      * @return boolean
      */
-    private function isExtensionAllowed($file)
+    protected function isExtensionAllowed($file)
     {
         // ==== Result ==== //
         $result = true;
 
+        // Default filename
+        $filename = null;
+
         // ==== Getting the files filename ==== //
-        $filename = basename($file);
+        if(is_string($file))
+        {
+            $filename = basename($file);
+        }
 
         // ==== Checking if the filename if valid ==== //
         if(self::isFileValid($filename))
@@ -334,7 +340,7 @@ class Uploader
      * @param string $index
      * @return boolean
      */
-    private function process($index)
+    protected function process($index)
     {
         // ==== Check variable ==== //
         $isOk = true;
@@ -405,7 +411,7 @@ class Uploader
                 if($moved === true)
                 {
                     // ==== Adding the file (with path) to the files array ==== //
-                    $this->file_list[] = array(
+                    $this->file_list[$filename] = array(
                         'filename' => $filename,
                         'filepath' => $this->options['uploads_dir'] . $filename,
                     );
