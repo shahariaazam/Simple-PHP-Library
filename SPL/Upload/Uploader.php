@@ -80,30 +80,30 @@ class Uploader
         $this->options['extension']      = 'keys'; // Available values: keys, values
         $this->options['extensions']     = array(
             //Office
-            "doc"  => "Microsoft Word 2003 Document",
-            "docx" => "Microsoft Word 2007 Document",
-            "xls"  => "Microsoft Excel 2003 Workbook",
-            "xlsx" => "Microsoft Excel 2007 Workbook",
+            "doc"   => "Microsoft Word 2003 Document",
+            "docx"  => "Microsoft Word 2007 Document",
+            "xls"   => "Microsoft Excel 2003 Workbook",
+            "xlsx"  => "Microsoft Excel 2007 Workbook",
             // Database
-            "db"  => "Database File",
-            "dbf" => "FoxPro Database File",
+            "db"    => "Database File",
+            "dbf"   => "FoxPro Database File",
             // text
-            "txt" => "Text File",
-            "rtf" => "Rich Text Format",
-            "ini" => "Ini file",
+            "txt"   => "Text File",
+            "rtf"   => "Rich Text Format",
+            "ini"   => "Ini file",
             // C++
-            "cpps" => "C++ Source File",
-            "cpph" => "C++ Header File",
+            "cpps"  => "C++ Source File",
+            "cpph"  => "C++ Header File",
             // Java
             "javas" => "Java Source File",
             "javac" => "Java Class File",
             // Pascal
-            "pas" => "Pascal File",
+            "pas"   => "Pascal File",
             // images
-            "gif" => "GIF Picture",
-            "jpg" => "JPG Picture",
-            "bmp" => "BMP Picture",
-            "png" => "PNG Picture",
+            "gif"   => "GIF Picture",
+            "jpg"   => "JPG Picture",
+            "bmp"   => "BMP Picture",
+            "png"   => "PNG Picture",
             // compressed
             "zip"   => "ZIP Archive",
             "tar"   => "TAR Archive",
@@ -111,13 +111,13 @@ class Uploader
             "bzip2" => "BZIP2 Archive",
             "rar"   => "RAR Archive",
             // music
-            "mp3"  => "MP3 Audio File",
-            "wav"  => "WAV Audio File",
-            "midi" => "MIDI Audio File",
-            "real" => "RealAudio File",
-            "mp4"  => "Music/Video File (.mp4)",
-            "pls"  => ".pls Playlist",
-            "m3u"  => ".m3u Playlist",
+            "mp3"   => "MP3 Audio File",
+            "wav"   => "WAV Audio File",
+            "midi"  => "MIDI Audio File",
+            "real"  => "RealAudio File",
+            "mp4"   => "Music/Video File (.mp4)",
+            "pls"   => ".pls Playlist",
+            "m3u"   => ".m3u Playlist",
             // movie
             "mpg"   => "MPG Video File",
             "mov"   => "Movie File",
@@ -125,9 +125,9 @@ class Uploader
             "flash" => "Flash Movie File",
             "mkv"   => "Movie File (.mkv)",
             // Micosoft / Adobe
-            "pdf" => "PDF File",
+            "pdf"   => "PDF File",
             //Disc Image
-            "iso" => "Disc Image (.iso)"
+            "iso"   => "Disc Image (.iso)"
         );
 
         // ==== Replacing the internal values with the external ones ==== //
@@ -243,7 +243,7 @@ class Uploader
      */
     protected static function isFileValid($filename)
     {
-        if(trim($filename) == '.' || trim($filename) == '..')
+        if($filename === null || trim($filename) == '.' || trim($filename) == '..')
         {
             return false;
         }
@@ -282,13 +282,19 @@ class Uploader
      * @param string $file
      * @return boolean
      */
-    private function isExtensionAllowed($file)
+    protected function isExtensionAllowed($file)
     {
         // ==== Result ==== //
         $result = true;
 
+        // Default filename
+        $filename = null;
+
         // ==== Getting the files filename ==== //
-        $filename = basename($file);
+        if(is_string($file))
+        {
+            $filename = basename($file);
+        }
 
         // ==== Checking if the filename if valid ==== //
         if(self::isFileValid($filename))
@@ -334,7 +340,7 @@ class Uploader
      * @param string $index
      * @return boolean
      */
-    private function process($index)
+    protected function process($index)
     {
         // ==== Check variable ==== //
         $isOk = true;
@@ -405,9 +411,10 @@ class Uploader
                 if($moved === true)
                 {
                     // ==== Adding the file (with path) to the files array ==== //
-                    $this->file_list[] = array(
+                    $this->file_list[$filename] = array(
                         'filename' => $filename,
                         'filepath' => $this->options['uploads_dir'] . $filename,
+                        'filetmp'  => $source
                     );
                 }
                 else
