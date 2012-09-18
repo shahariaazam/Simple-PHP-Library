@@ -127,20 +127,20 @@ class Vault
     private function generate()
     {
         // ==== Opening encryption module ==== //
-        $td = mcrypt_module_open($this->options['algo'], '', $this->options['mode'], '');
+        $td = \mcrypt_module_open($this->options['algo'], '', $this->options['mode'], '');
 
         /////////////////////////////////////////////////////////////////////////////////////
         // IV
         ///////////////////////////////////////////////////////////////////////////////////
         // ==== Generating the IV ==== //
-        $iv = mcrypt_createiv(mcrypt_enc_get_iv_size($td), MCRYPT_DEV_RANDOM);
+        $iv = \mcrypt_createiv(mcrypt_enc_get_iv_size($td), MCRYPT_DEV_RANDOM);
 
 
         /////////////////////////////////////////////////////////////////////////////////////
         // KEY
         ///////////////////////////////////////////////////////////////////////////////////
         // ==== Getting key length ==== //
-        $key_len = mcrypt_enc_get_key_size($td);
+        $key_len = \mcrypt_enc_get_key_size($td);
 
         // ==== Characters ==== //
         $chars = str_split('01$%234{}-56789qwe&*rtyu=_+~!@#iop[]asd:"|fg|(hjkl;\zxc|^vbnm,./?><:")');
@@ -156,7 +156,7 @@ class Vault
         }
 
         // ==== Closing the encryption module ==== //
-        mcrypt_module_close($td);
+        \mcrypt_module_close($td);
 
         // ==== Result ==== //
         $this->config_data = array('iv' => $iv, 'key' => $key);
@@ -268,22 +268,22 @@ class Vault
     private function initialize()
     {
         // ==== Opening encryption module ==== //
-        $this->td = mcrypt_module_open($this->options['algo'], '', $this->options['mode'], '');
+        $this->td = \mcrypt_module_open($this->options['algo'], '', $this->options['mode'], '');
 
         // ==== Getting initialization vector size ==== //
-        $iv_size = mcrypt_enc_get_iv_size($this->td);
+        $iv_size = \mcrypt_enc_get_iv_size($this->td);
 
         // ==== Creating initialization vector from random string ==== //
         $this->iv = substr($this->iv, 0, $iv_size);
 
         // ==== Getting key size ==== //
-        $key_size = mcrypt_enc_get_key_size($this->td);
+        $key_size = \mcrypt_enc_get_key_size($this->td);
 
         // ==== Generating random key ==== //
         $this->key = substr($this->key, 0, $key_size);
 
         // ==== Initializing all buffers needed for encryption/decryption ==== //
-        mcrypt_generic_init($this->td, $this->key, $this->iv);
+        \mcrypt_generic_init($this->td, $this->key, $this->iv);
     }
 
     /**
@@ -295,10 +295,10 @@ class Vault
     private function terminate()
     {
         // ==== Closing encryption handle ==== //
-        @mcrypt_generic_deinit($this->td);
+        @\mcrypt_generic_deinit($this->td);
 
         // ==== Closing encryption module ==== //
-        @mcrypt_module_close($this->td);
+        @\mcrypt_module_close($this->td);
     }
 
     /**
@@ -316,7 +316,7 @@ class Vault
             $this->initialize();
 
             // ==== Encrypting ==== //
-            $vault_layer     = mcrypt_generic($this->td, $data);
+            $vault_layer     = \mcrypt_generic($this->td, $data);
             $base64_layer    = base64_encode($vault_layer);
             $encrypted       = &$base64_layer;
 
@@ -346,7 +346,7 @@ class Vault
 
             // ==== Decrypting ==== //
             $base64_layer   = base64_decode($data);
-            $vault_layer    = mdecrypt_generic($this->td, $base64_layer);
+            $vault_layer    = \mdecrypt_generic($this->td, $base64_layer);
             $decrypted      = &$vault_layer;
 
             // ==== Terminating ==== //
