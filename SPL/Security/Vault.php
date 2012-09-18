@@ -93,6 +93,7 @@ class Vault
         $this->options['key']    = '';
         $this->options['layers'] = 1; // Encryption layers
         $this->options['shift']  = 4; // It's a shift multiplier for generating multilayer keys. Suggested value range: 2-8 and even numbers
+
         // ==== Overwriting default options ==== //
         if(count($options) > 0)
         {
@@ -112,9 +113,6 @@ class Vault
         {
             // ==== Triggering the config mode ==== //
             $this->config_mode = true;
-
-            // ==== Generating the config data ==== //
-            $this->generate();
         }
     }
 
@@ -125,7 +123,7 @@ class Vault
      * @param void
      * @return array
      */
-    private function generate()
+    public function generate()
     {
         // ==== Opening encryption module ==== //
         $td = mcrypt_module_open($this->options['algo'], '', $this->options['mode'], '');
