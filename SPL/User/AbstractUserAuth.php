@@ -165,7 +165,7 @@ abstract class AbstractUserAuth
         $this->options['cookie_domain']   = '';
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(count($options) > 0)
+        if(is_array($options) && count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }
