@@ -228,7 +228,14 @@ abstract class AbstractUserAuth
      */
     protected function setSession()
     {
-        $_SESSION = array_merge($_SESSION, $this->session);
+        if(is_array($_SESSION))
+        {
+            $_SESSION = array_merge($_SESSION, $this->session);
+        }
+        else
+        {
+            $_SESSION = $this->session;
+        }
     }
 
     /**
