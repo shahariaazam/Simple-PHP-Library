@@ -133,7 +133,7 @@ class Vault
         // IV
         ///////////////////////////////////////////////////////////////////////////////////
         // ==== Generating the IV ==== //
-        $iv = \mcrypt_createiv(mcrypt_enc_get_iv_size($td), MCRYPT_DEV_RANDOM);
+        $iv = \mcrypt_create_iv(\mcrypt_enc_get_iv_size($td), MCRYPT_DEV_RANDOM);
 
 
         /////////////////////////////////////////////////////////////////////////////////////
