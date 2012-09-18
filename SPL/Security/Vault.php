@@ -161,7 +161,6 @@ class Vault
 
         // ==== Result ==== //
         $this->config_data = array('iv'  => $iv, 'key' => $key);
-        print_r($this->config_data);
     }
 
     /**
