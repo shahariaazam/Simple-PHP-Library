@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * The Vault uses the MCRYPT_RIJNDAEL_256 encryption algorithm and the CBC block cipher mode.
@@ -17,6 +18,7 @@ namespace SPL\Security;
 
 class Vault
 {
+
     /**
      * Options array
      *
@@ -84,13 +86,13 @@ class Vault
     public function __construct(array $options = array())
     {
         // ==== Rewriting default values for variables in case they are set ==== //
-        $this->options['debug']         = false;
-        $this->options['algo']          = MCRYPT_RIJNDAEL_256;
-        $this->options['mode']          = MCRYPT_MODE_CBC;
-        $this->options['iv']            = '';
-        $this->options['key']           = '';
-        $this->options['layers']        = 1; // Encryption layers
-        $this->options['shift']         = 4; // It's a shift multiplier for generating multilayer keys. Suggested value range: 2-8 and even numbers
+        $this->options['debug']  = false;
+        $this->options['algo']   = MCRYPT_RIJNDAEL_256;
+        $this->options['mode']   = MCRYPT_MODE_CBC;
+        $this->options['iv']     = '';
+        $this->options['key']    = '';
+        $this->options['layers'] = 1; // Encryption layers
+        $this->options['shift']  = 4; // It's a shift multiplier for generating multilayer keys. Suggested value range: 2-8 and even numbers
 
         // ==== Overwriting default options ==== //
         if(count($options) > 0)
@@ -111,9 +113,6 @@ class Vault
         {
             // ==== Triggering the config mode ==== //
             $this->config_mode = true;
-
-            // ==== Generating the config data ==== //
-            $this->generate();
         }
     }
 
@@ -124,7 +123,7 @@ class Vault
      * @param void
      * @return array
      */
-    private function generate()
+    public function generate()
     {
         // ==== Opening encryption module ==== //
         $td = mcrypt_module_open($this->options['algo'], '', $this->options['mode'], '');
@@ -133,7 +132,7 @@ class Vault
         // IV
         ///////////////////////////////////////////////////////////////////////////////////
         // ==== Generating the IV ==== //
-        $iv = mcrypt_createiv(mcrypt_enc_get_iv_size($td), MCRYPT_DEV_RANDOM);
+        $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_DEV_RANDOM);
 
 
         /////////////////////////////////////////////////////////////////////////////////////
@@ -143,7 +142,7 @@ class Vault
         $key_len = mcrypt_enc_get_key_size($td);
 
         // ==== Characters ==== //
-        $chars = str_split('01$%234{}-56789qwe&*rtyu=_+~!@#iop[]asd:"|fg|(hjkl;\zxc|^vbnm,./?><:")');
+        $chars     = str_split('01$%234{}-56789qwe&*rtyu=_+~!@#iop[]asd:"|fg|(hjkl;\zxc|^vbnm,./?><:")');
         $chars_len = count($chars);
 
         // ==== Key ==== //
@@ -152,14 +151,14 @@ class Vault
         // ==== Generating the key ==== //
         for($i = 0; $i < $key_len; $i++)
         {
-            $key .= $chars[mt_rand(0, $chars_len-1)];
+            $key .= $chars[mt_rand(0, $chars_len - 1)];
         }
 
         // ==== Closing the encryption module ==== //
         mcrypt_module_close($td);
 
         // ==== Result ==== //
-        $this->config_data = array('iv' => $iv, 'key' => $key);
+        $this->config_data = array('iv'  => $iv, 'key' => $key);
     }
 
     /**
@@ -201,7 +200,7 @@ class Vault
             $key = '';
 
             // ===== Splitting the previous key into an array ==== //
-            $prevkey = str_split($this->keys[$i-1]);
+            $prevkey = str_split($this->keys[$i - 1]);
 
             // ==== Calculating the shift value ==== //
             $shift = $this->options['shift'] * $i;
@@ -209,7 +208,7 @@ class Vault
             // ==== Adjusting the shift value ==== //
             if($shift >= $max_ascii)
             {
-                $shift = ceil($max_ascii/$i);
+                $shift = ceil($max_ascii / $i);
             }
 
             // ==== Going through the characters of the previous key ==== //
@@ -242,7 +241,7 @@ class Vault
                         // ==== Checking ==== //
                         if(!in_array($ascii, $blacklist))
                         {
-                            $accepted= true;
+                            $accepted = true;
                         }
                     }
                 }
@@ -316,9 +315,9 @@ class Vault
             $this->initialize();
 
             // ==== Encrypting ==== //
-            $vault_layer     = mcrypt_generic($this->td, $data);
-            $base64_layer    = base64_encode($vault_layer);
-            $encrypted       = &$base64_layer;
+            $vault_layer  = mcrypt_generic($this->td, $data);
+            $base64_layer = base64_encode($vault_layer);
+            $encrypted    = &$base64_layer;
 
             // ==== Terminating ==== //
             $this->terminate();
@@ -345,9 +344,9 @@ class Vault
             $this->initialize();
 
             // ==== Decrypting ==== //
-            $base64_layer   = base64_decode($data);
-            $vault_layer    = mdecrypt_generic($this->td, $base64_layer);
-            $decrypted      = &$vault_layer;
+            $base64_layer = base64_decode($data);
+            $vault_layer  = mdecrypt_generic($this->td, $base64_layer);
+            $decrypted    = &$vault_layer;
 
             // ==== Terminating ==== //
             $this->terminate();
@@ -412,8 +411,8 @@ class Vault
                 // ==== Debug data ==== //
                 if($this->options['debug'])
                 {
-                    echo 'Encrypted: <pre>'.print_r($encrypted, 1).'</pre>';
-                    echo 'Keys: <pre>'.print_r($this->keys, 1).'</pre><br />';
+                    echo 'Encrypted: <pre>' . print_r($encrypted, 1) . '</pre>';
+                    echo 'Keys: <pre>' . print_r($this->keys, 1) . '</pre><br />';
                 }
             }
         }
@@ -472,15 +471,15 @@ class Vault
                     if($this->options['debug'])
                     {
                         // ==== Debug array ==== //
-                        $decrypted[$i-1] = $data;
+                        $decrypted[$i - 1] = $data;
                     }
                 }
 
                 // ==== Debug data ==== //
                 if($this->options['debug'])
                 {
-                    echo 'Decrypted: <pre>'.print_r($decrypted, 1).'</pre>';
-                    echo 'Keys: <pre>'.print_r(array_reverse($this->keys, true), 1).'</pre><br />';
+                    echo 'Decrypted: <pre>' . print_r($decrypted, 1) . '</pre>';
+                    echo 'Keys: <pre>' . print_r(array_reverse($this->keys, true), 1) . '</pre><br />';
                 }
             }
         }
@@ -499,5 +498,9 @@ class Vault
      * @param void
      * @return void
      */
-    public function __destruct() {}
+    public function __destruct()
+    {
+        
+    }
+
 }

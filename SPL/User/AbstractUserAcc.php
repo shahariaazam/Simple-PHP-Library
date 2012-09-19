@@ -135,7 +135,7 @@ abstract class AbstractUserAcc
         $this->options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(count($options) > 0)
+        if(is_array($options) && count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }

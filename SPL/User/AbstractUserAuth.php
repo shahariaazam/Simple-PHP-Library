@@ -158,7 +158,7 @@ abstract class AbstractUserAuth
         $this->options['cookie_domain']   = '';
 
         // ==== Replacing the internal values with the external ones ==== //
-        if(count($options) > 0)
+        if(is_array($options) && count($options) > 0)
         {
             $this->options = array_merge($this->options, $options);
         }
@@ -185,7 +185,51 @@ abstract class AbstractUserAuth
         $this->doAuth();
     }
 
+<<<<<<< HEAD
 /**
+=======
+    /**
+     * Retrieve the errors
+     *
+     * @param void
+     * @return array Empty array when no errors present or an array of error numbers
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Retrieves the data from the session
+     *
+     * @param void
+     * @return void
+     */
+    protected function getSession()
+    {
+        $this->session = &$_SESSION;
+    }
+
+    /**
+     * Sets the data to the session
+     *
+     * @param void
+     * @return void
+     */
+    protected function setSession()
+    {
+        if(is_array($_SESSION))
+        {
+            $_SESSION = array_merge($_SESSION, $this->session);
+        }
+        else
+        {
+            $_SESSION = $this->session;
+        }
+    }
+
+    /**
+>>>>>>> f0c652c1dff75f032c337e148aafe3a6d13f8712
      * Logs a message
      *
      * @param string $type
