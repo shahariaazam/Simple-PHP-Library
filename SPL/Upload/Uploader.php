@@ -302,20 +302,28 @@ class Uploader
             // ==== Getting file extension ==== //
             $extension = substr($filename, strrpos($filename, '.') + 1, strlen($filename));
 
-            // ==== Checking if the extension is allowed ==== //
-            if($this->options['extension'] == 'values') // Checking the values of the array
+            // Checking if the extension is valid
+            if(!empty($extension) && is_string($extension))
             {
-                if(!in_array($extension, $this->options['extensions']))
+                // ==== Checking if the extension is allowed ==== //
+                if($this->options['extension'] == 'values') // Checking the values of the array
                 {
-                    $result = false;
+                    if(!in_array($extension, $this->options['extensions']))
+                    {
+                        $result = false;
+                    }
+                }
+                else // Checking the keys of the array
+                {
+                    if(array_key_exists($extension, $this->options['extensions']) == false)
+                    {
+                        $result = false;
+                    }
                 }
             }
-            else // Checking the keys of the array
+            else
             {
-                if(array_key_exists($extension, $this->options['extensions']) == false)
-                {
-                    $result = false;
-                }
+                $result = false;
             }
 
             // Checking the result so we can register any errors
