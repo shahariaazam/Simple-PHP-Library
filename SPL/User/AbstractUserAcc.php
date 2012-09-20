@@ -352,7 +352,10 @@ abstract class AbstractUserAcc
                 if($this->db->num_rows() == 1)
                 {
                     // ==== Retrieving the regdate info === //
-                    $result = $this->db->result(0, 0);
+                    while($row = $this->db->fetch_assoc())
+                    {
+                        $result = $row;
+                    }
                 }
                 else
                 {
