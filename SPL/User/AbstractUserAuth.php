@@ -143,6 +143,8 @@ abstract class AbstractUserAuth
      * Sets different class properties and some options
      *
      * @param object $db
+     * @param AbstractUserAcc $userAcc
+     * @param Vault $vault
      * @param array $options
      * @return void
      */
