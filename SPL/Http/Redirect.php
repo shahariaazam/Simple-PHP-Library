@@ -16,8 +16,6 @@
 
 namespace SPL\Http;
 
-use SPL\Http\Exception;
-
 class Redirect
 {
     /**

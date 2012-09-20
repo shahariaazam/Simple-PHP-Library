@@ -13,9 +13,6 @@ set_include_path(implode(PATH_SEPARATOR, array(
 // Getting the autoloader
 require 'SPL/Autoload/Autoload.php';
 
-// Getting the functions
-require 'functions/common.inc.php';
-
 // Namespaces
 use SPL\Autoload\Autoload as Autoload;
 
