@@ -65,7 +65,7 @@ namespace SPL\User;
 use SPL\Url;
 use SPL\Validator;
 use SPL\Http\Headers as Headers;
-use SPL\Security\Vault as Vault;
+use SPL\Security\VaultInterface;
 
 abstract class AbstractAccounts implements AccountsInterface
 {
@@ -127,7 +127,7 @@ abstract class AbstractAccounts implements AccountsInterface
      * @param array $options
      * @return void
      */
-    public function __construct($db, Vault $vault, array $options = array())
+    public function __construct($db, VaultInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';

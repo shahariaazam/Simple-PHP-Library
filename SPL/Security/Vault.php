@@ -16,7 +16,7 @@
 
 namespace SPL\Security;
 
-class Vault
+class Vault implements VaultInterface
 {
 
     /**
