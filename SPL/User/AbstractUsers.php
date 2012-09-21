@@ -57,6 +57,10 @@
  * ========= User handling =========
  *
  * 200 - No info found in the database for the given account ID
+ * 210 - The user list could not be retrieved
+ * 220 - The user could not be added
+ * 230 - The user could not be updated
+ * 240 - The user could not be deleted
  *
  */
 
@@ -89,6 +93,13 @@ abstract class AbstractUsers implements UsersInterface
      * @var string
      */
     protected $log;
+
+    /**
+     * User prototype object
+     *
+     * @var \SPL\User\User
+     */
+    protected $userPrototype;
 
     /**
      * Database object
@@ -151,6 +162,17 @@ abstract class AbstractUsers implements UsersInterface
 
         // ==== Getting the session data ==== //
         $this->getSession();
+    }
+
+    /**
+     * Sets the prototype of the user object
+     *
+     * @param UserInterface $userPrototype
+     * @return UsersInterface
+     */
+    public function setUserPrototype(UserInterface $userPrototype)
+    {
+        $this->userPrototype = $userPrototype;
     }
 
     /**
@@ -642,6 +664,284 @@ abstract class AbstractUsers implements UsersInterface
 
         // ==== Result ==== //
         return $result;
+    }
+
+    /**
+     * SQL builder for the getUserList method
+     *
+     * @param array $params
+     * @return string
+     */
+    abstract protected function sqlGetUserList($params);
+
+    /**
+     * The method retrieves a list of users
+     *
+     * @param array $params
+     * @return mixed False on failure, an empty array if no users were found or an array or \SPL\User\User objects.
+     * @throws Exception\InvalidArgumentException
+     */
+    public function getUserList($params = array())
+    {
+        // Checking if the argument is an array
+        if(is_array($params))
+        {
+            // Result var
+            $list = false;
+
+            // Getting the SQL
+            $sql = $this->sqlGetUserList($params);
+
+            // Checking if the $sql is not empty
+            if(!empty($sql))
+            {
+                // Running the SQL
+                $this->db->query($sql);
+
+                // Getting the SQL error (if any)
+                $sql_error = $this->db->error();
+
+                // Checking if we have an error
+                if($sql_error == '')
+                {
+                    // Converting the list variable to an array
+                    $list = array();
+
+                    // Checking if any users are in the list
+                    if($this->db->num_rows() >= 1)
+                    {
+                        // Going through the rows
+                        while($row = $this->db->fetch_assoc())
+                        {
+                            // Cloning the prototype object
+                            $list[] = $user = clone $this->userPrototype;
+
+                            // Setting the user info
+                            $user->setInfo($row);
+                        }
+                    }
+                }
+                else
+                {
+                    // ==== Adding the error ==== //
+                    $this->log_message('error', 'The user list could not be retrieved.', __METHOD__, 210);
+
+                    // ==== Debug === //
+                    if($this->options['debug'])
+                    {
+                        $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                        $this->log .= '<b>ERROR:</b> User list retrieval failed.<br />';
+                        $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                        $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                        $this->log .= '<b>$params:</b><pre>' . print_r($params, 1) . '</pre><br /><br />';
+                    }
+                }
+            }
+
+            // Returning the list
+            return $list;
+        }
+
+        // Throwing an exception if the parameter is not an array
+        throw new Exception\InvalidArgumentException('The $params argument must be an array.');
+    }
+
+    /**
+     * SQL builder for the userAdd method
+     *
+     * @param array $params
+     * @return string
+     */
+    abstract protected function sqlUserAdd($params);
+
+    /**
+     * The method adds a user to the database
+     *
+     * @param array $params
+     * @return boolean
+     * @throws Exception\InvalidArgumentException
+     */
+    public function userAdd($params = array())
+    {
+        // Checking if the argument is an array
+        if(is_array($params))
+        {
+            // Result var
+            $success = false;
+
+            // Getting the SQL
+            $sql = $this->sqlUserAdd($params);
+
+            // Checking if the $sql is not empty
+            if(!empty($sql))
+            {
+                // Running the SQL
+                $this->db->query($sql);
+
+                // Getting the SQL error (if any)
+                $sql_error = $this->db->error();
+
+                // Checking if we have an error
+                if($sql_error != '')
+                {
+                    // ==== Adding the error ==== //
+                    $this->log_message('error', 'The user could not be added', __METHOD__, 220);
+
+                    // ==== Debug === //
+                    if($this->options['debug'])
+                    {
+                        $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                        $this->log .= '<b>ERROR:</b> User list retrieval failed.<br />';
+                        $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                        $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                        $this->log .= '<b>$params:</b><pre>' . print_r($params, 1) . '</pre><br /><br />';
+                    }
+                }
+                else
+                {
+                    // Setting the flag
+                    $success = true;
+                }
+            }
+
+            // Returning the result
+            return $success;
+        }
+
+        // Throwing an exception if the parameter is not an array
+        throw new Exception\InvalidArgumentException('The $params argument must be an array.');
+    }
+
+    /**
+     * SQL builder for the userUpdate method
+     *
+     * @param array $params
+     * @return string
+     */
+    abstract protected function sqlUserUpdate($params);
+
+    /**
+     * The method updates a user from the database
+     *
+     * @param array $params
+     * @return boolean
+     * @throws Exception\InvalidArgumentException
+     */
+    public function userUpdate($params = array())
+    {
+        // Checking if the argument is an array
+        if(is_array($params))
+        {
+            // Result var
+            $success = false;
+
+            // Getting the SQL
+            $sql = $this->sqlUserUpdate($params);
+
+            // Checking if the $sql is not empty
+            if(!empty($sql))
+            {
+                // Running the SQL
+                $this->db->query($sql);
+
+                // Getting the SQL error (if any)
+                $sql_error = $this->db->error();
+
+                // Checking if we have an error
+                if($sql_error != '')
+                {
+                    // ==== Adding the error ==== //
+                    $this->log_message('error', 'The user could not be updated', __METHOD__, 230);
+
+                    // ==== Debug === //
+                    if($this->options['debug'])
+                    {
+                        $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                        $this->log .= '<b>ERROR:</b> User list retrieval failed.<br />';
+                        $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                        $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                        $this->log .= '<b>$params:</b><pre>' . print_r($params, 1) . '</pre><br /><br />';
+                    }
+                }
+                else
+                {
+                    // Setting the flag
+                    $success = true;
+                }
+            }
+
+            // Returning the result
+            return $success;
+        }
+
+        // Throwing an exception if the parameter is not an array
+        throw new Exception\InvalidArgumentException('The $params argument must be an array.');
+    }
+
+    /**
+     * SQL builder for the userDelete method
+     *
+     * @param array $params
+     * @return string
+     */
+    abstract protected function sqlUserDelete($params);
+
+    /**
+     * The method delete a user from the database
+     *
+     * @param array $params
+     * @return boolean
+     * @throws Exception\InvalidArgumentException
+     */
+    public function userDelete($params = array())
+    {
+        // Checking if the argument is an array
+        if(is_array($params))
+        {
+            // Result var
+            $success = false;
+
+            // Getting the SQL
+            $sql = $this->sqlUserDelete($params);
+
+            // Checking if the $sql is not empty
+            if(!empty($sql))
+            {
+                // Running the SQL
+                $this->db->query($sql);
+
+                // Getting the SQL error (if any)
+                $sql_error = $this->db->error();
+
+                // Checking if we have an error
+                if($sql_error != '')
+                {
+                    // ==== Adding the error ==== //
+                    $this->log_message('error', 'The user could not be deleted', __METHOD__, 240);
+
+                    // ==== Debug === //
+                    if($this->options['debug'])
+                    {
+                        $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                        $this->log .= '<b>ERROR:</b> User list retrieval failed.<br />';
+                        $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                        $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                        $this->log .= '<b>$params:</b><pre>' . print_r($params, 1) . '</pre><br /><br />';
+                    }
+                }
+                else
+                {
+                    // Setting the flag
+                    $success = true;
+                }
+            }
+
+            // Returning the result
+            return $success;
+        }
+
+        // Throwing an exception if the parameter is not an array
+        throw new Exception\InvalidArgumentException('The $params argument must be an array.');
     }
 
     /**

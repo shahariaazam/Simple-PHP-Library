@@ -40,7 +40,7 @@ class User implements UserInterface
     }
 
     /**
-     * Sets some user info
+     * Sets the user info
      *
      * @param array $info
      * @return void
@@ -51,6 +51,17 @@ class User implements UserInterface
         {
             $this->info = $info;
         }
+    }
+
+    /**
+     * Gets the user info
+     *
+     * @param void
+     * @return array
+     */
+    public function getInfo()
+    {
+        return $this->info;
     }
 
     /**
