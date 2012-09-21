@@ -15,7 +15,7 @@
 
 namespace SPL\Validator;
 
-class Password
+class Password implements ValidatorInterface
 {
     /**
      * Options for the validation

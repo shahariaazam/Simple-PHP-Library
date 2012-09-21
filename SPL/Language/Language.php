@@ -15,7 +15,7 @@
 
 namespace SPL\Language;
 
-use SPL\URL\URL as URL;
+use SPL\Url\UrlInterface;
 
 class Language
 {
@@ -56,9 +56,9 @@ class Language
     private $mopt;
 
     /**
-     * URL object
+     * Url object
      *
-     * @var \SPL\URL\URL
+     * @var \SPL\Url\Url
      */
     protected $url;
 
@@ -72,11 +72,11 @@ class Language
     /**
      * Sets class options
      *
-     * @param URL $url
+     * @param Url $url
      * @param array $options
      * @return void
      */
-    public function __construct(URL $url, array $options = array())
+    public function __construct(UrlInterface $url, array $options = array())
     {
         // ==== Default options ==== //
         $this->options['default_language']  = 'en';
@@ -114,7 +114,7 @@ class Language
             }
         }
 
-        // Getting the URL object
+        // Getting the Url object
         $this->url = $url;
 
         // ==== Setting up mail options ==== //

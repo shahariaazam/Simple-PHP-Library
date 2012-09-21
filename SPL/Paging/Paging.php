@@ -17,7 +17,7 @@
 
 namespace SPL\Paging;
 
-use SPL\URL;
+use SPL\Url;
 
 
 class Paging
@@ -50,7 +50,7 @@ class Paging
      * @param array $options
      * @return void
      */
-    public function __construct(URL\URL $url, array $options = array())
+    public function __construct(Url\Url $url, array $options = array())
     {
         // ==== Default options ==== //
         $this->options['ipp'] = 10;

@@ -18,5 +18,10 @@ namespace SPL\User;
 
 class User
 {
-    
+    /**
+     * User information
+     *
+     * @var array
+     */
+    protected $info = array();
 }

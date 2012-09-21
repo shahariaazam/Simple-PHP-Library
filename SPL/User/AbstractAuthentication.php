@@ -67,12 +67,12 @@
 
 namespace SPL\User;
 
-use SPL\URL;
+use SPL\Url;
 use SPL\Http\Headers as Headers;
 use SPL\Security\Vault as Vault;
 use SPL\Variable\Variable as Variable;
 
-abstract class AbstractUserAuth
+abstract class AbstractAuthentication implements AuthenticationInterface
 {
     /**
      * Options array
@@ -858,7 +858,7 @@ abstract class AbstractUserAuth
             // ==== Adding some more data to the log ==== //
             $this->log .= '<hr><hr><strong>Other info</strong><hr>';
             $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
-            $this->log .= '<strong>URL:</strong><pre>' . URL\URL::getFullURL() . '<br /><br />';
+            $this->log .= '<strong>URL:</strong><pre>' . Url\Url::getFullURL() . '<br /><br />';
             $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
             $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
             $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';

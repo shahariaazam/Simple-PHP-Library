@@ -15,7 +15,7 @@
 
 namespace SPL\Validator;
 
-class Email
+class Email implements ValidatorInterface
 {
     /**
      * Validates the email address provided. It can also check the DNS to see if it is valid.

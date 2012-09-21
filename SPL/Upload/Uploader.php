@@ -15,7 +15,7 @@
 
 namespace SPL\Upload;
 
-class Uploader
+class Uploader implements UploadInterface
 {
     /**
      * Internal log of problems

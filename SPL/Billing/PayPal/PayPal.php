@@ -16,7 +16,7 @@
 
 namespace SPL\Billing\PayPal;
 
-abstract class PayPal
+abstract class PayPal implements PayPalInterface
 {
     /**
      * Environment constants
