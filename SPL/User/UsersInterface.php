@@ -13,4 +13,4 @@
 
 namespace SPL\User;
 
-interface AccountsInterface{}
+interface UsersInterface{}

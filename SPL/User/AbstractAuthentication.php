@@ -143,12 +143,12 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      * Sets different class properties and some options
      *
      * @param object $db
-     * @param AbstractUserAcc $userAcc
-     * @param Vault $vault
+     * @param UsersInterface $userAcc
+     * @param VaultInterface $vault
      * @param array $options
      * @return void
      */
-    public function __construct($db, AccountsInterface $userAcc, VaultInterface $vault, array $options = array())
+    public function __construct($db, UsersInterface $userAcc, VaultInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';

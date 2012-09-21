@@ -67,7 +67,7 @@ use SPL\Validator;
 use SPL\Http\Headers as Headers;
 use SPL\Security\VaultInterface;
 
-abstract class AbstractAccounts implements AccountsInterface
+abstract class AbstractUsers implements UsersInterface
 {
     /**
      * Options array
@@ -123,7 +123,7 @@ abstract class AbstractAccounts implements AccountsInterface
      * Sets different class properties and some options
      *
      * @param object $db
-     * @param object $vault
+     * @param VaultInterface $vault
      * @param array $options
      * @return void
      */
