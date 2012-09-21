@@ -9,4 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  */
+
+namespace SPL\Validator;
+
 interface ValidatorInterface{}

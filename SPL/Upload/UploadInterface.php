@@ -10,4 +10,6 @@
  *
  */
 
+namespace SPL\Upload;
+
 interface UploadInterface{}

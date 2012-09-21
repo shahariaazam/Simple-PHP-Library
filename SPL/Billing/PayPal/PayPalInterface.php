@@ -11,6 +11,6 @@
  *
  */
 
-namespace PayPal;
+namespace SPL\PayPal;
 
 interface PayPalInterface{}

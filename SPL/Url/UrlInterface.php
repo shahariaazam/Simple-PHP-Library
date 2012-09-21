@@ -11,4 +11,6 @@
  *
  */
 
+namespace SPL\Url;
+
 interface UrlInterface{}

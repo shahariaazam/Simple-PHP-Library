@@ -11,4 +11,6 @@
  *
  */
 
+namespace SPL\User;
+
 interface AccountsInterface{}
