@@ -86,18 +86,18 @@ class User extends \ArrayIterator implements UserInterface
     }
 
     /**
-     * Gets a requested offset
+     * Gets a requested index
      *
-     * @param string $offset
+     * @param string $index
      * @return mixed Null if the $offset is not found or the value
      */
-    public function offsetGet($offset)
+    public function offsetGet($index)
     {
         $value = null;
 
-        if($this->offsetExists($offset))
+        if(parent::offsetExists($index))
         {
-            $value = $this->offsetGet($offset);
+            $value = parent::offsetGet($index);
         }
 
         return $value;
@@ -115,6 +115,6 @@ class User extends \ArrayIterator implements UserInterface
         $this->info[$name] = $value;
 
         // Updating the storage
-        $this->offsetSet($name, $value);
+        parent::offsetSet($name, $value);
     }
 }
