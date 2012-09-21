@@ -679,10 +679,16 @@ abstract class AbstractUsers implements UsersInterface
      *
      * @param array $params
      * @return mixed False on failure, an empty array if no users were found or an array or \SPL\User\User objects.
-     * @throws Exception\InvalidArgumentException
+     * @throws Exception\InvalidArgumentException|Exception\RuntimeException
      */
     public function getUserList($params = array())
     {
+        // Checking if we have a prototype to work with
+        if($this->userPrototype instanceof UserInterface == false)
+        {
+            throw new Exception\RuntimeException('No User class prototype has been set.');
+        }
+
         // Checking if the argument is an array
         if(is_array($params))
         {
