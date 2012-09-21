@@ -989,7 +989,7 @@ abstract class AbstractAccounts implements AccountsInterface
         if($this->options['debug'] && $this->log != '')
         {
             // ==== Adding some more data to the log ==== //
-            $this->log .= '<hr><hr><strong>Other info</strong><hr>';
+            $this->log .= '<hr><hr><strong>Other info</strong><hr><br /><br />';
             $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
             $this->log .= '<strong>URL:</strong><pre>' . Url\Url::getFullURL() . '<br /><br />';
             $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
