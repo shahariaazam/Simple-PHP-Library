@@ -16,7 +16,7 @@
 
 namespace SPL\User;
 
-class User implements UserInterface
+class User extends \ArrayIterator implements UserInterface
 {
     /**
      * User information
@@ -77,6 +77,24 @@ class User implements UserInterface
         if(isset($this->info[$name]))
         {
             $value = $this->info[$name];
+        }
+
+        return $value;
+    }
+
+    /**
+     * Gets a requested offset
+     *
+     * @param string $offset
+     * @return mixed Null if the $offset is not found or the value
+     */
+    public function offsetGet($offset)
+    {
+        $value = null;
+
+        if($this->offsetExists($offset))
+        {
+            $value = $this->offsetGet($offset);
         }
 
         return $value;
