@@ -50,6 +50,9 @@ class User extends \ArrayIterator implements UserInterface
         if(is_array($info))
         {
             $this->info = $info;
+
+            // Initializing the storage
+            parent::__construct($info);
         }
     }
 
@@ -110,5 +113,8 @@ class User extends \ArrayIterator implements UserInterface
     public function __set($name, $value)
     {
         $this->info[$name] = $value;
+
+        // Updating the storage
+        $this->offsetSet($name, $value);
     }
 }
