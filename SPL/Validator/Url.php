@@ -27,18 +27,17 @@ class Url implements ValidatorInterface
     public static function isValid($url, $checkIfAccessible = true)
     {
         // ==== Check variable ==== //
-        $isValid = true;
+        $isValid = false;
 
         // ==== Sanitizing and validating the URL ==== //
         $url = filter_var(filter_var($url, FILTER_SANITIZE_URL), FILTER_VALIDATE_URL);
 
         // ==== Checking if the URL passed the previous checks ==== //
-        if($url === false)
+        if($url !== false && (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0))
         {
-            $isValid = false;
-        }
-        else
-        {
+            // Setting the flag to true
+            $isValid = true;
+
             // Should we check to see if the URL also exists
             if($checkIfAccessible === true)
             {
