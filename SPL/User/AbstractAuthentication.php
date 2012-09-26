@@ -496,6 +496,9 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             }
             else
             {
+                // ==== Authentication failed ==== //
+                $result = false;
+
                 // ==== Getting the errors from the UserAcc class ==== //
                 $this->errors = array_merge($this->errors, $this->userAcc->getErrors());
 
