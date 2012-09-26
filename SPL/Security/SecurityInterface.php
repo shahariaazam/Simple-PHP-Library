@@ -2,7 +2,7 @@
 
 /**
  *
- * Vault interface
+ * Security interface
  *
  * @author Brian
  * @link https://github.com/brian978
@@ -13,4 +13,4 @@
 
 namespace SPL\Security;
 
-interface VaultInterface{}
+interface SecurityInterface{}

@@ -67,9 +67,10 @@
 namespace SPL\User;
 
 use SPL\Url;
-use SPL\Validator;
+use SPL\Validator\Email;
+use SPL\Validator\Password;
 use SPL\Http\Headers as Headers;
-use SPL\Security\VaultInterface;
+use SPL\Security\SecurityInterface;
 
 abstract class AbstractUsers implements UsersInterface
 {
@@ -134,11 +135,11 @@ abstract class AbstractUsers implements UsersInterface
      * Sets different class properties and some options
      *
      * @param object $db
-     * @param VaultInterface $vault
+     * @param SecurityInterface $vault
      * @param array $options
      * @return void
      */
-    public function __construct($db, VaultInterface $vault, array $options = array())
+    public function __construct($db, SecurityInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']     = '';
@@ -1047,7 +1048,7 @@ abstract class AbstractUsers implements UsersInterface
             $options = array();
 
             // Creating the password validator object
-            $passwdValidator = new Validator\Password();
+            $passwdValidator = new Password();
 
             // ===== Checking the complexity ==== //
             $complexityOk = $passwdValidator->isValid($data['passwd']);
@@ -1070,7 +1071,7 @@ abstract class AbstractUsers implements UsersInterface
         else
         {
             // ==== Checking if the email is valid ==== //
-            $valid = Validator\Email::isValid($data['email'], true);
+            $valid = Email::isValid($data['email'], true);
             if($valid == false)
             {
                 // ==== Adding the error ==== //
