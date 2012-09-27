@@ -258,8 +258,8 @@ abstract class AbstractUsers implements UsersInterface
                 {
                     $this->log .= '<hr><hr><strong>' . $location . '</strong><hr><br />';
                     $this->log .= '<b>ERROR:</b> ' . $message . '<br />';
-                    $this->log .= '<b>QUERY:</b>' . $extra1 . '<br />';
-                    $this->log .= '<b>SQL ERROR:</b>' . $extra2 . '<br /><br />';
+                    $this->log .= '<b>QUERY:</b> ' . $extra1 . '<br />';
+                    $this->log .= '<b>SQL ERROR:</b> ' . $extra2 . '<br /><br />';
                 }
 
                 break;
