@@ -370,8 +370,11 @@ abstract class AbstractUsers implements UsersInterface
                 // ==== executing the SQL ==== //
                 $this->db->query($sql);
 
+                // Getting the SQL error
+                $sql_error = $this->db->error();
+
                 // ==== checking if data was found ==== //
-                if($this->db->num_rows() == 1)
+                if($sql_error == '' && $this->db->num_rows() == 1)
                 {
                     // ==== Retrieving the regdate info === //
                     while($row = $this->db->fetch_assoc())
@@ -385,7 +388,15 @@ abstract class AbstractUsers implements UsersInterface
                     $result = false;
 
                     // ==== Adding the error ==== //
-                    $this->log_message('error', 'Salt could not be retrieved from the database because it could not be found', __METHOD__, 101);
+                    $this->log_message('error', 'Salt could not be retrieved from the database because it could not be found.', __METHOD__, 101);
+
+                    // ==== Debug === //
+                    if($this->options['debug'])
+                    {
+                        $this->log .= '<hr><hr><strong>' . __METHOD__ . '</strong><hr><br />';
+                        $this->log .= '<b>QUERY:</b>' . $sql . '<br />';
+                        $this->log .= '<b>SQL ERROR:</b>' . $sql_error . '<br /><br />';
+                    }
                 }
             }
         }
