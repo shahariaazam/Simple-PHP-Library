@@ -388,7 +388,7 @@ abstract class AbstractUsers implements UsersInterface
                     $result = false;
 
                     // ==== Adding the error ==== //
-                    $this->log_message('error', 'Salt could not be retrieved from the database because it could not be found.', __METHOD__, 101, $sql, $sql_error);
+                    $this->log_message('sql', 'Salt could not be retrieved from the database because it could not be found.', __METHOD__, 101, $sql, $sql_error);
                 }
             }
         }
