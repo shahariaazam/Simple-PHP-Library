@@ -379,7 +379,7 @@ abstract class AbstractUsers implements UsersInterface
                     // ==== Retrieving the regdate info === //
                     while($row = $this->db->fetch_assoc())
                     {
-                        $result = $row;
+                        $result = $row['regdate'];
                     }
                 }
                 else
