@@ -59,4 +59,56 @@ class Directory
             }
         }
     }
+
+    /**
+     * For a given directory it returns an array containing the directory tree
+     *
+     * @param string $dir
+     * @param boolean $recursive
+     * @return array
+     * @throws Exception\RuntimeException
+     */
+    public static function getDirectoryContents($dir, $recursive = true)
+    {
+        // Checking if the directory exists
+        if(is_dir($dir))
+        {
+            // Directory contents
+            $contents = array();
+
+            // Getting the files from the directory
+            $files = scandir($dir);
+
+            // Removing the "dot" files from the array
+            array_walk($files, function($file, $index) use (&$contents, $dir, $recursive){
+
+                // Entry
+                $entry = array();
+
+                // Checking the file
+                if(trim($file) == '.' || trim($file) == '..')
+                {
+                    return null;
+                }
+
+                // Adding the file
+                $entry['file'] = $file;
+
+                // Checking if recursive is in effect
+                if(is_dir($dir . $file . '/') && $recursive === true)
+                {
+                    $entry['childs'] = self::getDirectoryContents($dir . $file . '/', $recursive);
+                }
+
+                // Adding the entry to the contents array
+                $contents[] = $entry;
+            });
+
+            // Returning the contents
+            return $contents;
+        }
+
+        // Throwing exception
+        throw new Exception\RuntimeException('The provided directory ( ' . $dir . ' ) is invalid.');
+    }
 }
