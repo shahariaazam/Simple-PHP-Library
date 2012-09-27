@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * The class handles the user accounts
@@ -74,6 +75,7 @@ use SPL\Security\SecurityInterface;
 
 abstract class AbstractUsers implements UsersInterface
 {
+
     /**
      * Options array
      *
@@ -130,7 +132,6 @@ abstract class AbstractUsers implements UsersInterface
      */
     protected $userinfo = array();
 
-
     /**
      * Sets different class properties and some options
      *
@@ -142,9 +143,9 @@ abstract class AbstractUsers implements UsersInterface
     public function __construct($db, SecurityInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
-        $this->options['unique_mail']     = '';
-        $this->options['debug']           = false;
-        $this->options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
+        $this->options['unique_mail'] = '';
+        $this->options['debug']       = false;
+        $this->options['mail']        = 'webmaster@' . $_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options) && count($options) > 0)
@@ -239,8 +240,8 @@ abstract class AbstractUsers implements UsersInterface
      * @param string $extra2
      * @return void
      */
-     protected function log_message($type, $message, $location = '', $number=0, $extra1 = '', $extra2 = '')
-     {
+    protected function log_message($type, $message, $location = '', $number = 0, $extra1 = '', $extra2 = '')
+    {
         // ==== Switching based on type ==== //
         switch($type)
         {
@@ -282,7 +283,7 @@ abstract class AbstractUsers implements UsersInterface
             default:
                 break;
         }
-     }
+    }
 
     /**
      * Builds the password using a salt and a string
@@ -293,7 +294,7 @@ abstract class AbstractUsers implements UsersInterface
      */
     protected function buildPasswd($salt, $passwd)
     {
-        $passwd = hash('sha512', $salt.$this->vault->encrypt($passwd));
+        $passwd = hash('sha512', $salt . $this->vault->encrypt($passwd));
 
         return $passwd;
     }
@@ -320,7 +321,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
         /////////////////////////////////////////////////
-
         //////////////////////////////////////////////////
         // BEGIN REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
@@ -334,7 +334,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
-
         // ==== Result ==== //
         return $result;
     }
@@ -428,7 +427,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
         /////////////////////////////////////////////////
-
         //////////////////////////////////////////////////
         // BEGIN REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
@@ -450,7 +448,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
-
         // ==== Result ==== //
         return $result;
     }
@@ -721,7 +718,7 @@ abstract class AbstractUsers implements UsersInterface
                         while($row = $this->db->fetch_assoc())
                         {
                             // Cloning the prototype object
-                            $list[] = $user = clone $this->userPrototype;
+                            $list[] = $user   = clone $this->userPrototype;
 
                             // Setting the user info
                             $user->setInfo($row);
@@ -1013,7 +1010,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
         /////////////////////////////////////////////////
-
         //////////////////////////////////////////////////
         // BEGIN REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
@@ -1058,7 +1054,6 @@ abstract class AbstractUsers implements UsersInterface
                 $this->log_message('error', 'Password complexity too low', __METHOD__, 26);
                 $result = false;
             }
-
         }
 
         // == email == //
@@ -1092,7 +1087,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
-
         // ==== result ==== //
         return $result;
     }
@@ -1216,7 +1210,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END INPUT SANITIZATION
         /////////////////////////////////////////////////
-
         //////////////////////////////////////////////////
         // BEGIN REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
@@ -1230,7 +1223,6 @@ abstract class AbstractUsers implements UsersInterface
         //////////////////////////////////////////////////
         // END REQUIRED FIELDS CHECKS
         /////////////////////////////////////////////////
-
         // ==== Result ==== //
         return $result;
     }
@@ -1297,14 +1289,14 @@ abstract class AbstractUsers implements UsersInterface
         {
             // ==== Adding some more data to the log ==== //
             $this->log .= '<hr><hr><strong>Other info</strong><hr><br /><br />';
-            $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
+            $this->log .= '<strong>ERRORS:</strong><pre>' . print_r($this->errors, true) . '<br /><br />';
             $this->log .= '<strong>URL:</strong><pre>' . Url\Url::getFullURL() . '<br /><br />';
-            $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
-            $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
-            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';
-            $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
-            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(Headers::request(), true).'<br /><br />';
-            $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
+            $this->log .= '<strong>GET:</strong><pre>' . print_r($_GET, true) . '<br /><br />';
+            $this->log .= '<strong>POST:</strong><pre>' . print_r($_POST, true) . '<br /><br />';
+            $this->log .= '<strong>SESSION:</strong><pre>' . print_r($this->session, true) . '<br /><br />';
+            $this->log .= '<strong>COOKIE:</strong><pre>' . print_r($_COOKIE, true) . '<br /><br />';
+            $this->log .= '<strong>HEADERS:</strong><pre>' . print_r(Headers::request(), true) . '<br /><br />';
+            $this->log .= '<strong>SERVER:</strong><pre>' . print_r($_SERVER, true) . '<br /><br />';
 
             // Mail options
             $to      = $this->options['mail'];
@@ -1315,4 +1307,5 @@ abstract class AbstractUsers implements UsersInterface
             mail($to, $subject, $this->log, $headers);
         }
     }
+
 }
