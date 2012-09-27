@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * The class handles the authentication of users
@@ -74,6 +75,7 @@ use SPL\Variable\Variable as Variable;
 
 abstract class AbstractAuthentication implements AuthenticationInterface
 {
+
     /**
      * Options array
      *
@@ -138,7 +140,6 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      */
     protected $userAcc;
 
-
     /**
      * Sets different class properties and some options
      *
@@ -151,13 +152,13 @@ abstract class AbstractAuthentication implements AuthenticationInterface
     public function __construct($db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
-        $this->options['unique_mail']     = '';
-        $this->options['debug']           = false;
-        $this->options['mail']            = 'webmaster@' . $_SERVER['HTTP_HOST'];
-        $this->options['cookie_name']     = 'auth';
-        $this->options['cookie_expire']   = 2592000;
-        $this->options['cookie_path']     = '/';
-        $this->options['cookie_domain']   = '';
+        $this->options['unique_mail']   = '';
+        $this->options['debug']         = false;
+        $this->options['mail']          = 'webmaster@' . $_SERVER['HTTP_HOST'];
+        $this->options['cookie_name']   = 'auth';
+        $this->options['cookie_expire'] = 2592000;
+        $this->options['cookie_path']   = '/';
+        $this->options['cookie_domain'] = '';
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options) && count($options) > 0)
@@ -238,8 +239,8 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      * @param string $extra2
      * @return void
      */
-     protected function log_message($type, $message, $location = '', $number=0, $extra1 = '', $extra2 = '')
-     {
+    protected function log_message($type, $message, $location = '', $number = 0, $extra1 = '', $extra2 = '')
+    {
         // ==== Switching based on type ==== //
         switch($type)
         {
@@ -281,7 +282,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             default:
                 break;
         }
-     }
+    }
 
     /**
      * Regenerates the session ID
@@ -386,8 +387,8 @@ abstract class AbstractAuthentication implements AuthenticationInterface
         if($this->options['debug'])
         {
             $log = '<strong>Info:</strong><br />';
-            $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-            $log .= 'Data: '.Variable::print_array($data, 1).'<br />';
+            $log .= 'Cookie name: ' . $this->options['cookie_name'] . '<br />';
+            $log .= 'Data: ' . Variable::print_array($data, 1) . '<br />';
             $log .= '<br /><br />';
 
             // ==== Adding log ==== //
@@ -558,7 +559,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             $data['ip_addr'] = $_SERVER['REMOTE_ADDR'];
 
             // ==== Getting the cookie ==== //
-            $data['cookie']  = $this->db->escape_string($_COOKIE[$this->options['cookie_name']]);
+            $data['cookie'] = $this->db->escape_string($_COOKIE[$this->options['cookie_name']]);
 
             // ==== Getting all the headers ==== //
             $headers = Headers::request();
@@ -570,8 +571,8 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             if($this->options['debug'])
             {
                 $log = '<strong>Info:</strong><br />';
-                $log .= 'Cookie name: '.$this->options['cookie_name'].'<br />';
-                $log .= 'Data: '.Variable::print_array($data, 1).'<br />';
+                $log .= 'Cookie name: ' . $this->options['cookie_name'] . '<br />';
+                $log .= 'Data: ' . Variable::print_array($data, 1) . '<br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //
@@ -631,8 +632,9 @@ abstract class AbstractAuthentication implements AuthenticationInterface
                     {
                         $log = '<strong>Info:</strong><br />';
                         $log .= 'Authentication falied.<br /><br />';
-                        $log .= '$this->session: '.Variable::print_array($this->session, 1).'<br />';
-                        $log .= '$_COOKIE: '.Variable::print_array($_COOKIE, 1).'<br />';
+                        $log .= '$this->session: ' . Variable::print_array($this->session, 1) . '<br />';
+                        $log .= '$_COOKIE: ' . Variable::print_array($_COOKIE, 1) . '<br />';
+                        $log .= '$sql_error: ' . $sql_error . '<br />';
                         $log .= '<br /><br />';
 
                         // ==== Adding the error ==== //
@@ -678,13 +680,13 @@ abstract class AbstractAuthentication implements AuthenticationInterface
         // ==== Skipping if already authenticated ==== //
         if($user_id > 0 // provided by doLogin
                 || (isset($this->session['auth'])
-                        && $this->session['auth'] !== true
-                        && !empty($_COOKIE[$this->options['cookie_name']])
-                        )
+                && $this->session['auth'] !== true
+                && !empty($_COOKIE[$this->options['cookie_name']])
+                )
                 || (!isset($this->session['auth'])
-                        && !empty($_COOKIE[$this->options['cookie_name']])
-                        )
-          )
+                && !empty($_COOKIE[$this->options['cookie_name']])
+                )
+        )
         {
             //////////////////////////////////////////////////////////
             // BEGIN DB CHECK ONLY WHEN AUTHENTICATING VIA COOKIE
@@ -714,7 +716,6 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             //////////////////////////////////////////////////////////
             // END DB CHECK ONLY WHEN AUTHENTICATING VIA COOKIE
             /////////////////////////////////////////////////////////
-
             // ==== Checking if the authentication process went OK ==== //
             if($success == true)
             {
@@ -750,7 +751,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             {
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Skipped database authentication<br /><br />';
-                $log .= 'User info: '.Variable::print_array($userinfo, 1).'<br />';
+                $log .= 'User info: ' . Variable::print_array($userinfo, 1) . '<br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //
@@ -800,7 +801,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
         // ==== Adding log data ==== //
         if($this->options['debug'])
         {
-            $log = '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true?'yes':'no') . '<br />';
+            $log = '<strong>Info:</strong> Authenticated: ' . ($this->authenticated == true ? 'yes' : 'no') . '<br />';
             $log .= '<br /><br />';
 
             // ==== Adding the error ==== //
@@ -860,14 +861,14 @@ abstract class AbstractAuthentication implements AuthenticationInterface
         {
             // ==== Adding some more data to the log ==== //
             $this->log .= '<hr><hr><strong>Other info</strong><hr><br /><br />';
-            $this->log .= '<strong>ERRORS:</strong><pre>'.print_r($this->errors, true).'<br /><br />';
+            $this->log .= '<strong>ERRORS:</strong><pre>' . print_r($this->errors, true) . '<br /><br />';
             $this->log .= '<strong>URL:</strong><pre>' . Url\Url::getFullURL() . '<br /><br />';
-            $this->log .= '<strong>GET:</strong><pre>'.print_r($_GET, true).'<br /><br />';
-            $this->log .= '<strong>POST:</strong><pre>'.print_r($_POST, true).'<br /><br />';
-            $this->log .= '<strong>SESSION:</strong><pre>'.print_r($this->session, true).'<br /><br />';
-            $this->log .= '<strong>COOKIE:</strong><pre>'.print_r($_COOKIE, true).'<br /><br />';
-            $this->log .= '<strong>HEADERS:</strong><pre>'.print_r(Headers::request(), true).'<br /><br />';
-            $this->log .= '<strong>SERVER:</strong><pre>'.print_r($_SERVER, true).'<br /><br />';
+            $this->log .= '<strong>GET:</strong><pre>' . print_r($_GET, true) . '<br /><br />';
+            $this->log .= '<strong>POST:</strong><pre>' . print_r($_POST, true) . '<br /><br />';
+            $this->log .= '<strong>SESSION:</strong><pre>' . print_r($this->session, true) . '<br /><br />';
+            $this->log .= '<strong>COOKIE:</strong><pre>' . print_r($_COOKIE, true) . '<br /><br />';
+            $this->log .= '<strong>HEADERS:</strong><pre>' . print_r(Headers::request(), true) . '<br /><br />';
+            $this->log .= '<strong>SERVER:</strong><pre>' . print_r($_SERVER, true) . '<br /><br />';
 
             // Mail options
             $to      = $this->options['mail'];
@@ -878,4 +879,5 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             mail($to, $subject, $this->log, $headers);
         }
     }
+
 }
