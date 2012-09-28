@@ -471,7 +471,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
                         else
                         {
                             // ==== Adding the error ==== //
-                            $this->log_message('error', 'Could not insert authentication info into the database', __METHOD__, 501);
+                            $this->log_message('sql', 'Could not insert authentication info into the database', __METHOD__, 501, $sql, $sql_error);
                         }
                     }
                     else
