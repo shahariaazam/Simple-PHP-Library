@@ -291,10 +291,17 @@ class Language
             // ==== Building language file path for the default language ==== //
             $file = $this->options['lang_dir'] . $this->lang . $this->options['lang_sufix'];
 
+            // Checking if the default language exists
+            if(is_file($file))
+            {
+                // ==== Assign language file path ==== //
+                $this->file = $file;
+            }
+
             // ==== Adding debug data ==== //
             if($this->options['debug'])
             {
-                $this->log .= '<b>Notice:</b> File <i><u>' . $this->file . '</u></i> not found. Falling back to default language.<br /><br />';
+                $this->log .= '<b>Notice:</b> File <i><u>' . $file . '</u></i> not found. Falling back to default language.<br /><br />';
             }
         }
         else
