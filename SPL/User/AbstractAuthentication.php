@@ -116,7 +116,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      *
      * @var array
      */
-    protected $session;
+    protected $session = array();
 
     /**
      * Cookie container

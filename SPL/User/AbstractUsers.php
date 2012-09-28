@@ -123,7 +123,7 @@ abstract class AbstractUsers implements UsersInterface
      *
      * @var array
      */
-    protected $session;
+    protected $session = array();
 
     /**
      * Array with the userinfo
