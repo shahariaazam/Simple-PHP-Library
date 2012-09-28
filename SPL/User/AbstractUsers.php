@@ -196,7 +196,7 @@ abstract class AbstractUsers implements UsersInterface
      */
     protected function getSession()
     {
-        $this->session = &$_SESSION;
+
     }
 
     /**
@@ -207,7 +207,7 @@ abstract class AbstractUsers implements UsersInterface
      */
     protected function setSession()
     {
-        $_SESSION = array_merge($_SESSION, $this->session);
+        
     }
 
     /**

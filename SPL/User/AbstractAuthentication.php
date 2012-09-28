@@ -207,7 +207,16 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      */
     protected function getSession()
     {
-        $this->session = &$_SESSION;
+        
+        if(isset($_SESSION['auth']))
+        {
+            $this->session['auth'] = $_SESSION['auth'];
+        }
+
+        if(isset($_SESSION['userinfo']))
+        {
+            $this->session['userinfo'] = $_SESSION['userinfo'];
+        }
     }
 
     /**
