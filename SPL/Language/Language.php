@@ -162,7 +162,7 @@ class Language
      */
     protected function getSession()
     {
-        $this->session = $_SESSION;
+        $this->session = &$_SESSION;
     }
 
     /**
@@ -256,6 +256,9 @@ class Language
             // ==== Setting the cookie var ==== //
             $_COOKIE['lang_' . $this->uq] = $this->lang;
         }
+
+        // Setting the session
+        $this->setSession();
     }
 
     /**
