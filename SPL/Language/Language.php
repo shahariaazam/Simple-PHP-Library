@@ -102,7 +102,7 @@ class Language
 
         // ==== Cookie options ==== //
         $this->options['cookie_enabled']   = false;
-        $this->options['cookie_expire']    = 2592000;
+        $this->options['cookie_expire']    = 2592000; // 30 days
         $this->options['cookie_domain']    = '';
         $this->options['cookie_path']      = '/';
 
