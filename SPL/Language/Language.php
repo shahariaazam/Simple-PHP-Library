@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Language
- * @version 3.7.1
+ * @version 3.8
  *
  */
 
@@ -25,7 +25,7 @@ class Language
      *
      * @var string
      */
-    protected $log;
+    protected $log = '';
 
     /**
      * Session array
