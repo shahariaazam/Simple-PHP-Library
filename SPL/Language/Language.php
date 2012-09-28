@@ -317,7 +317,7 @@ class Language
      * @param void
      * @return void
      */
-    private function loadTexts()
+    protected function loadTexts()
     {
         // ==== Temporary log ==== //
         $log = '';
@@ -329,7 +329,7 @@ class Language
         if(!is_array($this->texts))
         {
             // ==== Checking if a file was detected ==== //
-            if($this->file !== null)
+            if($this->file == null)
             {
                 // ==== Adding debug data ==== //
                 if($this->options['debug'])
