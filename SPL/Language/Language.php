@@ -21,39 +21,32 @@ class Language
 {
 
     /**
+     * Log
+     *
+     * @var string
+     */
+    protected $log;
+
+    /**
+     * Session array
+     *
+     * @var array
+     */
+    protected $session;
+
+    /**
      * Variable that contains options for the class
      *
      * @var array
      */
-    private $options;
+    protected $options;
 
     /**
      * Unique identifier
      *
      * @var string
      */
-    private $uq;
-
-    /**
-     * Language file location
-     *
-     * @var string
-     */
-    private $file;
-
-    /**
-     * Array with all the texts
-     *
-     * @var array
-     */
-    private $texts;
-
-    /**
-     * Variable that holds the options for the debug mail
-     *
-     * @var array
-     */
-    private $mopt;
+    protected $uq;
 
     /**
      * Url object
@@ -63,11 +56,32 @@ class Language
     protected $url;
 
     /**
+     * Language file location
+     *
+     * @var string
+     */
+    protected $file = null;
+
+    /**
+     * Array with all the texts
+     *
+     * @var array
+     */
+    protected $texts;
+
+    /**
+     * Detected language
+     *
+     * @var string
+     */
+    protected $lang;
+
+    /**
      * CodeIgniter object
      *
      * @var CodeIgniter
      */
-     private $CI;
+    protected $CI;
 
     /**
      * Sets class options
@@ -79,17 +93,23 @@ class Language
     public function __construct(UrlInterface $url, array $options = array())
     {
         // ==== Default options ==== //
-        $this->options['default_language']  = 'en';
-        $this->options['code_igniter']      = false;
-        $this->options['lang_dir']          = 'lang/';
-        $this->options['lang_sufix']        = '.lang.php';
-        $this->options['cookie_enabled']    = false;
-        $this->options['cookie_expire']     = 2592000;
-        $this->options['cookie_domain']     = '';
-        $this->options['cookie_path']       = '/';
-        $this->options['debug']             = false;
-        $this->options['mail_id']           = '[GENERIC]';
-        $this->options['mail']              = 'webmaster@'.$_SERVER['HTTP_HOST'];
+        $this->options['default_language'] = 'en';
+        $this->options['code_igniter']     = false;
+
+        // ==== Language files options ==== //
+        $this->options['lang_dir']         = 'lang/';
+        $this->options['lang_sufix']       = '.lang.php';
+
+        // ==== Cookie options ==== //
+        $this->options['cookie_enabled']   = false;
+        $this->options['cookie_expire']    = 2592000;
+        $this->options['cookie_domain']    = '';
+        $this->options['cookie_path']      = '/';
+
+        // ==== Debug options ==== //
+        $this->options['debug']            = false;
+        $this->options['mail_id']          = '[GENERIC]';
+        $this->options['mail']             = 'webmaster@' . $_SERVER['HTTP_HOST'];
 
         // ==== Replacing the internal values with the external ones ==== //
         if(count($options) > 0)
@@ -105,64 +125,148 @@ class Language
             // ==== Getting the cookie domain ==== //
             $this->options['cookie_domain'] = $this->CI->config->item('cookie_domain');
         }
-        else
-        {
-            // ==== Checking for session initialization ==== //
-            if(session_id() == '')
-            {
-                trigger_error('The Language class requires sessions to work properly.', E_USER_WARNING);
-            }
-        }
 
         // Getting the Url object
         $this->url = $url;
 
-        // ==== Setting up mail options ==== //
-        $this->mopt['to']         = $this->options['mail'];
-        $this->mopt['subject']    = '[DEBUG]' . $this->options['mail_id'] . ' ' . __CLASS__ . ' Class';
-        $this->mopt['msg']        = '';
-        $this->mopt['headers']    = 'MIME-Version: 1.0' . "\r\n";
-        $this->mopt['headers']   .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-
-        // ==== Loading the language ==== //
-        $this->loadLanguage();
-
-        // ==== Loading the texts ==== //
-        $this->loadTexts();
+        // Initializing
+        $this->initialize();
     }
 
     /**
-     * Retrieves the current language
+     * Initializes the language class properties
+     *
+     * @param void
+     * @return void
+     */
+    protected function initialize()
+    {
+        // ==== Generating a unique ID ==== //
+        $this->uq = sha1(realpath(dirname(__FILE__)));
+
+        // ==== Detecting the language ==== //
+        $this->detectLanguage();
+
+        // ==== Setting the language
+        $this->setLanguage();
+
+        // ==== Loading the language ==== //
+        $this->loadLanguage();
+    }
+
+    /**
+     * The method retrieves the data from session
+     *
+     * @param void
+     * @return void
+     */
+    protected function getSession()
+    {
+        $this->session = $_SESSION;
+    }
+
+    /**
+     * The method saves the session data
+     *
+     * @param void
+     * @return void
+     */
+    protected function setSession()
+    {
+        if(is_array($_SESSION))
+        {
+            $_SESSION = array_merge($_SESSION, $this->session);
+        }
+        else
+        {
+            $_SESSION = $this->session;
+        }
+    }
+
+    /**
+     * Detectes the current language
+     *
+     * @param void
+     * @return void
+     */
+    protected function detectLanguage()
+    {
+        // ==== Checking the possible locations for a language ==== //
+        /**
+         * -------------------------
+         * LANGUAGE ID FROM GET
+         * -------------------------
+         */
+        if($this->url->getParam('lang') !== null)
+        {
+            $this->lang = $this->url->getParam('lang');
+        }
+        /**
+         * -------------------------
+         * LANGUAGE ID FROM SESSION
+         * -------------------------
+         */
+        else if(isset($this->session['lang_' . $this->uq]))
+        {
+            $this->lang = $this->session['lang_' . $this->uq];
+        }
+        /**
+         * -------------------------
+         * LANGUAGE ID FROM COOKIE
+         * -------------------------
+         */
+        else if($this->options['cookie_enabled'] == true && isset($_COOKIE['lang_' . $this->uq]))
+        {
+            $this->lang = $_COOKIE['lang_' . $this->uq];
+        }
+        /**
+         * -------------------------
+         * DEFAULT LANGUAGE
+         * -------------------------
+         */
+        else
+        {
+            $this->lang = $this->options['default_language'];
+        }
+    }
+
+    /**
+     * Sets the language in different locations (like session and cookie)
+     *
+     * @param void
+     * @return void
+     */
+    protected function setLanguage()
+    {
+        // ==== Intializing or overwriting the session variable ===== //
+        $this->session['lang_' . $this->uq] = $this->lang;
+
+        // ==== If rememeber is active ==== //
+        if($this->options['cookie_enabled'] == true
+                && is_numeric($this->options['cookie_expire'])
+                && $this->options['cookie_expire'] >= 0
+                && !empty($this->options['cookie_path'])
+                && !empty($this->options['cookie_domain'])
+                && ((isset($_COOKIE['lang_' . $this->uq]) && $_COOKIE['lang_' . $this->uq] != $this->lang) || !isset($_COOKIE['lang_' . $this->uq]))
+        )
+        {
+            // ==== Setting the cookie ==== //
+            setcookie('lang_' . $this->uq, $this->lang, time() + $this->options['cookie_expire'], $this->options['cookie_path'], $this->options['cookie_domain']);
+
+            // ==== Setting the cookie var ==== //
+            $_COOKIE['lang_' . $this->uq] = $this->lang;
+        }
+    }
+
+    /**
+     * Returns the current language
      *
      * @param void
      * @return string
      */
     public function getLanguage()
     {
-        // ==== Checking the possible locations for a language ==== //
-        if($this->url->getParam('lang') !== null) // LANG PARAM IN GET
-        {
-            $lang = $this->url->getParam('lang');
-        }
-        elseif(isset($_SESSION['lang_' . $this->uq])) // LANGUAGE ID FROM SESSION
-        {
-            $lang = $_SESSION['lang_' . $this->uq];
-        }
-        elseif($this->options['code_igniter'] == true && $this->CI->session->userdata('lang_' . $this->uq) != false) // LANGUAGE ID FROM CI SESSION
-        {
-            $lang = $this->CI->session->userdata('lang_' . $this->uq);
-        }
-        elseif(isset($_COOKIE['lang_' . $this->uq]) && $this->options['cookie_enabled'] == true) // LANGUAGE ID FROM COOKIE
-        {
-            $lang = $_COOKIE['lang_' . $this->uq];
-        }
-        else // DEFAULT LANGUAGE
-        {
-            $lang = $this->options['default_language'];
-        }
-
-        // ==== Returning the language ==== //
-        return $lang;
+        return $this->lang;
     }
 
     /**
@@ -173,61 +277,26 @@ class Language
      */
     protected function loadLanguage()
     {
-        // ==== Generating unique identifier ==== //
-        $salt = realpath(dirname(__FILE__));
-
-        // ==== Hashing unique ID ==== //
-        $this->uq = sha1($salt);
-
-        // ==== Getting the language ==== //
-        $lang = $this->getLanguage();
-
         // ==== Building language file path for the requested language ==== //
-        $langfile = $this->options['lang_dir'] . $lang . $this->options['lang_sufix'];
+        $file = $this->options['lang_dir'] . $this->lang . $this->options['lang_sufix'];
 
         // ==== Checking if the file exists == falling back to default if not ==== //
-        if(!is_file($langfile))
+        if(!is_file($file))
         {
-            $lang = $this->options['default_language'];
+            $this->lang = $this->options['default_language'];
 
             // ==== Building language file path for the default language ==== //
-            $langfile = $this->options['lang_dir'] . $lang . $this->options['lang_sufix'];
+            $file = $this->options['lang_dir'] . $this->lang . $this->options['lang_sufix'];
 
             // ==== Adding debug data ==== //
             if($this->options['debug'])
             {
-                $this->mopt['msg'] .= '<b>Notice:</b> File <i><u>' . $this->file . '</u></i> not found. Falling back to default language.<br /><br />';
+                $this->log .= '<b>Notice:</b> File <i><u>' . $this->file . '</u></i> not found. Falling back to default language.<br /><br />';
             }
-        }
 
-        // ==== Intializing or overwriting the session variable ===== //
-        if($this->options['code_igniter'] == true)
-        {
-            $this->CI->session->set_userdata('lang_' . $this->uq, $lang);
+            // ==== Assign language file path ==== //
+            $this->file = $file;
         }
-        else
-        {
-            $_SESSION['lang_' . $this->uq] = $lang;
-        }
-
-        // ==== If rememeber is active ==== //
-        if($this->options['cookie_enabled'] == true
-                && is_numeric($this->options['cookie_expire'])
-                && $this->options['cookie_expire'] >= 0
-                && !empty($this->options['cookie_path'])
-                && !empty($this->options['cookie_domain'])
-                && ((isset($_COOKIE['lang_' . $this->uq]) && $_COOKIE['lang_' . $this->uq] != $lang) || !isset($_COOKIE['lang_' . $this->uq]))
-        )
-        {
-            // ==== Setting the cookie ==== //
-            setcookie('lang_' . $this->uq, $lang, time() + $this->options['cookie_expire'], $this->options['cookie_path'], $this->options['cookie_domain']);
-
-            // ==== Setting the cookie var ==== //
-            $_COOKIE['lang_' . $this->uq] = $lang;
-        }
-
-        // ==== Assign language file path ==== //
-        $this->file = $langfile;
     }
 
     /**
@@ -247,8 +316,8 @@ class Language
         // ==== Checking if the texts have already been loaded ==== //
         if(!is_array($this->texts))
         {
-            // ==== Second file check == First was in constructor ==== //
-            if(!is_file($this->file))
+            // ==== Checking if a file was detected ==== //
+            if($this->file !== null)
             {
                 // ==== Adding debug data ==== //
                 if($this->options['debug'])
@@ -284,7 +353,7 @@ class Language
         // ==== Adding debug data ==== //
         if($this->options['debug'] && $isOk === false)
         {
-            $this->mopt['msg'] .= $log;
+            $this->log .= $log;
         }
 
         // ==== Returning result ==== //
@@ -300,6 +369,19 @@ class Language
      */
     public function _($txt, array $data = array())
     {
+        // Static var to determine if the texts were loaded
+        static $textsLoaded = false;
+
+        // Checking if the texts were loaded
+        if($textsLoaded == false)
+        {
+            // Loading the texts
+            $this->loadTexts();
+
+            // Setting the flag
+            $textsLoaded = true;
+        }
+
         // ==== Checking if the text exists ==== //
         if(isset($this->texts[$txt]))
         {
@@ -310,7 +392,7 @@ class Language
             if(count($data) > 0)
             {
                 // ==== Going through the data and replacing stuff in the text ==== //
-                foreach ($data as $token => $value)
+                foreach($data as $token => $value)
                 {
                     $text = str_replace('{' . $token . '}', $value, $text);
                 }
@@ -332,7 +414,7 @@ class Language
                 $line = $backtrace[0]['line'];
                 $file = $backtrace[0]['file'];
 
-                $this->mopt['msg'] .= '<br /><b>Info:</b><br />Line: ' . $line . '<br />File: ' . $file . '<br /><br />' . $log;
+                $this->log .= '<br /><b>Info:</b><br />Line: ' . $line . '<br />File: ' . $file . '<br /><br />' . $log;
             }
 
             return false;
@@ -348,10 +430,14 @@ class Language
     public function __destruct()
     {
         // ==== Sending debug if on ==== //
-        if($this->options['debug'] && $this->mopt['msg'] != '')
+        if($this->options['debug'] && $this->log != '')
         {
+            // ==== Setting up mail options ==== //
+            $subject = '[DEBUG]' . $this->options['mail_id'] . ' ' . __CLASS__ . ' Class';
+            $headers = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+
             // ==== Sending debug mail ==== //
-            mail($this->mopt['to'], $this->mopt['subject'], $this->mopt['msg'], $this->mopt['headers']);
+            mail($this->options['mail'], $subject, $this->log, $headers);
         }
     }
 
