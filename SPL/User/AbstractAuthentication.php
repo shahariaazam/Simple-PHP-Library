@@ -10,7 +10,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name AbstractUserAuth
- * @version 2.3
+ * @version 2.5
  *
  *
  * External errors:
@@ -72,6 +72,7 @@ use SPL\Url;
 use SPL\Http\Headers as Headers;
 use SPL\Security\SecurityInterface;
 use SPL\Variable\Variable as Variable;
+use SPL\Db\DbInterface;
 
 abstract class AbstractAuthentication implements AuthenticationInterface
 {
@@ -143,13 +144,13 @@ abstract class AbstractAuthentication implements AuthenticationInterface
     /**
      * Sets different class properties and some options
      *
-     * @param object $db
+     * @param DbInterface $db
      * @param UsersInterface $userAcc
      * @param SecurityInterface $vault
      * @param array $options
      * @return void
      */
-    public function __construct($db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
+    public function __construct(DbInterface $db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']   = '';
@@ -223,7 +224,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      */
     protected function getSession()
     {
-        
+
         if(isset($_SESSION['auth']))
         {
             $this->session['auth'] = $_SESSION['auth'];

@@ -12,7 +12,7 @@
  * @uses Password validator object
  *
  * @name AbstractUserAcc
- * @version 2.3
+ * @version 2.5
  *
  *
  * Internal errors:
@@ -70,8 +70,9 @@ namespace SPL\User;
 use SPL\Url;
 use SPL\Validator\Email;
 use SPL\Validator\Password;
-use SPL\Http\Headers as Headers;
+use SPL\Http\Headers;
 use SPL\Security\SecurityInterface;
+use SPL\Db\DbInterface;
 
 abstract class AbstractUsers implements UsersInterface
 {
@@ -105,6 +106,13 @@ abstract class AbstractUsers implements UsersInterface
     protected $userPrototype;
 
     /**
+     * User prototype class
+     *
+     * @var string
+     */
+    protected $userPrototypeClass = 'SPL\\User\\User';
+
+    /**
      * Database object
      *
      * @var db_module
@@ -135,12 +143,13 @@ abstract class AbstractUsers implements UsersInterface
     /**
      * Sets different class properties and some options
      *
-     * @param object $db
+     * @param DbInterface $db
      * @param SecurityInterface $vault
      * @param array $options
+     * @param UserInterface $userPrototype
      * @return void
      */
-    public function __construct($db, SecurityInterface $vault, array $options = array())
+    public function __construct(DbInterface $db, SecurityInterface $vault, array $options = array(), UserInterface $userPrototype = null)
     {
         // ==== Default $options ==== //
         $this->options['unique_mail'] = '';
@@ -162,8 +171,32 @@ abstract class AbstractUsers implements UsersInterface
         // ==== Getting the vault object ==== //
         $this->vault = $vault;
 
+        // ==== Getting the userPrototype class ==== //
+        if($userPrototype instanceof UserInterface)
+        {
+            $this->setUserPrototype($userPrototype);
+        }
+
+        // ==== Initializing ==== //
+        $this->initialize();
+    }
+
+    /**
+     * The method initializes the rest of the object
+     *
+     * @param void
+     * @return void
+     */
+    protected function initialize()
+    {
         // ==== Getting the session data ==== //
         $this->getSession();
+
+        // ==== Setting the userPrototype class if not set already==== //
+        if($this->userPrototype instanceof UserInterface == false)
+        {
+            $this->setUserPrototype(new $this->userPrototypeClass);
+        }
     }
 
     /**
@@ -207,7 +240,7 @@ abstract class AbstractUsers implements UsersInterface
      */
     protected function setSession()
     {
-        
+
     }
 
     /**

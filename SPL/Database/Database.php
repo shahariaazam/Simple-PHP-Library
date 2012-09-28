@@ -21,10 +21,12 @@
 
 namespace SPL\Database;
 
+use SPL\Db\DbInterface;
+
 ////////////////////////////////////////////////////////////////////////////
 //  Database Initializer                                                 //
 //////////////////////////////////////////////////////////////////////////
-abstract class Database
+abstract class Database implements DbInterface
 {
 
     /**
