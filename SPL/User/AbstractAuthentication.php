@@ -159,6 +159,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
         $this->options['cookie_expire'] = 2592000;
         $this->options['cookie_path']   = '/';
         $this->options['cookie_domain'] = '';
+        $this->options['cookie_hide']   = true;
 
         // ==== Replacing the internal values with the external ones ==== //
         if(is_array($options) && count($options) > 0)
@@ -178,11 +179,26 @@ abstract class AbstractAuthentication implements AuthenticationInterface
         // ==== Getting the UserAcc object ==== //
         $this->userAcc = $userAcc;
 
+        // ==== Initializing ==== //
+        $this->initialize();
+    }
+
+    /**
+     * The method initializes the rest of the object
+     *
+     * @param void
+     * @return void
+     */
+    protected function initialize()
+    {
         // ==== Getting the session data ==== //
         $this->getSession();
 
         // ==== Hidding the cookie ==== //
-        $this->hideCookie();
+        if($this->options['cookie_hide'] === true)
+        {
+            $this->hideCookie();
+        }
 
         // ==== Triggering the auto-authentication ==== //
         $this->doAuth();
