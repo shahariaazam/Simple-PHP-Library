@@ -142,7 +142,7 @@ class Language
     protected function initialize()
     {
         // ==== Generating a unique ID ==== //
-        $this->uq = sha1(realpath(dirname(__FILE__)));
+        $this->uq = sha1(serialize($this->options));
 
         // ==== Detecting the language ==== //
         $this->detectLanguage();
