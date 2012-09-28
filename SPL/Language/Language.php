@@ -296,7 +296,9 @@ class Language
             {
                 $this->log .= '<b>Notice:</b> File <i><u>' . $this->file . '</u></i> not found. Falling back to default language.<br /><br />';
             }
-
+        }
+        else
+        {
             // ==== Assign language file path ==== //
             $this->file = $file;
         }
