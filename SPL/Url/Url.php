@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * URL manager class.
@@ -19,6 +20,7 @@ use SPL\Validator;
 
 class Url implements UrlInterface
 {
+
     /**
      * Options array. This contains settings about how the class should act.
      *
@@ -59,7 +61,7 @@ class Url implements UrlInterface
      *
      * @var array
      */
-    private $url_params = array();
+    private $params = array();
 
     /**
      * Rewrite active or not
@@ -73,20 +75,22 @@ class Url implements UrlInterface
      *
      * @param array $options
      * @return void
+     * @throws Exception\RuntimeException
      */
     public function __construct(array $options = array())
     {
         // ==== Default options ==== //
         $this->options['site_root']         = '';
         $this->options['site_root_ssl']     = '';
-        $this->options['controller']        = 'c';
-        $this->options['action']            = 'a';
+        $this->options['controller']        = 'controller';
+        $this->options['action']            = 'action';
         $this->options['index_page']        = 'index';
         $this->options['persistent_params'] = array();
-        $this->options['rewrite']           = false;
-        $this->options['use_get_array']     = true;
-        $this->options['require_ssl']       = false;
-        $this->options['mvc_style']         = false; // URL format similar to the ones used by a MVC
+        $this->options['rewrite']         = false;
+        $this->options['use_get_array']   = false;
+        $this->options['require_ssl']     = false;
+        $this->options['mvc_style']       = false; // URL format similar to the ones used by a MVC
+        $this->options['auto_initialize'] = true;
 
         // ==== Replacing options with custom ones ==== //
         if(count($options) > 0)
@@ -94,6 +98,22 @@ class Url implements UrlInterface
             $this->options = array_replace($this->options, $options);
         }
 
+        // Checking if we should auto initialize the object
+        if($this->options['auto_initialize'])
+        {
+            $this->initialize();
+        }
+    }
+
+    /**
+     * Initializes the class
+     *
+     * @param void
+     * @return void
+     * @throws Exception\RuntimeException
+     */
+    protected function initialize()
+    {
         // ==== Checking if the site_root option has been set ==== //
         if(!empty($this->options['site_root']))
         {
@@ -104,13 +124,13 @@ class Url implements UrlInterface
             $this->url = self::getFullURL();
 
             // ==== Correcting the site root ==== //
-            if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/')+1))
+            if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/') + 1))
             {
                 $this->options['site_root'] .= '/';
             }
 
             // ==== Correcting the URL ==== //
-            if($this->rewrite && strlen($this->url) > (strrpos($this->url, '/')+1) && strpos($this->url, '?'.$this->options['controller'].'=') === false)
+            if($this->rewrite && strlen($this->url) > (strrpos($this->url, '/') + 1) && strpos($this->url, '?' . $this->options['controller'] . '=') === false)
             {
                 $this->url .= '/';
             }
@@ -124,7 +144,7 @@ class Url implements UrlInterface
             // == If invalid == //
             if(Validator\Url::isValid($this->options['site_root'], false) === false)
             {
-                throw new Exception\InvalidArgumentException('Invalid site root URL. URL: ' . $this->options['site_root']);
+                throw new Exception\RuntimeException('Invalid site root URL. URL: ' . $this->options['site_root']);
             }
             else
             {
@@ -141,7 +161,7 @@ class Url implements UrlInterface
         else
         {
             // ==== Triggering error ==== //
-            throw new Exception\InvalidArgumentException('The site root parameter is not set.');
+            throw new Exception\RuntimeException('The site root parameter is not set.');
         }
     }
 
@@ -154,13 +174,11 @@ class Url implements UrlInterface
      */
     public static function getFullURL()
     {
-        $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
-        $domain = $_SERVER['SERVER_NAME'];
+        $protocol    = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+        $domain      = $_SERVER['SERVER_NAME'];
         $request_uri = $_SERVER['REQUEST_URI'];
 
-        $full_url = $protocol . $domain . $request_uri;
-
-        return $full_url;
+        return $protocol . $domain . $request_uri;
     }
 
     /**
@@ -172,13 +190,12 @@ class Url implements UrlInterface
     public static function deparse_url($comps)
     {
         // Building the URL from the components
-        $url = (isset($comps['scheme']) ? $comps['scheme'] : '') . '://' .  // Protocol
-               (isset($comps['host']) ? $comps['host'] : '') .              // Host
-               (isset($comps['port']) ? ':' . $comps['port'] : '') .        // Port
-               (isset($comps['path']) ? $comps['path'] : '') .              // Path
-               (isset($comps['query']) ? '?' . $comps['query'] : '') .      // Query string
-               (isset($comps['fragment']) ? $comps['fragment'] : '');       // Anchor
-
+        $url = (isset($comps['scheme']) ? $comps['scheme'] : '') . '://' . // Protocol
+                (isset($comps['host']) ? $comps['host'] : '') . // Host
+                (isset($comps['port']) ? ':' . $comps['port'] : '') . // Port
+                (isset($comps['path']) ? $comps['path'] : '') . // Path
+                (isset($comps['query']) ? '?' . $comps['query'] : '') . // Query string
+                (isset($comps['fragment']) ? $comps['fragment'] : '');       // Anchor
         // Returning the URL
         return $url;
     }
@@ -189,7 +206,7 @@ class Url implements UrlInterface
      * @param void
      * @return string
      */
-    private function getSiteRoot()
+    protected function getSiteRoot()
     {
         // Default site root
         $site_root = $this->options['site_root'];
@@ -213,12 +230,12 @@ class Url implements UrlInterface
      * @param void
      * @return void
      */
-    private function loadGetParams()
+    protected function loadGetParams()
     {
         // Going through the elements in the $_GET array
-        foreach($_GET as $index => $value)
+        foreach($_GET as $name => $value)
         {
-            $this->setParam($index, rawurldecode(trim($value)));
+            $this->setParam($name, rawurldecode(trim($value)));
         }
 
         // Resseting the $_GET array if we should not use it
@@ -228,7 +245,7 @@ class Url implements UrlInterface
         }
     }
 
-/**
+    /**
      * Retrieves data from the URL string
      *
      * @throws Exception
@@ -292,7 +309,7 @@ class Url implements UrlInterface
                     }
 
                     // ==== The data should contain an even number of elements ==== //
-                    if(count($data)%2 == 0)
+                    if(count($data) % 2 == 0)
                     {
                         // Reindexing the array
                         $data = array_values($data);
@@ -311,7 +328,7 @@ class Url implements UrlInterface
                     // ==== Merging the $_GET array with the $get array ==== //
                     if($this->options['use_get_array'] === true)
                     {
-                        $_GET = array_merge($_GET, $this->url_params);
+                        $_GET = array_merge($_GET, $this->params);
                     }
                 }
             }
@@ -358,9 +375,9 @@ class Url implements UrlInterface
     public function getParam($name, $default = null)
     {
         // Checking if the parameter exists
-        if(isset($this->url_params[$name]))
+        if(isset($this->params[$name]))
         {
-            return $this->url_params[$name];
+            return $this->params[$name];
         }
 
         // Returning null if the parameter does not exist
@@ -379,7 +396,7 @@ class Url implements UrlInterface
         // Setting the parameters value
         if(!empty($value))
         {
-            $this->url_params[$name] = rawurlencode(trim($value));
+            $this->params[$name] = rawurlencode(trim($value));
         }
 
         // Returning the current object
@@ -394,7 +411,7 @@ class Url implements UrlInterface
      */
     public function getParams()
     {
-        return $this->url_params;
+        return $this->params;
     }
 
     /**
@@ -542,20 +559,14 @@ class Url implements UrlInterface
             $params = self::array_append($params, $this->persistent_params);
         }
 
-        // ==== Failsafes for when CI support is enabled ==== //
+        // ==== Failsafes for MVC style URL ==== //
         if($this->options['mvc_style'])
         {
-            // Controller param
-            if(!isset($params[$this->options['controller']]))
-            {
-                $params[$this->options['controller']] = $page;
-            }
-
             // Adding the default params only if params count is higher then 1
             if(count($params) > 1)
             {
                 // Method param
-                if(!isset($params[$this->options['action']]))
+                if(empty($params[$this->options['action']]))
                 {
                     $params[$this->options['action']] = 'index';
                 }
@@ -568,49 +579,16 @@ class Url implements UrlInterface
             ////////////////////////////////////////////////////////////////
             //    REWRITE ENABLED
             ///////////////////////////////////////////////////////////////
-            // ==== Checking if the URL is to be build using the MVC style ==== //
-            if($this->options['mvc_style'])
+            // The characters that join the parameters
+            $glue1 = $glue2 = '/';
+
+            // ==== Building the firs part of the URL ==== //
+            $url .= $page;
+
+            // ==== Checking for the rest of the params ==== //
+            if(!empty($params[$this->options['action']]))
             {
-                // ==== Building the firs part of the URL ==== //
-                $url .= $params[$this->options['controller']] . '/';
-
-                // ==== Checking for the rest of the params ==== //
-                if(isset($params[$this->options['action']]))
-                {
-                     $url .= $params[$this->options['action']] . '/';
-                }
-
-                // ==== Building the omit array ==== //
-                $omit_array = array(
-                    $this->options['controller'],
-                    $this->options['action']
-                );
-            }
-            else
-            {
-                // ==== Adding the requested page to the URL ==== //
-                $url .= $page . '/';
-
-                // ==== Building the omit array ==== //
-                $omit_array = array(
-                    $this->options['controller']
-                );
-            }
-
-            // ==== Going through the params and building the URL ==== //
-            foreach($params as $name => $value)
-            {
-                // ==== Skipping the page token if present ==== //
-                if(in_array($name, $omit_array))
-                {
-                    continue;
-                }
-
-                // ==== Adding the parameter to the URL ==== //
-                if(trim($value) != '')
-                {
-                    $url .= $name . '/' . $value . '/';
-                }
+                $url .= $glue1 . $params[$this->options['action']];
             }
         }
         elseif(!empty($page))
@@ -618,54 +596,44 @@ class Url implements UrlInterface
             ////////////////////////////////////////////////////////////////
             //    REWRITE DISABLED
             ///////////////////////////////////////////////////////////////
-            // ==== Checking if the URL is to be build using the MVC style ==== //
-            if($this->options['mvc_style'])
+            // The characters that join the parameters
+            $glue1 = '&';
+            $glue2 = '=';
+
+            // ==== Building the firs part of the URL ==== //
+            $url .= '?' . $this->options['controller'] . $glue2 . $page;
+
+            // ==== Checking for the rest of the params ==== //
+            if(!empty($params[$this->options['action']]))
             {
-                // ==== Building the firs part of the URL ==== //
-                $url .= '?' . $this->options['controller'] . '=' . $params[$this->options['controller']];
-
-
-                // ==== Checking for the rest of the params ==== //
-                if(isset($params[$this->options['action']]))
-                {
-                    $url .= '&' . $this->options['action'] . '=' . $params[$this->options['action']];
-                }
-
-                // ==== Building the omit array ==== //
-                $omit_array = array(
-                    $this->options['controller'],
-                    $this->options['action']
-                );
+                $url .= $glue1 . $this->options['action'] . $glue2 . $params[$this->options['action']];
             }
-            else
+        }
+
+        // Removing the controller from the params
+        if(!empty($params[$this->options['controller']]))
+        {
+            unset($params[$this->options['controller']]);
+        }
+
+        // Removing the action from the params
+        if(!empty($params[$this->options['action']]))
+        {
+            unset($params[$this->options['action']]);
+        }
+
+        // ==== Going through the params and building the URL ==== //
+        foreach($params as $name => $value)
+        {
+            // ==== Adding the parameter to the URL ==== //
+            if(trim($value) != '')
             {
-                // ==== Adding the requested page to the URL ==== //
-                $url .= '?' . $this->options['controller'] . '=' . $page;
-
-                // ==== Building the omit array ==== //
-                $omit_array = array(
-                    $this->options['controller']
-                );
-            }
-
-            // ==== Going through the params and building the URL ==== //
-            foreach($params as $name => $value)
-            {
-                // ==== Skipping the page token if present ==== //
-                if(in_array($name, $omit_array))
-                {
-                    continue;
-                }
-
-                // ==== Adding the parameter to the URL ==== //
-                if(trim($value) != '')
-                {
-                    $url .= '&' . $name . '=' . $value;
-                }
+                $url .= $glue1 . $name . $glue2 . $value;
             }
         }
 
         // ==== Returning result ==== //
         return $url;
     }
+
 }
