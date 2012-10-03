@@ -10,7 +10,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name URL
- * @version 2.9
+ * @version 3.0
  *
  */
 
@@ -297,31 +297,25 @@ class Url implements UrlInterface
                     // ==== Getting the controller ==== //
                     $this->setParam($this->options['controller'], $data[0]);
 
-                    // Removing from data
-                    unset($data[0]);
-
                     // ==== Getting the method ==== //
-                    if($this->options['mvc_style'] && isset($data[1]))
+                    if($this->options['mvc_style'] && !empty($data[1]))
                     {
                         $this->setParam($this->options['action'], $data[1]);
-
-                        // Removing from data
-                        unset($data[1]);
                     }
 
-                    // ==== The data should contain an even number of elements ==== //
-                    if(count($data) % 2 == 0)
-                    {
-                        // Reindexing the array
-                        $data = array_values($data);
+                    // Data count
+                    $count = count($data);
 
+                    // ==== The data should contain an even number of elements ==== //
+                    if($count % 2 == 0)
+                    {
                         // ==== Going through the names and building the URL params array ==== //
-                        foreach($data as $key => $value)
+                        for($i = 2; $i < $count; $i++)
                         {
                             // Adding the parameter data to the URL params array
-                            if($key % 2 == 0)
+                            if($i % 2 == 0)
                             {
-                                $this->setParam($data[$key], $data[$key + 1]);
+                                $this->setParam($data[$i], $data[$i + 1]);
                             }
                         }
                     }
@@ -564,7 +558,7 @@ class Url implements UrlInterface
         if($this->options['mvc_style'])
         {
             // Adding the default params only if params count is higher then 1
-            if(count($params) > 1)
+            if(count($params) >= 1)
             {
                 // Method param
                 if(empty($params[$this->options['action']]))
@@ -590,9 +584,12 @@ class Url implements UrlInterface
             if(!empty($params[$this->options['action']]))
             {
                 $url .= $glue1 . $params[$this->options['action']];
+
+                // Removing the action
+                unset($params[$this->options['action']]);
             }
         }
-        elseif(!empty($page))
+        else if(!empty($page))
         {
             ////////////////////////////////////////////////////////////////
             //    REWRITE DISABLED
@@ -608,6 +605,9 @@ class Url implements UrlInterface
             if(!empty($params[$this->options['action']]))
             {
                 $url .= $glue1 . $this->options['action'] . $glue2 . $params[$this->options['action']];
+
+                // Removing the action
+                unset($params[$this->options['action']]);
             }
         }
 
@@ -615,12 +615,6 @@ class Url implements UrlInterface
         if(!empty($params[$this->options['controller']]))
         {
             unset($params[$this->options['controller']]);
-        }
-
-        // Removing the action from the params
-        if(!empty($params[$this->options['action']]))
-        {
-            unset($params[$this->options['action']]);
         }
 
         // ==== Going through the params and building the URL ==== //
