@@ -191,11 +191,12 @@ class Url implements UrlInterface
     {
         // Building the URL from the components
         $url = (isset($comps['scheme']) ? $comps['scheme'] : '') . '://' . // Protocol
-                (isset($comps['host']) ? $comps['host'] : '') . // Host
-                (isset($comps['port']) ? ':' . $comps['port'] : '') . // Port
-                (isset($comps['path']) ? $comps['path'] : '') . // Path
-                (isset($comps['query']) ? '?' . $comps['query'] : '') . // Query string
-                (isset($comps['fragment']) ? $comps['fragment'] : '');       // Anchor
+                (isset($comps['host']) ? $comps['host'] : '') .            // Host
+                (isset($comps['port']) ? ':' . $comps['port'] : '') .      // Port
+                (isset($comps['path']) ? $comps['path'] : '') .            // Path
+                (isset($comps['query']) ? '?' . $comps['query'] : '') .    // Query string
+                (isset($comps['fragment']) ? $comps['fragment'] : '');     // Anchor
+
         // Returning the URL
         return $url;
     }
