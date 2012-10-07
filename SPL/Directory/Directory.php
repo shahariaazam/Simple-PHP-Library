@@ -101,7 +101,7 @@ class Directory
                 }
 
                 // Adding the entry to the contents array
-                $contents[] = $entry;
+                $contents[$dir] = $entry;
             });
 
             // Returning the contents
