@@ -94,7 +94,11 @@ class Directory
                 // Checking if recursive is in effect
                 if(is_dir($dir . $file . '/') && $recursive === true)
                 {
-                    $entry[$dir . $file . '/'] = Directory::getDirectoryContents($dir . $file . '/', $recursive);
+                    $entry['directory'] = array(
+                        'name'     => $file,
+                        'path'     => $dir . $file . '/',
+                        'contents' => Directory::getDirectoryContents($dir . $file . '/', $recursive)
+                    );
                 }
                 else
                 {
