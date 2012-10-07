@@ -97,7 +97,7 @@ class Directory
                 // Checking if recursive is in effect
                 if(is_dir($dir . $file . '/') && $recursive === true)
                 {
-                    $entry['childs'] = self::getDirectoryContents($dir . $file . '/', $recursive);
+                    $entry['childs'] = Directory::getDirectoryContents($dir . $file . '/', $recursive);
                 }
 
                 // Adding the entry to the contents array
