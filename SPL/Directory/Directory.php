@@ -91,13 +91,15 @@ class Directory
                     return null;
                 }
 
-                // Adding the file
-                $entry['file'] = $file;
-
                 // Checking if recursive is in effect
                 if(is_dir($dir . $file . '/') && $recursive === true)
                 {
-                    $entry['childs'] = Directory::getDirectoryContents($dir . $file . '/', $recursive);
+                    $entry[$dir . $file . '/'] = Directory::getDirectoryContents($dir . $file . '/', $recursive);
+                }
+                else
+                {
+                    // Adding the file
+                    $entry['file'] = $file;
                 }
 
                 // Adding the entry to the contents array
