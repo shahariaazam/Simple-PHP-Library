@@ -10,7 +10,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Headers
- * @version 1.0
+ * @version 1.2
  *
  */
 
@@ -41,6 +41,12 @@ class Redirect
      */
     public static function http($url, $options = array())
     {
+        // Throwing the exception if the required function does not exist
+        if(!function_exists('http_redirect'))
+        {
+            throw new Exception\RuntimeException('You need the "pecl_http" PECL extension to use the Redirect::http method');
+        }
+
         // ==== Default http_redirect parameters ==== //
         $params['params'] = array();
         $params['session'] = false;
@@ -52,13 +58,7 @@ class Redirect
             $params = array_replace($params, $options);
         }
 
-        if(function_exists('http_redirect'))
-        {
-            http_redirect($url, $params['params'], $params['session'], $params['status']);
-            exit();
-        }
-
-        // Throwing the exception
-        throw new Exception\RuntimeException('You need the "pecl_http" PECL extension to use the "http_redirect" function.');
+        // Redirecting
+        http_redirect($url, $params['params'], $params['session'], $params['status']);
     }
 }
