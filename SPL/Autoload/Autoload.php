@@ -64,6 +64,9 @@ class Autoload
      */
     public static function register($namespaces = array())
     {
+        // Getting the include paths
+        self::$paths = explode(PATH_SEPARATOR, get_include_path());
+
         // Registering the autoload function
         $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'loadClass'));
 
@@ -153,9 +156,6 @@ class Autoload
      */
     public static function load($class_name)
     {
-        // Getting the include paths
-        self::$paths = explode(PATH_SEPARATOR, get_include_path());
-
         // Checking if the class was already loaded or not
         if(!isset(self::$loaded[$class_name]))
         {
