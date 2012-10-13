@@ -22,21 +22,28 @@ class Autoload
      *
      * @var array
      */
-    private static $loaded = array();
+    protected static $loaded = array();
+
+    /**
+     * Namespaces
+     *
+     * @var array
+     */
+    protected static $namespaces = array();
 
     /**
      * Stores a list of paths (usually the ones from the include path
      *
      * @var array
      */
-    private static $paths = array();
+    protected static $paths = array();
 
     /**
      * Flag that determines if the an exception is thrown or not when a class file is not found
      *
      * @var boolean
      */
-    private static $skip = false;
+    protected static $skip = false;
 
     /**
      * Sets the skip property to true so that no exception is thrown when a file for a class is not found
@@ -52,22 +59,37 @@ class Autoload
     /**
      * Registers the Autoload class as the __autoload() implementation
      *
-     * @param void
+     * @param array $namespaces
      * @return void
      */
-    public static function register()
+    public static function register($namespaces = array())
     {
-        // Getting the include paths
-        self::$paths = explode(PATH_SEPARATOR, get_include_path());
-
         // Registering the autoload function
-        $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'load'));
+        $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'loadClass'));
 
         // Checking if the autoload class was loaded or not
         if($registered === false)
         {
             throw new \RuntimeException('Unable to register the autoload function');
         }
+
+        // Registering the namespaces
+        foreach($namespaces as $namespace => $path)
+        {
+            self::registerNamespace($namespace, $path);
+        }
+    }
+
+    /**
+     * Registers a given namespace
+     *
+     * @param string $namespace
+     * @param string $path
+     * @return void
+     */
+    protected static function registerNamespace($namespace, $path)
+    {
+        self::$namespaces[$namespace] = $path;
     }
 
     /**
@@ -85,11 +107,55 @@ class Autoload
     /**
      * Loads a requested class
      *
+     * @param string $class
+     * @return void
+     * @throws Exception\RuntimeException
+     */
+    protected static function loadClass($class)
+    {
+        // Checking if the class was already loaded or not
+        if(!isset(self::$loaded[$class]))
+        {
+            // Getting the namespace of the class
+            $namespace = current(explode('\\', $class));
+
+            // Checking if the namespace exists
+            if(isset(self::$namespaces[$namespace]))
+            {
+                // Building the filepath
+                $file_path = self::$namespaces[$namespace] . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+
+                // Checking if a file exists for the requested class
+                if(is_file($file_path))
+                {
+                    // Adding the file to the loaded array
+                    self::$loaded[$class] = $file_path;
+
+                    // Loading the file
+                    require $file_path;
+                }
+            }
+
+            // Checking if the class file was loaded
+            if(!isset(self::$loaded[$class]) && self::$skip === false)
+            {
+                self::load_legacy($class);
+            }
+        }
+    }
+
+    /**
+     * Loads a requested class
+     *
      * @param string $class_name
      * @return void
+     * @throws Exception\RuntimeException
      */
     public static function load($class_name)
     {
+        // Getting the include paths
+        self::$paths = explode(PATH_SEPARATOR, get_include_path());
+
         // Checking if the class was already loaded or not
         if(!isset(self::$loaded[$class_name]))
         {
@@ -112,7 +178,7 @@ class Autoload
                     self::$loaded[$class_name] = $file_path;
 
                     // Loading the file
-                    require $file_path;
+                    require_once $file_path;
                 }
             }
 
