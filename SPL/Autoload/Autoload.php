@@ -9,7 +9,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Autoload
- * @version 1.1
+ * @version 2.0
  *
  */
 
@@ -17,6 +17,7 @@ namespace SPL\Autoload;
 
 class Autoload
 {
+
     /**
      * Stores the loaded classes
      *
@@ -30,13 +31,6 @@ class Autoload
      * @var array
      */
     protected static $namespaces = array();
-
-    /**
-     * Stores a list of paths (usually the ones from the include path
-     *
-     * @var array
-     */
-    protected static $paths = array();
 
     /**
      * Flag that determines if the an exception is thrown or not when a class file is not found
@@ -64,9 +58,6 @@ class Autoload
      */
     public static function register($namespaces = array())
     {
-        // Getting the include paths
-        self::$paths = explode(PATH_SEPARATOR, get_include_path());
-
         // Registering the autoload function
         $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'loadClass'));
 
@@ -96,18 +87,6 @@ class Autoload
     }
 
     /**
-     * Used to add more paths to the ones already got from the include path
-     *
-     * @param array $paths
-     * @return void
-     */
-    public static function addPaths(array $paths)
-    {
-        // Adding the new paths
-        self::$paths = array_merge(self::$paths, $paths);
-    }
-
-    /**
      * Loads a requested class
      *
      * @param string $class
@@ -126,67 +105,25 @@ class Autoload
             if(isset(self::$namespaces[$namespace]))
             {
                 // Building the filepath
-                $file_path = self::$namespaces[$namespace] . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+                $file = self::$namespaces[$namespace] . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 
                 // Checking if a file exists for the requested class
-                if(is_file($file_path))
+                if(is_file($file))
                 {
                     // Adding the file to the loaded array
-                    self::$loaded[$class] = $file_path;
+                    self::$loaded[$class] = $file;
 
                     // Loading the file
-                    require $file_path;
+                    include $file;
                 }
             }
 
             // Checking if the class file was loaded
             if(!isset(self::$loaded[$class]) && self::$skip === false)
             {
-                self::load_legacy($class);
+                throw new Exception\RuntimeException('No file was found for class ' . $class);
             }
         }
     }
 
-    /**
-     * Loads a requested class
-     *
-     * @param string $class_name
-     * @return void
-     * @throws Exception\RuntimeException
-     */
-    public static function load($class_name)
-    {
-        // Checking if the class was already loaded or not
-        if(!isset(self::$loaded[$class_name]))
-        {
-            // Formating the class name
-            $file = $class_name . '.php';
-
-            // Fixing the class file name
-            $file = str_replace('\\', DIRECTORY_SEPARATOR, $file);
-
-            // Going through the directories where classes might be
-            foreach(self::$paths as $path)
-            {
-                // Building the file path
-                $file_path = $path . DIRECTORY_SEPARATOR . $file;
-
-                // Checking if a file exists for the requested class
-                if(is_file($file_path))
-                {
-                    // Adding the file to the loaded array
-                    self::$loaded[$class_name] = $file_path;
-
-                    // Loading the file
-                    require_once $file_path;
-                }
-            }
-
-            // Checking if the class file was loaded
-            if(!isset(self::$loaded[$class_name]) && self::$skip === false)
-            {
-                throw new Exception\RuntimeException('No file was found for class ' . $class_name);
-            }
-        }
-    }
 }
