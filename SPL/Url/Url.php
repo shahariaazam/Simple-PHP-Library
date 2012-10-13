@@ -112,7 +112,7 @@ class Url implements UrlInterface
      * @return void
      * @throws Exception\RuntimeException
      */
-    protected function initialize()
+    public function initialize()
     {
         // ==== Checking if the site_root option has been set ==== //
         if(!empty($this->options['site_root']))
@@ -511,6 +511,19 @@ class Url implements UrlInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Called when a call is made to the class like it's a function
+     *
+     * @param string $page Page to link to
+     * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
+     * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
+     * @return string
+     */
+    public function __invoke($page = '', array $params = array(), $merge_get = false)
+    {
+        return $this->get($page, $params, $merge_get);
     }
 
     /**
