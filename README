@@ -9,7 +9,7 @@ Getting started
 // Including the autoloader
 include '/path/to/library/SPL/Autoload/Autoload.php';
 
-// Creating the autoload object
+// Registering the loader
 \SPL\Autoload\Autoload::register(array(
     'SPL' => '/path/to/library' // Note that there is not trailing slash
 ));
@@ -18,7 +18,7 @@ include '/path/to/library/SPL/Autoload/Autoload.php';
 If you don't want the class to throw an Exception when no file for a class is found then also add the following line:
 
 // Skips the Exception trigger when no file is found for the requested class
-Autoload::skipException();
+\SPL\Autoload\Autoload::skipException();
 
 
 Documentation
