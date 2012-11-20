@@ -15,4 +15,4 @@
 
 namespace SPL\Url\Exception;
 
-class InvalidArgumentException extends \InvalidArgumentException implements Exception {}
+class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface {}

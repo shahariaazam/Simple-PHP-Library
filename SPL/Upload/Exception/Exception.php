@@ -15,4 +15,4 @@
 
 namespace SPL\Upload\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}

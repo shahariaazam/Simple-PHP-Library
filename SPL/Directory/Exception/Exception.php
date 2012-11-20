@@ -15,4 +15,4 @@
 
 namespace SPL\Directory\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}

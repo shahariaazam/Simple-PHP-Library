@@ -15,4 +15,4 @@
 
 namespace SPL\User\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}

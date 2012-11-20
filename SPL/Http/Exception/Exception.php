@@ -15,4 +15,4 @@
 
 namespace SPL\Http\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}
