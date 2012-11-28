@@ -22,42 +22,42 @@ class Uploader implements UploadInterface
      *
      * @var string
      */
-    private $log;
+    protected $log;
 
     /**
      * Variable that contains options for the class
      *
      * @var array
      */
-    private $options;
+    protected $options;
 
     /**
      * Property that determins if any files have been set for upload
      *
      * @var boolean
      */
-    private $set_files = false;
+    protected $set_files = false;
 
     /**
      * File list
      *
      * @var array
      */
-    private $file_list = array();
+    protected $file_list = array();
 
     /**
      * Array with files data
      *
      * @var array
      */
-    private $files = array();
+    protected $files = array();
 
     /**
      * Error codes
      *
      * @var array
      */
-    private $errors;
+    protected $errors;
 
     /**
      * Sets the class options
