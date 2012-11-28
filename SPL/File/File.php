@@ -9,13 +9,13 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name File
- * @version 1.0
+ * @version 2.0
  *
  */
 
 namespace SPL\File;
 
-class File extends FileInterface
+class File implements FileInterface
 {
 
     /**
@@ -60,21 +60,50 @@ class File extends FileInterface
     protected $type;
 
     /**
+     * Mime type
+     *
+     * @var string
+     */
+    protected $mime;
+
+    /**
+     * An array that contains extra info about the file
+     *
+     * @var array
+     */
+    protected $extra;
+
+    /**
      * The constructor of the class initializes the file properties using different methods
      *
      * @param string $fqpn This is the fully qualified path name (FQPN). Example: /usr/bin/server.conf
+     * @param array $extra [ optional ] An array containing extra info about the object
      * @return void
      */
-    public function __construct($fqpn)
+    public function __construct($fqpn, array $extra = array())
     {
         $pathinfo = pathinfo($fqpn);
 
-        $this->fqpn      = $fqpn;
+        if(!empty($extra))
+        {
+            $this->extra = $extra;
+        }
+
+        $this->fqpn      = realpath($fqpn);
         $this->extension = !empty($pathinfo['extension']) ? $pathinfo['extension'] : '';
         $this->basename  = $pathinfo['basename'];
         $this->path      = $pathinfo['dirname'];
         $this->size      = filesize($fqpn);
         $this->type      = filetype($fqpn);
+        $this->mime      = '';
+
+        if(isset($this->extra['mime']))
+        {
+            $this->mime = $this->extra['mime'];
+
+            // The mime does not need to be in 2 places
+            unset($this->extra['mime']);
+        }
     }
 
     /**
@@ -88,10 +117,36 @@ class File extends FileInterface
         {
             return $this->$name;
         }
+        else if(isset($this->extra[$name]))
+        {
+            return $this->extra[$name];
+        }
         else
         {
             return null;
         }
+    }
+
+    /**
+     *
+     * @param string $name
+     * @return \SPL\File\File
+     */
+    public function __set($name, $value)
+    {
+        if(is_string($name))
+        {
+            if(property_exists($this, $name) && !in_array($name, array('fqpn', 'extension', 'basename', 'path', 'size')))
+            {
+                $this->$name = $value;
+            }
+            else if(is_numeric($name))
+            {
+                $this->extra[$name] = $value;
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -102,15 +157,10 @@ class File extends FileInterface
      * @throws \SPL\File\Exception\RuntimeException
      * @return \SPL\File\File
      */
-    public function rename($name, $extension = null)
+    public function rename($name, $extension = '')
     {
-        if(!emtpy($name) && !is_numeric($name))
+        if(!empty($name) && !is_numeric($name) && is_string($extension))
         {
-            if($extension === null || !is_string($extension) || strval($extension) == '')
-            {
-                $extension = $this->extension;
-            }
-
             $newname = $name . $extension;
 
             // This is used for an extra check so that we make sure the rename is successfull
@@ -125,17 +175,27 @@ class File extends FileInterface
                 throw new Exception\RuntimeException('The file could not be renamed because the basename is not present in the FPQN');
             }
 
-            if(rename($this->basename, $newname) === false)
+            if(rename($this->path . '/' . $this->basename, $this->path . '/' . $newname) === false)
             {
                 throw new Exception\RuntimeException('Failed to rename the file because of an unkown error');
             }
 
-            if($this->extension !== $extension)
+            if($extension === '')
             {
-                $this->extension = $extension;
+                $pathinfo = pathinfo($this->fqpn);
+
+                if(isset($pathinfo['extension']))
+                {
+                    $extension = $pathinfo['extension'];
+                }
+                else
+                {
+                    throw new Exception\RuntimeException('Failed to autodetect the file extension. Please make sure it is an actual file and not a directory');
+                }
             }
 
-            $this->basename = $newname;
+            $this->extension = $extension;
+            $this->basename  = $newname;
         }
 
         return $this;
@@ -166,5 +226,4 @@ class File extends FileInterface
             exit();
         }
     }
-
 }

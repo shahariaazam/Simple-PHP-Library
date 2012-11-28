@@ -64,7 +64,7 @@ class Autoload
         // Checking if the autoload class was loaded or not
         if($registered === false)
         {
-            throw new \RuntimeException('Unable to register the autoload function');
+            throw new Exception\RuntimeException('Unable to register the autoload function');
         }
 
         // Registering the namespaces

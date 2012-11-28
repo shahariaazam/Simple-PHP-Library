@@ -15,6 +15,8 @@
 
 namespace SPL\Upload;
 
+use SPL\File\FileInterface;
+
 class Uploader implements UploadInterface
 {
     /**
@@ -43,7 +45,7 @@ class Uploader implements UploadInterface
      *
      * @var array
      */
-    protected $file_list = array();
+    protected $filelist = array();
 
     /**
      * Array with files data
@@ -58,6 +60,20 @@ class Uploader implements UploadInterface
      * @var array
      */
     protected $errors;
+
+    /**
+     * Class used to identify a file
+     *
+     * @var string
+     */
+    protected $fileClass = '\SPL\File\File';
+
+    /**
+     * The permissions used to create the uploads dir (if autocreate_dir is set to true)
+     *
+     * @var float
+     */
+    protected $uploads_dir_mode = 0777;
 
     /**
      * Sets the class options
@@ -225,13 +241,13 @@ class Uploader implements UploadInterface
      */
     public function getFileList()
     {
-        if(count($this->file_list) == 0)
+        if(count($this->filelist) == 0)
         {
             return false;
         }
         else
         {
-            return $this->file_list;
+            return $this->filelist;
         }
     }
 
@@ -279,28 +295,19 @@ class Uploader implements UploadInterface
     /**
      * Checks if the file extension is allowed
      *
-     * @param string $file
+     * @param FileInterface $file
      * @return boolean
      */
-    protected function isExtensionAllowed($file)
+    protected function isExtensionAllowed(FileInterface $file)
     {
         // ==== Result ==== //
         $result = true;
 
-        // Default filename
-        $filename = null;
-
-        // ==== Getting the files filename ==== //
-        if(is_string($file))
-        {
-            $filename = basename($file);
-        }
-
         // ==== Checking if the filename if valid ==== //
-        if(self::isFileValid($filename))
+        if(self::isFileValid($file->basename))
         {
             // ==== Getting file extension ==== //
-            $extension = substr($filename, strrpos($filename, '.') + 1, strlen($filename));
+            $extension = \SPL\File\FileInfo::getExtension($file->uploadpath);
 
             // Checking if the extension is valid
             if(!empty($extension) && is_string($extension))
@@ -329,8 +336,7 @@ class Uploader implements UploadInterface
             // Checking the result so we can register any errors
             if($result === false)
             {
-                // ==== Adding error data ==== //
-                $this->errors[$filename][] = 'The files extension ( ' . $extension . ' ) is not allowed.';
+                $this->errors[$file->basename][] = 'The files extension ( ' . $extension . ' ) is not allowed.';
             }
         }
         else
@@ -362,11 +368,18 @@ class Uploader implements UploadInterface
                 // Checking if any errors occured
                 if($isOk === true)
                 {
-                    // ==== Getting the filename of the original file ==== //
-                    $filename = $this->files[$index]['name'][$nr];
+                    $extra = array(
+                        'mime'        => $this->files[$index]['type'][$nr],
+                        'uploadpath'  => $this->options['uploads_dir'] . $this->files[$index]['name'][$nr],
+                        'uploadname'  => $this->files[$index]['name'][$nr],
+                        'uploaderror' => $this->files[$index]['error'][$nr]
+                    );
+
+                    // Creating the new file object
+                    $fileObject = new $this->fileClass($file, $extra);
 
                     // Uploading the file
-                    $isOk = $this->execute($file, $filename);
+                    $isOk = $this->execute($fileObject);
                 }
                 else
                 {
@@ -377,11 +390,18 @@ class Uploader implements UploadInterface
         }
         else // String
         {
-            // ==== Getting the filename of the original file ==== //
-            $filename = $this->files[$index]['name'];
+            $extra = array(
+                'mime'        => $this->files[$index]['type'],
+                'uploadpath'  => $this->options['uploads_dir'] . $this->files[$index]['name'],
+                'uploadname'  => $this->files[$index]['name'],
+                'uploaderror' => $this->files[$index]['error']
+            );
+
+            // Creating the new file object using the temporary file which we will rename
+            $fileObject = new $this->fileClass($this->files[$index]['tmp_name'], $extra);
 
             // Uploading the file
-            $isOk = $this->execute($this->files[$index]['tmp_name'], $filename);
+            $isOk = $this->execute($fileObject);
         }
 
         // ==== Returning result ==== //
@@ -389,22 +409,21 @@ class Uploader implements UploadInterface
     }
 
     /**
-     * Uploads a file with a given filename
+     * Uploads a file
      *
-     * @param string $source The source of the file
-     * @param string $filename The name of the file. This is how it will be written on the hard drive
+     * @param FileInterface $file
      * @return boolean
      */
-    protected function execute($source, $filename)
+    protected function execute(FileInterface $file)
     {
         // Check var
         $isOk = true;
 
         // Checking if we have anything to upload
-        if(!self::isEmpty($filename))
+        if(!self::isEmpty($file->basename))
         {
             // ==== Checking if the extension is allowed ==== //
-            if($this->isExtensionAllowed($filename))
+            if($this->isExtensionAllowed($file))
             {
                 // Default value for moved
                 $moved = true;
@@ -412,29 +431,25 @@ class Uploader implements UploadInterface
                 // ==== Checking if the file has been uploaded successfully ==== ///
                 if($this->options['simulate'] === false)
                 {
-                    $moved = move_uploaded_file($source, $this->options['uploads_dir'] . $filename);
+                    $moved = move_uploaded_file($file->fqpn, $file->uploadpath);
                 }
 
                 // Checking if the file was succesfully moved
                 if($moved === true)
                 {
                     // ==== Adding the file (with path) to the files array ==== //
-                    $this->file_list[$filename] = array(
-                        'filename' => $filename,
-                        'filepath' => $this->options['uploads_dir'] . $filename,
-                        'filetmp'  => $source
-                    );
+                    $this->filelist[$file->basename] = $file;
                 }
                 else
                 {
                     // ==== Adding log data ==== //
                     if($this->options['debug'])
                     {
-                        $this->log .= '<b>ERROR:</b> Failed to upload file: ' . $filename . '<br /><br />';
+                        $this->log .= '<b>ERROR:</b> Failed to upload file: ' . $file->basename . '<br /><br />';
                     }
 
                     // ==== Adding error data ==== //
-                    $this->errors[$filename][] = 'Failed to upload file';
+                    $this->errors[$file->basename][] = 'Failed to upload file';
 
                     $isOk = false;
                 }
@@ -470,7 +485,7 @@ class Uploader implements UploadInterface
         if(!is_dir($this->options['uploads_dir']) && $this->options['autocreate_dir'] === true && $this->options['simulate'] === false)
         {
             // Checking if we can create the directory
-            if(mkdir($this->options['uploads_dir'], 0777, true) === false)
+            if(mkdir($this->options['uploads_dir'], $this->uploads_dir_mode, true) === false)
             {
                 // ==== Adding log data ==== //
                 if($this->options['debug'])
@@ -554,13 +569,13 @@ class Uploader implements UploadInterface
         if($this->options['simulate'] === false)
         {
             // Going through the filelist
-            foreach($this->file_list as $info)
+            foreach($this->filelist as $file)
             {
                 // Checking if the file exists
-                if(is_file(unlink($info['filepath'])))
+                if(is_file($file->uploadpath))
                 {
                     // Removing the file
-                    $removed = unlink($info['filepath']);
+                    $removed = unlink($file->uploadpath);
 
                     // Checking if the file was not successfully removed
                     if($removed === false)
@@ -585,12 +600,12 @@ class Uploader implements UploadInterface
     public function __destruct()
     {
         // ==== Sending debug if on ==== //
-        if($this->options['debug'] && ($this->log !== '' || count($this->file_list) > 0 || count($this->errors) > 0))
+        if($this->options['debug'] && ($this->log !== '' || count($this->filelist) > 0 || count($this->errors) > 0))
         {
             // Adding more stuff to the log
             $this->log .= '<strong>' . __METHOD__ . '</strong><br /><br />';
             $this->log .= '$this->options: <pre>' . print_r($this->options, 1) . '</pre><br /><br />';
-            $this->log .= '$this->file_list: <pre>' . print_r($this->file_list, 1) . '</pre><br /><br />';
+            $this->log .= '$this->filelist: <pre>' . print_r($this->filelist, 1) . '</pre><br /><br />';
             $this->log .= '$this->errors: <pre>' . print_r($this->errors, 1) . '</pre><hr><br /><br />';
 
             // ==== Setting up mail options ==== //
