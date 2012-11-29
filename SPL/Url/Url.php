@@ -297,7 +297,7 @@ class Url implements UrlInterface
                     $this->setParam($this->options['controller'], $data[0]);
 
                     // ==== Getting the method ==== //
-                    $this->setParam($this->options['action'], $data[1]);
+                    $this->setParam($this->options['action'], isset($data[1]) ? $data[1] : 'index');
 
                     // Data count
                     $count = count($data);
