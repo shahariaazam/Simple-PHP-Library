@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Exception class
+ * InvalidArgumentException
  *
  * @author Brian
  * @link https://github.com/brian978
@@ -13,6 +13,6 @@
  *
  */
 
-namespace SPL\Directory\Exception;
+namespace SPL\File\Exception;
 
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface {}

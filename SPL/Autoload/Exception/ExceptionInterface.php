@@ -13,6 +13,6 @@
  *
  */
 
-namespace SPL\Billing\Exception;
+namespace SPL\Autoload\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}

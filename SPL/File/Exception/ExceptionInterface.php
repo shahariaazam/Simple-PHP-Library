@@ -13,6 +13,6 @@
  *
  */
 
-namespace SPL\Directory\Exception;
+namespace SPL\File\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}

@@ -86,11 +86,10 @@ class Url implements UrlInterface
         $this->options['action']            = 'action';
         $this->options['index_page']        = 'index';
         $this->options['persistent_params'] = array();
-        $this->options['rewrite']         = false;
-        $this->options['use_get_array']   = false;
-        $this->options['require_ssl']     = false;
-        $this->options['mvc_style']       = false; // URL format similar to the ones used by a MVC
-        $this->options['auto_initialize'] = true;
+        $this->options['rewrite']           = false;
+        $this->options['use_get_array']     = false;
+        $this->options['require_ssl']       = false;
+        $this->options['auto_initialize']   = true;
 
         // ==== Replacing options with custom ones ==== //
         if(count($options) > 0)
@@ -298,10 +297,7 @@ class Url implements UrlInterface
                     $this->setParam($this->options['controller'], $data[0]);
 
                     // ==== Getting the method ==== //
-                    if($this->options['mvc_style'] && !empty($data[1]))
-                    {
-                        $this->setParam($this->options['action'], $data[1]);
-                    }
+                    $this->setParam($this->options['action'], $data[1]);
 
                     // Data count
                     $count = count($data);
@@ -516,25 +512,25 @@ class Url implements UrlInterface
     /**
      * Called when a call is made to the class like it's a function
      *
-     * @param string $page Page to link to
+     * @param string $controller Page to link to
      * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
      * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
      * @return string
      */
-    public function __invoke($page = '', array $params = array(), $merge_get = false)
+    public function __invoke($controller = '', array $params = array(), $merge_get = false)
     {
-        return $this->get($page, $params, $merge_get);
+        return $this->get($controller, $params, $merge_get);
     }
 
     /**
      * Builds the URL using the provided params
      *
-     * @param string $page Page to link to
+     * @param string $controller Page to link to
      * @param array $params Parameters that must be added to the URL. If an empty string is provided for the page parameter then the params given here will be removed from the URL. In the latter case if no params are given all the $_GET params will be removed.
      * @param boolean $merge_get When set to true the method will merge $_GET with $params if the request points to the current page
      * @return string
      */
-    public function get($page = '', array $params = array(), $merge_get = false)
+    public function get($controller = '', array $params = array(), $merge_get = false)
     {
         // Default site root to use
         $url = $this->options['site_root'];
@@ -549,7 +545,7 @@ class Url implements UrlInterface
         }
 
         // Link to the same page but with different params (this includes the $_GET params)
-        if($page == $this->getCurrentPage() && $merge_get === true)
+        if($controller == $this->getCurrentPage() && $merge_get === true)
         {
             // ==== If the page is exactly the same as the one the user is on then take all the $_GET parameters ==== //
             $params = self::array_append($this->getParams(), $params);
@@ -567,17 +563,13 @@ class Url implements UrlInterface
             $params = self::array_append($params, $this->persistent_params);
         }
 
-        // ==== Failsafes for MVC style URL ==== //
-        if($this->options['mvc_style'])
+        // If the params count is higher then 1 we need to make sure we have an action
+        if(count($params) >= 1)
         {
-            // Adding the default params only if params count is higher then 1
-            if(count($params) >= 1)
+            // Method param
+            if(empty($params[$this->options['action']]))
             {
-                // Method param
-                if(empty($params[$this->options['action']]))
-                {
-                    $params[$this->options['action']] = 'index';
-                }
+                $params[$this->options['action']] = 'index';
             }
         }
 
@@ -590,8 +582,8 @@ class Url implements UrlInterface
             // The characters that join the parameters
             $glue1 = $glue2 = '/';
 
-            // ==== Building the firs part of the URL ==== //
-            $url .= $page;
+            // ==== The URL has the dash already ==== //
+            $url .= $controller;
 
             // ==== Checking for the rest of the params ==== //
             if(!empty($params[$this->options['action']]))
@@ -602,7 +594,7 @@ class Url implements UrlInterface
                 unset($params[$this->options['action']]);
             }
         }
-        else if(!empty($page))
+        else if(!empty($controller))
         {
             ////////////////////////////////////////////////////////////////
             //    REWRITE DISABLED
@@ -611,8 +603,8 @@ class Url implements UrlInterface
             $glue1 = '&';
             $glue2 = '=';
 
-            // ==== Building the firs part of the URL ==== //
-            $url .= '?' . $this->options['controller'] . $glue2 . $page;
+            // ==== Building the first part of the URL ==== //
+            $url .= '?' . $this->options['controller'] . $glue2 . $controller;
 
             // ==== Checking for the rest of the params ==== //
             if(!empty($params[$this->options['action']]))
@@ -624,7 +616,7 @@ class Url implements UrlInterface
             }
         }
 
-        // Removing the controller from the params
+        // Removing the controller from the params if it has been set
         if(!empty($params[$this->options['controller']]))
         {
             unset($params[$this->options['controller']]);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Exception Interface
+ * Exception Interface for the Exceptions used by the URL class
  *
  * @author Brian
  * @link https://github.com/brian978
@@ -13,6 +13,6 @@
  *
  */
 
-namespace SPL\Upload\Exception;
+namespace SPL\Url\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}

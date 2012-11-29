@@ -13,6 +13,6 @@
  *
  */
 
-namespace SPL\User\Exception;
+namespace SPL\Http\Exception;
 
-interface Exception {}
+interface ExceptionInterface {}
