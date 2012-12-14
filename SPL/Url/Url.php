@@ -122,10 +122,15 @@ class Url implements UrlInterface
             // ==== Getting URL ==== //
             $this->url = self::getFullURL();
 
-            // ==== Correcting the site root ==== //
+            // ==== Correcting the site roots ==== //
             if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/') + 1))
             {
                 $this->options['site_root'] .= '/';
+            }
+
+            if(strlen($this->options['site_root_ssl']) > (strrpos($this->options['site_root_ssl'], '/') + 1))
+            {
+                $this->options['site_root_ssl'] .= '/';
             }
 
             // ==== Correcting the URL ==== //
