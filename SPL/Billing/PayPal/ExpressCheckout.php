@@ -93,12 +93,6 @@ class ExpressCheckout extends PayPal
      */
     public function __construct(array $options, $environment = self::ENV_TESTING, $platform = self::PLATFORM_DESKTOP)
     {
-        // Checking the type of the options param
-        if(!is_array($options))
-        {
-            throw new Exception\InvalidArgumentException('The $options parameter must be an array.');
-        }
-
         // Checking the environment param to see if it's valid
         if(!in_array($environment, array(self::ENV_PRODUCTION, self::ENV_TESTING)))
         {
@@ -134,9 +128,6 @@ class ExpressCheckout extends PayPal
 
         // Logging
         $this->log('log', '<strong>Parameters:</strong> <pre>' . print_r(func_get_args(), 1) . '</pre>', __METHOD__);
-
-        // Initializing the servers
-        $this->initServers();
     }
 
     /**
@@ -245,7 +236,7 @@ class ExpressCheckout extends PayPal
     }
 
     /**
-     * Returns the URL to PayPal
+     * Returns the URL needed to redirect to PayPal
      *
      * @param Response $response
      * @return string
