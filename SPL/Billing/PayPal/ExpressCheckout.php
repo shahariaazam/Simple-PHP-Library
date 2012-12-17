@@ -331,13 +331,10 @@ class ExpressCheckout extends PayPal
      */
     public function SetExpressCheckout(Items\Items $items, $returnUrl, $cancelUrl)
     {
-        // Status
         $result = true;
+        $log    = '';
 
-        // Local log
-        $log = '';
-
-        // Price
+        // Total price of the items
         $price = $items->getPrice();
 
         // Checking the required vars
@@ -354,7 +351,7 @@ class ExpressCheckout extends PayPal
             // Checking if the currency is supported by PayPal
             if($this->isCurrencySupported($items->currency))
             {
-                // Encoding
+                // Encoding is required by PayPal
                 $returnUrl = urlencode($returnUrl);
                 $cancelUrl = urlencode($cancelUrl);
                 $price     = urlencode($price);
@@ -401,17 +398,15 @@ class ExpressCheckout extends PayPal
                 $log .= '<strong>Request URL:</strong> ' . $url . '<br /><br />';
                 $log .= '<strong>Response:</strong> <pre>' . print_r($response, 1) . '</pre><br /><br />';
 
-                try{
-
-                    // Checking the response
+                try
+                {
                     $isResponseOk = $this->checkResponse($response);
-
-                } catch (Exception\InvalidArgumentException $e) {
-
+                }
+                catch (Exception\InvalidArgumentException $e)
+                {
                     throw new Exception\RuntimeException('The response could not be checked', 0, $e);
                 }
 
-                // Verifying
                 if($isResponseOk === true)
                 {
                     $result = new Response($response);
@@ -454,11 +449,8 @@ class ExpressCheckout extends PayPal
      */
     public function GetExpressCheckoutDetails()
     {
-        // Status
         $result = true;
-
-        // Local log
-        $log = '';
+        $log    = '';
 
         // Token
         $token = $this->getToken();
@@ -488,17 +480,15 @@ class ExpressCheckout extends PayPal
             $log .= '<strong>Request URL:</strong> ' . $url . '<br /><br />';
             $log .= '<strong>Response:</strong> <pre>' . print_r($response, 1) . '</pre><br /><br />';
 
-            try{
-
-                // Checking the response
+            try
+            {
                 $isResponseOk = $this->checkResponse($response);
-
-            } catch (Exception\InvalidArgumentException $e) {
-
+            }
+            catch (Exception\InvalidArgumentException $e)
+            {
                 throw new Exception\RuntimeException('The response could not be checked', 0, $e);
             }
 
-            // Verifying
             if($isResponseOk === true)
             {
                 $result = new Response($response);
@@ -538,13 +528,8 @@ class ExpressCheckout extends PayPal
         // Local log
         $log = '';
 
-        // Price
-        $price = $items->getPrice();
-
-        // Token
-        $token = $this->getToken();
-
-        // PayerId
+        $price   = $items->getPrice();
+        $token   = $this->getToken();
         $payerId = $this->getPayerId();
 
         // Checking the required vars
@@ -560,7 +545,7 @@ class ExpressCheckout extends PayPal
             // Checking if the currency is supported by PayPal
             if($this->isCurrencySupported($items->currency))
             {
-                // Encoding
+                // Encoding is required by PayPal
                 $price = urlencode($price);
 
                 // Request string
@@ -585,17 +570,15 @@ class ExpressCheckout extends PayPal
                 $log .= '<strong>Request URL:</strong> ' . $url . '<br /><br />';
                 $log .= '<strong>Response:</strong> <pre>' . print_r($response, 1) . '</pre><br /><br />';
 
-                try{
-
-                    // Checking the response
+                try
+                {
                     $isResponseOk = $this->checkResponse($response);
-
-                } catch (Exception\InvalidArgumentException $e) {
-
+                }
+                catch (Exception\InvalidArgumentException $e)
+                {
                     throw new Exception\RuntimeException('The response could not be checked', 0, $e);
                 }
 
-                // Verifying
                 if($isResponseOk === true)
                 {
                     $result = new Response($response);
@@ -629,10 +612,10 @@ class ExpressCheckout extends PayPal
     }
 
     /**
-     * Sends a POST to a specified URL
+     * Sends a POST request to a specified URL
      *
      * @param string $url
-     * @param string $query_string
+     * @param string $query_string The fields used to post the data
      * @return string
      */
     protected function post($url, $query_string)
@@ -664,7 +647,7 @@ class ExpressCheckout extends PayPal
     }
 
     /**
-     * Processes a response from PayPal
+     * Processes a response from PayPal and breaks the string into an array
      *
      * @param string $response
      * @return array
@@ -689,7 +672,7 @@ class ExpressCheckout extends PayPal
                 // Separating the key from the value
                 $kv = explode('=', $keyvalue);
 
-                // Storing
+                // Building the array
                 $result[$kv[0]] = $kv[1];
             }
         }
@@ -738,7 +721,6 @@ class ExpressCheckout extends PayPal
     }
 
     /**
-     * Adds a message to the Log
      *
      * @param string $type
      * @param string $message
