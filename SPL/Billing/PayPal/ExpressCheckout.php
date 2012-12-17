@@ -86,8 +86,8 @@ class ExpressCheckout extends PayPal
      * Used to initialize the options and create the object
      *
      * @param array $options
-     * @param string $environment
-     * @param string $platform
+     * @param string $environment [ optional ] Default is "testing"
+     * @param string $platform [ optional ] Default is "desktop"
      * @return ExpressCheckout
      * @throws \SPL\Billing\Exception\InvalidArgumentException
      */
