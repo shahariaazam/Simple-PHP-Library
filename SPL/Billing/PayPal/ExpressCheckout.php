@@ -259,16 +259,25 @@ class ExpressCheckout extends PayPal
      * @param string $type
      * @param string $token [ optional ]
      * @return string
+     * @throws \SPL\Billing\Exception\RuntimeException
      */
     protected function getEndpointUrl($type, $token = '')
     {
-        // Getting the URL
-        $url = $this->servers[$type][$this->environment];
+        $url = '';
 
-        // Checking if the token is empty or not and replacing
-        if(!empty($token))
+        if(isset($this->servers[$type][$this->environment]))
         {
-            $url = str_replace('{token}', $token, $url);
+            $url = $this->servers[$type][$this->environment];
+
+            // Checking if the token is empty or not and replacing
+            if(!empty($token))
+            {
+                $url = str_replace('{token}', $token, $url);
+            }
+        }
+        else
+        {
+            throw new Exception\RuntimeException('The requested URL type was not found in the server config');
         }
 
         // Returning the URL
