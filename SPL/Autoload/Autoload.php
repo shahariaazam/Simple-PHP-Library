@@ -105,7 +105,7 @@ class Autoload
             if(isset(self::$namespaces[$namespace]))
             {
                 // Building the filepath
-                $file = self::$namespaces[$namespace] . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+                $file = self::$namespaces[$namespace] . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 
                 // Checking if a file exists for the requested class
                 if(is_file($file))
