@@ -59,7 +59,7 @@ class Autoload
     public static function register($namespaces = array())
     {
         // Registering the autoload function
-        $registered = spl_autoload_register(array('\SPL\Autoload\Autoload', 'loadClass'));
+        $registered = spl_autoload_register(array('\\' . __NAMESPACE__ . '\Autoload', 'loadClass'));
 
         // Checking if the autoload class was loaded or not
         if($registered === false)
