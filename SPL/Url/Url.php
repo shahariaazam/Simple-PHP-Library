@@ -473,8 +473,8 @@ class Url implements UrlInterface
     /**
      * Changes the site root to the non-SSL one
      *
-     * @param void
      * @return object
+     * @throws Exception\RuntimeException
      */
     public function disableSSL()
     {

@@ -17,10 +17,12 @@
 
 namespace SPL\Database;
 
+use SPL\Db\Adapter\AdapterInterface;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //              MySQL Database Class                                                          //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class Mysql implements db_module
+class Mysql implements AdapterInterface
 {
 
     /**
@@ -56,7 +58,7 @@ class Mysql implements db_module
      * Class constructor
      *
      * @param array $options
-     * @return void
+     * @return \SPL\Database\Mysql
      */
     public function __construct($options)
     {

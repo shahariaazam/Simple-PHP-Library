@@ -52,6 +52,7 @@ class Errors
      * Sets the debug email address
      *
      * @param string $email
+     * @throws \Exception
      * @return void
      */
     public static function setEmail($email)

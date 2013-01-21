@@ -345,7 +345,7 @@ class Language
                 require_once $this->file;
 
                 // ==== Getting texts ==== //
-                if(!is_array($text))
+                if(!isset($text) || !is_array($text))
                 {
                     // ==== Adding debug data ==== //
                     if($this->options['debug'])
@@ -375,8 +375,9 @@ class Language
     /**
      * Retrieves a text from the cache
      *
-     * @param string $text
+     * @param string $txt
      * @param array $data The given data is used to parse the text
+     * @internal param string $text
      * @return mixed false on fail or string on success
      */
     public function _($txt, array $data = array())

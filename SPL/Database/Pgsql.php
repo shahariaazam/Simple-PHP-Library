@@ -17,10 +17,12 @@
 
 namespace SPL\Database;
 
+use SPL\Db\Adapter\AdapterInterface;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //              PostgreSQL Database Class                                                     //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class Pgsql implements db_module
+class Pgsql implements AdapterInterface
 {
 
     /**
@@ -56,7 +58,7 @@ class Pgsql implements db_module
      * Class constructor
      *
      * @param array $options
-     * @return void
+     * @return \SPL\Database\Pgsql
      */
     public function __construct($options)
     {
@@ -325,7 +327,7 @@ class Pgsql implements db_module
      * @param string $result_type
      * @return mixed false on fail or array on success
      */
-    public function fetch_array($result_type='both')
+    public function fetch_array($result_type = 'both')
     {
         // ==== Checking if we have a resource ==== //
         if(is_resource($this->resource))

@@ -45,8 +45,8 @@ class Cart
      * The method is the constructor for this class.
      * The constructor is private because only the Singleton pattern should be used when creating the object
      *
-     * @param void
-     * @return void
+     * @internal param $void
+     * @return \SPL\Cart\Cart
      */
     private function __construct()
     {
@@ -251,8 +251,7 @@ class Cart
     /**
      * Is used to empty the contents of the cart
      *
-     * @param void
-     * @return void
+     * @return boolean
      */
     public function emptyCart()
     {

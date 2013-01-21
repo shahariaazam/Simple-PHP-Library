@@ -78,7 +78,7 @@ class File implements FileInterface
      *
      * @param string $fqpn This is the fully qualified path name (FQPN). Example: /usr/bin/server.conf
      * @param array $extra [ optional ] An array containing extra info about the object
-     * @return void
+     * @return \SPL\File\File
      */
     public function __construct($fqpn, array $extra = array())
     {
@@ -130,6 +130,7 @@ class File implements FileInterface
     /**
      *
      * @param string $name
+     * @param mixed $value
      * @return \SPL\File\File
      */
     public function __set($name, $value)

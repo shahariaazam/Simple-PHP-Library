@@ -16,10 +16,12 @@
 
 namespace SPL\Database;
 
+use \SPL\Db\DbInterface;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //              dBase Database Class                                                          //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class Dbase implements db_module
+class Dbase implements DbInterface
 {
 
     /**
@@ -88,7 +90,7 @@ class Dbase implements db_module
      * Class constructor
      *
      * @param array $options
-     * @return void
+     * @return \SPL\Database\Dbase
      */
     public function __construct($options)
     {
@@ -157,12 +159,11 @@ class Dbase implements db_module
     }
 
     /**
-     * The method executes a query
+     * The method returns the info from the dbase database
      *
-     * @param string $query
-     * @return boolean
+     * @return void
      */
-    public function query($query='')
+    public function fetch()
     {
         // ==== Getting the numer of rows in the database ==== //
         $num_rows = dbase_numrecords($this->link_id);
@@ -361,7 +362,7 @@ class Dbase implements db_module
         return $string;
     }
 
-    /**
+     /**
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query

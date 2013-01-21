@@ -80,7 +80,6 @@ class Items
      * Updates the price of the items
      *
      * @param Item $item
-     * @param number $number
      * @return void
      */
     public function updatePrice(Item $item)
@@ -91,8 +90,7 @@ class Items
     /**
      * Retrieves the array of items
      *
-     * @param void
-     * @return void
+     * @return array
      */
     public function getItems()
     {

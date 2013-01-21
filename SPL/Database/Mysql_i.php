@@ -17,10 +17,12 @@
 
 namespace SPL\Database;
 
+use SPL\Db\Adapter\AdapterInterface;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //              MySQLi Database Class                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-class Mysql_i implements db_module
+class Mysql_i implements AdapterInterface
 {
 
     /**
@@ -89,7 +91,7 @@ class Mysql_i implements db_module
         $this->link = new \mysqli($this->options['host'], $this->options['user'], $this->options['passwd'], $this->options['db'], $this->options['port']);
 
         // ==== Checking if connection was successfull ==== //
-        if($this->link->connect_error != NULL)
+        if($this->link->connect_error != null)
         {
             return false;
         }
@@ -320,7 +322,7 @@ class Mysql_i implements db_module
         {
             $array = $this->result->fetch_assoc();
 
-            if($array === NULL)
+            if($array === null)
             {
                 $failed = true;
             }
@@ -347,7 +349,7 @@ class Mysql_i implements db_module
      * @param string $result_type
      * @return mixed false on fail or array on success
      */
-    public function fetch_array($result_type='both')
+    public function fetch_array($result_type = 'both')
     {
         // ==== Check variable for success/failure ==== //
         $failed = false;
@@ -364,7 +366,7 @@ class Mysql_i implements db_module
 
             $array = $this->result->fetch_array($types[$result_type]);
 
-            if($array === NULL)
+            if($array === null)
             {
                 $failed = true;
             }
@@ -432,7 +434,7 @@ class Mysql_i implements db_module
      * USE THIS INSTEAD OF QUERY WHEN YOU WANT THE LAST INSERTED ID
      *
      * @param string $query
-     * @param string $autoincrementField
+     * @param string $autoIncrementField
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField)
@@ -477,11 +479,11 @@ class Mysql_i implements db_module
         if(is_object($this->link))
         {
             // ==== Checking for errors ==== //
-            if($this->link->connect_error != NULL)
+            if($this->link->connect_error != null)
             {
                 $error = $this->link->connect_error;
             }
-            elseif($this->link->error  != NULL)
+            elseif($this->link->error  != null)
             {
                 $error = $this->link->error;
             }

@@ -148,7 +148,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      * @param UsersInterface $userAcc
      * @param SecurityInterface $vault
      * @param array $options
-     * @return void
+     * @return \SPL\User\AbstractAuthentication
      */
     public function __construct(DbInterface $db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
     {
@@ -260,7 +260,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      * @param string $type
      * @param string $message
      * @param string $location
-     * @param string $number
+     * @param int $number
      * @param string $extra1
      * @param string $extra2
      * @return void
@@ -296,6 +296,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
                 {
                     $this->errors[] = $number;
                 }
+                break;
 
             // LOG
             case 'log':

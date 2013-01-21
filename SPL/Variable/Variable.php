@@ -21,7 +21,8 @@ class Variable
      * Properly prints an array
      *
      * @param array $array
-     * @return void
+     * @param bool $return
+     * @return string
      */
     public static function print_array($array, $return = false)
     {
@@ -33,5 +34,7 @@ class Variable
         }
 
         echo $str;
+
+        return '';
     }
 }

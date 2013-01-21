@@ -86,10 +86,10 @@ class ExpressCheckout extends PayPal
      * Used to initialize the options and create the object
      *
      * @param array $options
-     * @param string $environment [ optional ] Default is "testing"
-     * @param string $platform [ optional ] Default is "desktop"
-     * @return ExpressCheckout
+     * @param int $environment [ optional ] Default is "testing"
+     * @param int $platform [ optional ] Default is "desktop"
      * @throws \SPL\Billing\Exception\InvalidArgumentException
+     * @return ExpressCheckout
      */
     public function __construct(array $options, $environment = self::ENV_TESTING, $platform = self::PLATFORM_DESKTOP)
     {

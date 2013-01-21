@@ -81,7 +81,7 @@ class Vault implements SecurityInterface
      *
      * @access public
      * @param array $options
-     * @return void
+     * @return \SPL\Security\Vault
      */
     public function __construct(array $options = array())
     {
