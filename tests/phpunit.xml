@@ -1,0 +1,7 @@
+<phpunit bootstrap="Bootstrap.php">
+    <testsuites>
+        <testsuite name="SPL Tests">
+            <directory phpVersion="5.3.0" phpVersionOperator=">=">SPL/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

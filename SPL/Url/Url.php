@@ -74,8 +74,7 @@ class Url implements UrlInterface
      * Class constructor. It also validates the URL
      *
      * @param array $options
-     * @return void
-     * @throws Exception\RuntimeException
+     * @return \SPL\Url\Url
      */
     public function __construct(array $options = array())
     {
@@ -117,7 +116,7 @@ class Url implements UrlInterface
         if(!empty($this->options['site_root']))
         {
             // ==== Setting rewrite property ==== //
-            $this->rewrite = &$this->options['rewrite'];
+            $this->rewrite = $this->options['rewrite'];
 
             // ==== Getting URL ==== //
             $this->url = self::getFullURL();
@@ -253,7 +252,6 @@ class Url implements UrlInterface
     /**
      * Retrieves data from the URL string
      *
-     * @throws Exception
      * @return void
      */
     protected function getURLData()
@@ -451,7 +449,7 @@ class Url implements UrlInterface
     /**
      * Changes the site root to the SSL one
      *
-     * @param void
+     * @throws Exception\RuntimeException
      * @return object
      */
     public function enableSSL()
@@ -464,7 +462,7 @@ class Url implements UrlInterface
         else
         {
             // ==== Triggering an error ==== //
-            Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
+            throw new Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
         }
 
         return $this;
@@ -474,20 +472,10 @@ class Url implements UrlInterface
      * Changes the site root to the non-SSL one
      *
      * @return object
-     * @throws Exception\RuntimeException
      */
     public function disableSSL()
     {
-        // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->options['site_root']))
-        {
-            $this->use_ssl = false;
-        }
-        else
-        {
-            // ==== Triggering an error ==== //
-            throw new Exception\RuntimeException('To switch to non-SSL you need to set the site_root option.');
-        }
+        $this->use_ssl = false;
 
         return $this;
     }
@@ -495,7 +483,7 @@ class Url implements UrlInterface
     /**
      * Used to trigger the temporary SSL (when you want SSL for a single link)
      *
-     * @param void
+     * @throws Exception\RuntimeException
      * @return object
      */
     public function ssl()
@@ -508,7 +496,7 @@ class Url implements UrlInterface
         else
         {
             // ==== Triggering an error ==== //
-            Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
+            throw new Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
         }
 
         return $this;
@@ -578,6 +566,10 @@ class Url implements UrlInterface
             }
         }
 
+        // The characters that join the parameters (default)
+        $glue1 = '&';
+        $glue2 = '=';
+
         // ==== Processing the data to generate the URL ==== //
         if($this->rewrite)
         {
@@ -604,10 +596,6 @@ class Url implements UrlInterface
             ////////////////////////////////////////////////////////////////
             //    REWRITE DISABLED
             ///////////////////////////////////////////////////////////////
-            // The characters that join the parameters
-            $glue1 = '&';
-            $glue2 = '=';
-
             // ==== Building the first part of the URL ==== //
             $url .= '?' . $this->options['controller'] . $glue2 . $controller;
 
