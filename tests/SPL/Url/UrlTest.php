@@ -10,9 +10,16 @@ use SPL\Url\Url;
  */
 class UrlTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $_SERVER['HTTPS']       = 'On';
+        $_SERVER['SERVER_NAME'] = 'localhost';
+        $_SERVER['REQUEST_URI'] = '';
+    }
+
     /**
      * @expectedException \SPL\Url\Exception\RuntimeException
-     * @expectedExceptionMessage The site root parameter is not set.
+     * @expectedExceptionMessage Invalid site root URL.
      */
     public function testSiteRootIsNotSet()
     {
@@ -33,7 +40,7 @@ class UrlTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \SPL\Url\Exception\RuntimeException
-     * @expectedExceptionMessage To switch to SSL you need to set the site_root_ssl option
+     * @expectedExceptionMessage Invalid SSL site root URL
      */
     public function testSiteRootSslIsInvalid()
     {

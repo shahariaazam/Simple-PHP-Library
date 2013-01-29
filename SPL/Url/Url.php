@@ -99,7 +99,7 @@ class Url implements UrlInterface
         // Checking if we should auto initialize the object
         if($this->options['auto_initialize'])
         {
-            $this->initialize();
+            $this->init();
         }
     }
 
@@ -110,61 +110,57 @@ class Url implements UrlInterface
      * @return void
      * @throws Exception\RuntimeException
      */
-    public function initialize()
+    public function init()
     {
-        // ==== Checking if the site_root option has been set ==== //
-        if(!empty($this->options['site_root']))
+        if(Validator\Url::isValid($this->options['site_root'], false) === false)
         {
+            throw new Exception\RuntimeException('Invalid site root URL.');
+        }
+        else
+        {
+            // ==== Changing to SSL if requested ==== //
+            if($this->options['require_ssl'] === true)
+            {
+                if(Validator\Url::isValid($this->options['site_root_ssl'], false) === false)
+                {
+                    throw new Exception\RuntimeException('Invalid SSL site root URL.');
+                }
+
+                // ==== Correcting the SSL site root so we don't have issues with the URL generation ==== //
+                if(strlen($this->options['site_root_ssl']) > (strrpos($this->options['site_root_ssl'], '/') + 1))
+                {
+                    $this->options['site_root_ssl'] .= '/';
+                }
+
+                $this->use_ssl = true;
+            }
+
             // ==== Setting rewrite property ==== //
             $this->rewrite = $this->options['rewrite'];
 
             // ==== Getting URL ==== //
             $this->url = self::getFullURL();
 
-            // ==== Correcting the site roots ==== //
+            // ==== Correcting the site roots so we don't have issues with the URL generation ==== //
             if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/') + 1))
             {
                 $this->options['site_root'] .= '/';
             }
 
-            if(strlen($this->options['site_root_ssl']) > (strrpos($this->options['site_root_ssl'], '/') + 1))
-            {
-                $this->options['site_root_ssl'] .= '/';
-            }
-
-            // ==== Correcting the URL ==== //
+            // ==== Correcting the detected URL ==== //
             if($this->rewrite && strlen($this->url) > (strrpos($this->url, '/') + 1) && strpos($this->url, '?' . $this->options['controller'] . '=') === false)
             {
                 $this->url .= '/';
             }
 
-            // ==== Changing to SSL if requested ==== //
-            if($this->options['require_ssl'] === true)
-            {
-                $this->enableSSL();
-            }
+            // Loading the params in $_GET
+            $this->loadGetParams();
 
-            // == If invalid == //
-            if(Validator\Url::isValid($this->options['site_root'], false) === false)
-            {
-                throw new Exception\RuntimeException('Invalid site root URL. URL: ' . $this->options['site_root']);
-            }
-            else
-            {
-                // Loading the params in $_GET
-                $this->loadGetParams();
+            // ==== Getting the URL data from GET or by splitting the URL ==== //
+            $this->getURLData();
 
-                // ==== Getting the URL data ==== //
-                $this->getURLData();
-
-                // ==== Initializing the default params ==== //
-                $this->initParams();
-            }
-        }
-        else
-        {
-            // ==== Triggering error ==== //
-            throw new Exception\RuntimeException('The site root parameter is not set.');
+            // ==== Initializing the default params ==== //
+            $this->initParams();
         }
     }
 
@@ -177,19 +173,11 @@ class Url implements UrlInterface
      */
     public static function getFullURL()
     {
-        $url = '';
+        $protocol    = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+        $domain      = $_SERVER['SERVER_NAME'];
+        $request_uri = $_SERVER['REQUEST_URI'];
 
-        // Condition only put for PHPUnit tests to pass
-        if(isset($_SERVER['HTTPS']) && isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_URI']))
-        {
-            $protocol    = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
-            $domain      = $_SERVER['SERVER_NAME'];
-            $request_uri = $_SERVER['REQUEST_URI'];
-
-            $url = $protocol . $domain . $request_uri;
-        }
-
-        return $url;
+        return $protocol . $domain . $request_uri;
     }
 
     /**
@@ -463,14 +451,14 @@ class Url implements UrlInterface
     public function enableSSL()
     {
         // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->options['site_root_ssl']))
+        if(Validator\Url::isValid($this->options['site_root_ssl'], false) === true)
         {
             $this->use_ssl = true;
         }
         else
         {
             // ==== Triggering an error ==== //
-            throw new Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
+            throw new Exception\RuntimeException('Invalid SSL site root URL.');
         }
 
         return $this;
@@ -497,14 +485,14 @@ class Url implements UrlInterface
     public function ssl()
     {
         // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->options['site_root_ssl']))
+        if(Validator\Url::isValid($this->options['site_root_ssl'], false) === true)
         {
             $this->tmp_ssl = true;
         }
         else
         {
             // ==== Triggering an error ==== //
-            throw new Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
+            throw new Exception\RuntimeException('Invalid SSL site root URL.');
         }
 
         return $this;
