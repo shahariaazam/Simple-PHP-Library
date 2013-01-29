@@ -126,12 +126,6 @@ class Url implements UrlInterface
                     throw new Exception\RuntimeException('Invalid SSL site root URL.');
                 }
 
-                // ==== Correcting the SSL site root so we don't have issues with the URL generation ==== //
-                if(strlen($this->options['site_root_ssl']) > (strrpos($this->options['site_root_ssl'], '/') + 1))
-                {
-                    $this->options['site_root_ssl'] .= '/';
-                }
-
                 $this->use_ssl = true;
             }
 
@@ -145,6 +139,12 @@ class Url implements UrlInterface
             if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/') + 1))
             {
                 $this->options['site_root'] .= '/';
+            }
+
+            // ==== Correcting the SSL site root so we don't have issues with the URL generation ==== //
+            if(!empty($this->options['site_root_ssl']) && strlen($this->options['site_root_ssl']) > (strrpos($this->options['site_root_ssl'], '/') + 1))
+            {
+                $this->options['site_root_ssl'] .= '/';
             }
 
             // ==== Correcting the detected URL ==== //
@@ -533,24 +533,21 @@ class Url implements UrlInterface
             $this->tmp_ssl = false;
         }
 
-        // Link to the same page but with different params (this includes the $_GET params)
-        if($controller == $this->getCurrentPage() && $merge_get === true)
+        // Merging the params if required
+        if($merge_get === true)
         {
-            // ==== If the page is exactly the same as the one the user is on then take all the $_GET parameters ==== //
-            $params = self::array_append($this->getParams(), $params);
-        }
-        // New page with params that must be automaticaly loaded
-        else
-        {
-            // ===== Checking if we should merge the GET ==== //
-            if($merge_get === true)
-            {
-                $params = self::array_append($this->getParams(), $params);
-            }
+            // This should now contain all the parameters (first ones should be the given ones)
+            $get_params = array_replace($params, $this->getParams());
 
-            // ==== Adding default params ==== //
-            $params = self::array_append($params, $this->persistent_params);
+            // Now that we have all the params in order we override the get params with the given params
+            $params = array_replace($get_params, $params);
         }
+
+        // Now we need to add the persistent params to the given ones (persistent should be the last ones)
+        $persistent_params = array_replace($params, $this->persistent_params);
+
+        // Now that we have all the params in order we override the persistent params with the given params
+        $params = array_replace($persistent_params, $params);
 
         // If the params count is higher then 1 we need to make sure we have an action
         if(count($params) >= 1)
