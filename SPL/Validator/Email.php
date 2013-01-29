@@ -21,50 +21,44 @@ class Email implements ValidatorInterface
      * Validates the email address provided. It can also check the DNS to see if it is valid.
      *
      * @param string $email
-     * @param boolean $checkDNS [optional]
+     * @param boolean $checkDns [ optional ]
      * @return boolean
      */
-    public static function isValid($email, $checkDNS = false)
+    public static function isValid($email, $checkDns = false)
     {
         // ==== Check variable ==== //
-        $isValid = true;
+        $isValid = false;
 
         // ==== Sanitizing and validating the email ==== //
         $email = filter_var(filter_var($email, FILTER_SANITIZE_EMAIL), FILTER_VALIDATE_EMAIL);
 
         // ==== Checking DNS record (if activated) if the email is ok so far ===== //
-        if($email == false)
+        if($email !== false)
         {
-            $isValid = false;
+            $isValid = true;
         }
-        elseif($checkDNS)
+
+        if($checkDns === true)
         {
+            $dns = '';
+
             // ==== Getting DNS part of the mail ==== //
             $pieces = explode('@', $email);
-            $dns = $pieces[1];
+
+            if(isset($pieces[1]))
+            {
+                $dns = $pieces[1];
+            }
 
             // ==== Checking if the checkdnsrr exists ==== //
-            if(function_exists('checkdnsrr'))
+            if(function_exists('checkdnsrr') && checkdnsrr($dns) === true)
             {
-                // ==== Checking DNS ==== //
-                if(checkdnsrr($dns) === false)
-                {
-                    $isValid = false;
-                }
+                $isValid = true; var_dump($isValid);
             }
             // ==== Checking if the gethostbyname exists ==== //
-            elseif(function_exists('gethostbyname'))
+            else if(function_exists('gethostbyname') && gethostbyname($dns) !== $dns)
             {
-                // ==== Checking DNS ==== //
-                if(gethostbyname($dns) === $dns)
-                {
-                    $isValid = false;
-                }
-            }
-            // ==== Throwing a Warning message ==== //
-            else
-            {
-                trigger_error('DNS checking requires either checkdnsrr or the gethostbyname function.', E_USER_WARNING);
+                $isValid = true; var_dump($isValid);
             }
         }
 
