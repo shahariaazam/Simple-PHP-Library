@@ -22,6 +22,7 @@ class Email implements ValidatorInterface
      *
      * @param string $email
      * @param boolean $checkDns [ optional ]
+     * @throws \RuntimeException
      * @return boolean
      */
     public static function isValid($email, $checkDns = false)
