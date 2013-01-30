@@ -27,15 +27,15 @@ class Email implements ValidatorInterface
     public static function isValid($email, $checkDns = false)
     {
         // ==== Check variable ==== //
-        $isValid = false;
+        $isValid = true;
 
         // ==== Sanitizing and validating the email ==== //
         $email = filter_var(filter_var($email, FILTER_SANITIZE_EMAIL), FILTER_VALIDATE_EMAIL);
 
         // ==== Checking DNS record (if activated) if the email is ok so far ===== //
-        if($email !== false)
+        if($email === false)
         {
-            $isValid = true;
+            $isValid = false;
         }
 
         if($checkDns === true)
@@ -51,14 +51,18 @@ class Email implements ValidatorInterface
             }
 
             // ==== Checking if the checkdnsrr exists ==== //
-            if(function_exists('checkdnsrr') && checkdnsrr($dns) === true)
+            if(function_exists('checkdnsrr') && checkdnsrr($dns) === false)
             {
-                $isValid = true; var_dump($isValid);
+                $isValid = false;
             }
             // ==== Checking if the gethostbyname exists ==== //
-            else if(function_exists('gethostbyname') && gethostbyname($dns) !== $dns)
+            else if(function_exists('gethostbyname') && gethostbyname($dns) === $dns)
             {
-                $isValid = true; var_dump($isValid);
+                $isValid = false;
+            }
+            else
+            {
+                throw new \RuntimeException('In order for the domain name to be checked one of the following functions must be available: checkdnsrr, gethostbyname');
             }
         }
 
