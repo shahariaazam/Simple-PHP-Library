@@ -377,5 +377,7 @@ class Paging
                 }
             }
         }
+
+        return null;
     }
 }

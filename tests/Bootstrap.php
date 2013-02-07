@@ -14,5 +14,6 @@ $path = realpath(dirname(__FILE__) . '/..');
 include $path . '/SPL/Autoload/Autoload.php';
 
 Autoload::register(array(
-                        'SPL' => $path
+                        'SPL' => $path,
+                        'tests' => $path
                    ));

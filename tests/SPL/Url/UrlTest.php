@@ -1,13 +1,17 @@
 <?php
 
-use SPL\Url\Url;
-
 /**
  * User: brian978
  * Created on: 1/24/13
  * License: Creative Commons Attribution-ShareAlike 3.0
  *
  */
+
+namespace tests\SPL\Url;
+
+use PHPUnit_Framework_TestCase;
+use SPL\Url\Url;
+
 class UrlTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()

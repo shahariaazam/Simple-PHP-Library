@@ -21,10 +21,10 @@ class Url implements ValidatorInterface
      * Validates a given URL. It can also check if the URL is accessible (on by default).
      * 
      * @param string $url
-     * @param boolean $checkIfAccessible When this parameter is set to true (which is default) the function also make a cURL call to see if the URL is accessible
+     * @param boolean $checkIfAccessible [ optional ] When this parameter is set to true the function will make a cURL to the given URL
      * @return boolean
      */
-    public static function isValid($url, $checkIfAccessible = true)
+    public static function isValid($url, $checkIfAccessible = false)
     {
         // ==== Check variable ==== //
         $isValid = false;

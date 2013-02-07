@@ -315,7 +315,7 @@ class Language
      * Loads the texts in the class cache
      *
      * @param void
-     * @return void
+     * @return boolean
      */
     protected function loadTexts()
     {

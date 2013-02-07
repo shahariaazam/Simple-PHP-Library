@@ -1,13 +1,17 @@
 <?php
 
-use SPL\Validator\Email;
-
 /**
  * User: brian978
  * Created on: 1/29/13
  * License: Creative Commons Attribution-ShareAlike 3.0
  *
  */
+
+namespace tests\SPL\Validator;
+
+use PHPUnit_Framework_TestCase;
+use SPL\Validator\Email;
+
 class EmailTest extends PHPUnit_Framework_TestCase
 {
     public function testValidationFail()

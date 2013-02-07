@@ -15,6 +15,7 @@
 
 namespace SPL\Upload;
 
+use SPL\File\FileInfo;
 use SPL\File\FileInterface;
 
 class Uploader implements UploadInterface
@@ -307,7 +308,7 @@ class Uploader implements UploadInterface
         if(self::isFileValid($file->basename))
         {
             // ==== Getting file extension ==== //
-            $extension = \SPL\File\FileInfo::getExtension($file->uploadpath);
+            $extension = FileInfo::getExtension($file->uploadpath);
 
             // Checking if the extension is valid
             if(!empty($extension) && is_string($extension))
@@ -583,7 +584,7 @@ class Uploader implements UploadInterface
                         // ==== Adding log data ==== //
                         if($this->options['debug'])
                         {
-                            $this->log .= '<strong>ERROR</strong> Could not remove the file with name <em>' . $info['filename'] . '</em> from path <em>' . $info['filepath'] . '</em>.';
+                            $this->log .= '<strong>ERROR</strong> Could not remove the file with name <em>' . $file->filename . '</em> from path <em>' . $file->filepath . '</em>.';
                         }
                     }
                 }

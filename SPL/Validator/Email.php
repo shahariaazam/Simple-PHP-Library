@@ -38,8 +38,7 @@ class Email implements ValidatorInterface
         {
             $isValid = false;
         }
-
-        if($checkDns === true)
+        else if($checkDns === true)
         {
             $dns = '';
 

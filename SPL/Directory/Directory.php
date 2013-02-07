@@ -47,7 +47,7 @@ class Directory
                             self::cleanup($dir . $file . '/', $whitelist);
 
                             // ==== Removing directory ==== //
-                            @rmdir($dir . $file);
+                            rmdir($dir . $file);
                         }
                         else if(is_file($dir . $file))
                         {
