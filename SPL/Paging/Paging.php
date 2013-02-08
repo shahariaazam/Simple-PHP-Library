@@ -46,9 +46,9 @@ class Paging
     /**
      * Sets the URL object and the provided options
      *
-     * @param object $url
+     * @param \SPL\Url\Url $url
      * @param array $options
-     * @return void
+     * @return \SPL\Paging\Paging
      */
     public function __construct(Url\Url $url, array $options = array())
     {
@@ -204,7 +204,7 @@ class Paging
      * Prints the pages
      *
      * @param boolean $default_layout
-     * @return void
+     * @return mixed
      */
     public function show($default_layout = false)
     {
@@ -221,11 +221,9 @@ class Paging
             $pagenum = 1;
         }
 
-        $minpagenum = 1;                          // Default minimum page number
-        $maxpagenum = 0;                          // Default maximum page number
-        $numrows    = &$this->rows;              // Number of rows got from query
-        $ipp        = &$this->options['ipp'];    // Items per page
-        $pages      = &$this->options['pages'];  // Pages displayed
+        $numrows    = $this->rows;              // Number of rows got from query
+        $ipp        = $this->options['ipp'];    // Items per page
+        $pages      = $this->options['pages'];  // Pages displayed
 
         //If rows per page not 0
         if($numrows != 0)
@@ -379,5 +377,7 @@ class Paging
                 }
             }
         }
+
+        return null;
     }
 }

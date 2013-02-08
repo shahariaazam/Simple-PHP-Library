@@ -40,7 +40,7 @@ abstract class PayPal implements PayPalInterface
      */
     protected static function getExpressCheckoutButton()
     {
-        return '<img src="https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif" align="left" style="margin-right:7px;" />';
+        return '<img src="https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif" style="margin-right:7px;" />';
     }
 
     /**

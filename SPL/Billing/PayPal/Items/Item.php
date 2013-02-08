@@ -26,7 +26,7 @@ class Item
     /**
      * Items object
      *
-     * @var Items\Items
+     * @var \SPL\Billing\PayPal\Items\Items
      */
     private $observer;
 
@@ -44,8 +44,8 @@ class Item
     /**
      * Sets the items object
      *
-     * @param Items\Items $items
-     * @return void
+     * @param \SPL\Billing\PayPal\Items\Items $items
+     * @return \SPL\Billing\PayPal\Items\Item
      */
     public function setObserver(Items $items)
     {

@@ -29,7 +29,7 @@ class Vault implements SecurityInterface
     /**
      * Hold the handle for the encryption module and mode
      *
-     * @var encryption_descriptor
+     * @var resource
      */
     private $td;
 
@@ -81,7 +81,7 @@ class Vault implements SecurityInterface
      *
      * @access public
      * @param array $options
-     * @return void
+     * @return \SPL\Security\Vault
      */
     public function __construct(array $options = array())
     {

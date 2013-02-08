@@ -54,7 +54,7 @@ class Autoload
      * Registers the Autoload class as the __autoload() implementation
      *
      * @param array $namespaces
-     * @return void
+     * @throws Exception\RuntimeException
      */
     public static function register($namespaces = array())
     {

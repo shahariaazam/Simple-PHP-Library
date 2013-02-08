@@ -55,12 +55,13 @@ class Image
      */
     private $enabled = true;
 
-    /**
+     /**
      * Sets the image file and the provided options
      *
      * @param string $image
      * @param array $options
-     * @return object
+     * @throws \Exception
+     * @return \SPL\Image\Image
      */
     public function __construct($image, array $options = array())
     {
@@ -86,10 +87,10 @@ class Image
         }
         else
         {
-            throw new Exception('Image file is invalid');
-
             // ==== Disabling the object ==== //
             $this->enabled = false;
+
+            throw new \Exception('Image file is invalid');
         }
     }
 
@@ -177,7 +178,7 @@ class Image
         }
 
         // ==== Checking if the image provided is supported
-        if(key_exists($ext, $this->supported))
+        if(isset($this->supported[$ext]))
         {
             // ==== Resizing image ==== //
             $new = $this->resizeImg($this->image);
@@ -248,7 +249,7 @@ class Image
         }
 
         // ==== Checking if the image extension is supported ==== //
-        if(key_exists($ext, $this->supported))
+        if(isset($this->supported[$ext]))
         {
             // ==== Getting the directory where the image will be stored ==== //
             $dir = $this->options['dir'];

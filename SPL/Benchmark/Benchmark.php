@@ -315,10 +315,8 @@ class Benchmark
                  */
             }
         }
-        else
-        {
-            return '';
-        }
+
+        return '';
     }
 
     /**

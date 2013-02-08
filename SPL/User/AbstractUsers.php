@@ -110,12 +110,12 @@ abstract class AbstractUsers implements UsersInterface
      *
      * @var string
      */
-    protected $userPrototypeClass = 'SPL\\User\\User';
+    protected $userPrototypeClass = 'SPL\User\User';
 
     /**
      * Database object
      *
-     * @var db_module
+     * @var \SPL\Db\Adapter\AdapterInterface
      */
     protected $db;
 
@@ -147,7 +147,7 @@ abstract class AbstractUsers implements UsersInterface
      * @param SecurityInterface $vault
      * @param array $options
      * @param UserInterface $userPrototype
-     * @return void
+     * @return \SPL\User\AbstractUsers
      */
     public function __construct(DbInterface $db, SecurityInterface $vault, array $options = array(), UserInterface $userPrototype = null)
     {
@@ -258,7 +258,7 @@ abstract class AbstractUsers implements UsersInterface
         }
         else
         {
-            return NULL;
+            return null;
         }
     }
 
@@ -304,6 +304,7 @@ abstract class AbstractUsers implements UsersInterface
                 {
                     $this->errors[] = $number;
                 }
+                break;
 
             // LOG
             case 'log':

@@ -74,8 +74,7 @@ class Url implements UrlInterface
      * Class constructor. It also validates the URL
      *
      * @param array $options
-     * @return void
-     * @throws Exception\RuntimeException
+     * @return \SPL\Url\Url
      */
     public function __construct(array $options = array())
     {
@@ -100,7 +99,7 @@ class Url implements UrlInterface
         // Checking if we should auto initialize the object
         if($this->options['auto_initialize'])
         {
-            $this->initialize();
+            $this->init();
         }
     }
 
@@ -111,61 +110,57 @@ class Url implements UrlInterface
      * @return void
      * @throws Exception\RuntimeException
      */
-    public function initialize()
+    public function init()
     {
-        // ==== Checking if the site_root option has been set ==== //
-        if(!empty($this->options['site_root']))
+        if(Validator\Url::isValid($this->options['site_root'], false) === false)
         {
+            throw new Exception\RuntimeException('Invalid site root URL.');
+        }
+        else
+        {
+            // ==== Changing to SSL if requested ==== //
+            if($this->options['require_ssl'] === true)
+            {
+                if(Validator\Url::isValid($this->options['site_root_ssl'], false) === false)
+                {
+                    throw new Exception\RuntimeException('Invalid SSL site root URL.');
+                }
+
+                $this->use_ssl = true;
+            }
+
             // ==== Setting rewrite property ==== //
-            $this->rewrite = &$this->options['rewrite'];
+            $this->rewrite = $this->options['rewrite'];
 
             // ==== Getting URL ==== //
             $this->url = self::getFullURL();
 
-            // ==== Correcting the site roots ==== //
+            // ==== Correcting the site roots so we don't have issues with the URL generation ==== //
             if(strlen($this->options['site_root']) > (strrpos($this->options['site_root'], '/') + 1))
             {
                 $this->options['site_root'] .= '/';
             }
 
-            if(strlen($this->options['site_root_ssl']) > (strrpos($this->options['site_root_ssl'], '/') + 1))
+            // ==== Correcting the SSL site root so we don't have issues with the URL generation ==== //
+            if(!empty($this->options['site_root_ssl']) && strlen($this->options['site_root_ssl']) > (strrpos($this->options['site_root_ssl'], '/') + 1))
             {
                 $this->options['site_root_ssl'] .= '/';
             }
 
-            // ==== Correcting the URL ==== //
+            // ==== Correcting the detected URL ==== //
             if($this->rewrite && strlen($this->url) > (strrpos($this->url, '/') + 1) && strpos($this->url, '?' . $this->options['controller'] . '=') === false)
             {
                 $this->url .= '/';
             }
 
-            // ==== Changing to SSL if requested ==== //
-            if($this->options['require_ssl'] === true)
-            {
-                $this->enableSSL();
-            }
+            // Loading the params in $_GET
+            $this->loadGetParams();
 
-            // == If invalid == //
-            if(Validator\Url::isValid($this->options['site_root'], false) === false)
-            {
-                throw new Exception\RuntimeException('Invalid site root URL. URL: ' . $this->options['site_root']);
-            }
-            else
-            {
-                // Loading the params in $_GET
-                $this->loadGetParams();
+            // ==== Getting the URL data from GET or by splitting the URL ==== //
+            $this->getURLData();
 
-                // ==== Getting the URL data ==== //
-                $this->getURLData();
-
-                // ==== Initializing the default params ==== //
-                $this->initParams();
-            }
-        }
-        else
-        {
-            // ==== Triggering error ==== //
-            throw new Exception\RuntimeException('The site root parameter is not set.');
+            // ==== Initializing the default params ==== //
+            $this->initParams();
         }
     }
 
@@ -253,7 +248,6 @@ class Url implements UrlInterface
     /**
      * Retrieves data from the URL string
      *
-     * @throws Exception
      * @return void
      */
     protected function getURLData()
@@ -451,20 +445,20 @@ class Url implements UrlInterface
     /**
      * Changes the site root to the SSL one
      *
-     * @param void
+     * @throws Exception\RuntimeException
      * @return object
      */
     public function enableSSL()
     {
         // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->options['site_root_ssl']))
+        if(Validator\Url::isValid($this->options['site_root_ssl'], false) === true)
         {
             $this->use_ssl = true;
         }
         else
         {
             // ==== Triggering an error ==== //
-            Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
+            throw new Exception\RuntimeException('Invalid SSL site root URL.');
         }
 
         return $this;
@@ -473,21 +467,11 @@ class Url implements UrlInterface
     /**
      * Changes the site root to the non-SSL one
      *
-     * @param void
      * @return object
      */
     public function disableSSL()
     {
-        // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->options['site_root']))
-        {
-            $this->use_ssl = false;
-        }
-        else
-        {
-            // ==== Triggering an error ==== //
-            throw new Exception\RuntimeException('To switch to non-SSL you need to set the site_root option.');
-        }
+        $this->use_ssl = false;
 
         return $this;
     }
@@ -495,20 +479,20 @@ class Url implements UrlInterface
     /**
      * Used to trigger the temporary SSL (when you want SSL for a single link)
      *
-     * @param void
+     * @throws Exception\RuntimeException
      * @return object
      */
     public function ssl()
     {
         // ==== Checking if the SSL site root is even set ==== //
-        if(!empty($this->options['site_root_ssl']))
+        if(Validator\Url::isValid($this->options['site_root_ssl'], false) === true)
         {
             $this->tmp_ssl = true;
         }
         else
         {
             // ==== Triggering an error ==== //
-            Exception\RuntimeException('To switch to SSL you need to set the site_root_ssl option.');
+            throw new Exception\RuntimeException('Invalid SSL site root URL.');
         }
 
         return $this;
@@ -549,24 +533,21 @@ class Url implements UrlInterface
             $this->tmp_ssl = false;
         }
 
-        // Link to the same page but with different params (this includes the $_GET params)
-        if($controller == $this->getCurrentPage() && $merge_get === true)
+        // Merging the params if required
+        if($merge_get === true)
         {
-            // ==== If the page is exactly the same as the one the user is on then take all the $_GET parameters ==== //
-            $params = self::array_append($this->getParams(), $params);
-        }
-        // New page with params that must be automaticaly loaded
-        else
-        {
-            // ===== Checking if we should merge the GET ==== //
-            if($merge_get === true)
-            {
-                $params = self::array_append($this->getParams(), $params);
-            }
+            // This should now contain all the parameters (first ones should be the given ones)
+            $get_params = array_replace($params, $this->getParams());
 
-            // ==== Adding default params ==== //
-            $params = self::array_append($params, $this->persistent_params);
+            // Now that we have all the params in order we override the get params with the given params
+            $params = array_replace($get_params, $params);
         }
+
+        // Now we need to add the persistent params to the given ones (persistent should be the last ones)
+        $persistent_params = array_replace($params, $this->persistent_params);
+
+        // Now that we have all the params in order we override the persistent params with the given params
+        $params = array_replace($persistent_params, $params);
 
         // If the params count is higher then 1 we need to make sure we have an action
         if(count($params) >= 1)
@@ -577,6 +558,10 @@ class Url implements UrlInterface
                 $params[$this->options['action']] = 'index';
             }
         }
+
+        // The characters that join the parameters (default)
+        $glue1 = '&';
+        $glue2 = '=';
 
         // ==== Processing the data to generate the URL ==== //
         if($this->rewrite)
@@ -604,10 +589,6 @@ class Url implements UrlInterface
             ////////////////////////////////////////////////////////////////
             //    REWRITE DISABLED
             ///////////////////////////////////////////////////////////////
-            // The characters that join the parameters
-            $glue1 = '&';
-            $glue2 = '=';
-
             // ==== Building the first part of the URL ==== //
             $url .= '?' . $this->options['controller'] . $glue2 . $controller;
 
