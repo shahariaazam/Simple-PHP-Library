@@ -78,10 +78,16 @@ class File implements FileInterface
      *
      * @param string $fqpn This is the fully qualified path name (FQPN). Example: /usr/bin/server.conf
      * @param array $extra [ optional ] An array containing extra info about the object
+     * @throws Exception\RuntimeException
      * @return \SPL\File\File
      */
     public function __construct($fqpn, array $extra = array())
     {
+        if(!is_file($fqpn))
+        {
+            throw new Exception\RuntimeException('Given FQPN does not point to a file');
+        }
+
         $pathinfo = pathinfo($fqpn);
 
         if(!empty($extra))
@@ -158,43 +164,24 @@ class File implements FileInterface
      * @throws \SPL\File\Exception\RuntimeException
      * @return \SPL\File\File
      */
-    public function rename($name, $extension = '')
+    public function rename($name, $extension = null)
     {
-        if(!empty($name) && !is_numeric($name) && is_string($extension))
+        // If the extension was not given then we assume the existing extension
+        if($extension === null)
+        {
+            $extension = $this->extension;
+        }
+
+        if(!empty($name) && is_string($name) && is_string($extension))
         {
             $newname = $name . $extension;
-
-            // This is used for an extra check so that we make sure the rename is successfull
-            $count = 0;
-
-            // We need to replace the old name in the FQPN so they are not out of sync
-            $this->fqpn = str_replace($this->basename, $newname, $this->fqpn, $count);
-
-            // If the replace failed we need to exit to prevent further modifications
-            if($count === 0)
-            {
-                throw new Exception\RuntimeException('The file could not be renamed because the basename is not present in the FPQN');
-            }
 
             if(rename($this->path . '/' . $this->basename, $this->path . '/' . $newname) === false)
             {
                 throw new Exception\RuntimeException('Failed to rename the file because of an unkown error');
             }
 
-            if($extension === '')
-            {
-                $pathinfo = pathinfo($this->fqpn);
-
-                if(isset($pathinfo['extension']))
-                {
-                    $extension = $pathinfo['extension'];
-                }
-                else
-                {
-                    throw new Exception\RuntimeException('Failed to autodetect the file extension. Please make sure it is an actual file and not a directory');
-                }
-            }
-
+            $this->fqpn      = str_replace($this->basename, $newname, $this->fqpn);
             $this->extension = $extension;
             $this->basename  = $newname;
         }
