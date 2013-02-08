@@ -27,8 +27,7 @@ class FileInfo implements FileInterface
     public static function getExtension($fqpn)
     {
         $array = explode('.', $fqpn);
-        $ext = $array[count($array) - 1];
 
-        return $ext;
+        return array_pop($array);
     }
 }
