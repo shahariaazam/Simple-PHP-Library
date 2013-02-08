@@ -28,9 +28,6 @@ class Headers
      */
     public static function getForUrl($url, $assoc = true)
     {
-        // Headers array
-        $headers = array();
-
         // Checking if the required function exists
         if(function_exists('get_headers'))
         {

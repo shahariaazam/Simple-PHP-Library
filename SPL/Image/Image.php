@@ -226,7 +226,7 @@ class Image
      *
      * @param string $new_ext
      * @param boolean $random Flag that determins if the image name is random or not
-     * @return false on failure or image name on success
+     * @return boolean false on failure or image name on success
      */
     public function write($new_ext = '', $random=false)
     {

@@ -18,6 +18,7 @@
 namespace SPL\Paging;
 
 use SPL\Url;
+use SPL\Database\db_module;
 
 
 class Paging
@@ -32,7 +33,7 @@ class Paging
     /**
      * URL Object
      *
-     * @var URL
+     * @var \SPL\Url\Url
      */
     private $url;
 
@@ -128,7 +129,7 @@ class Paging
         $data = array();
 
         // ==== Getting data ==== //
-        if($db->numrows() != 0)
+        if($db->num_rows() != 0)
         {
             // == Adding data from query to the data array == //
             while($data[] = $db->fetch_assoc());
@@ -253,7 +254,7 @@ class Paging
                 // ==== Default layout ==== //
                 if($default_layout)
                 {
-                    echo '<br /><center>';
+                    echo '<br /><div style="margin: 0 auto;">';
                 }
 
                 // ==== Getting minimum page number ==== //
@@ -367,7 +368,7 @@ class Paging
                 // ==== Default layout ==== //
                 if($default_layout)
                 {
-                    echo '</center>';
+                    echo '</div>';
                 }
 
                 // ==== Array layout ==== //

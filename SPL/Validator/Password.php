@@ -23,12 +23,12 @@ class Password implements ValidatorInterface
      * @var array
      */
     private $options = array();
-    
+
     /**
      * Sets the class options
-     * 
+     *
      * @param array $options
-     * @return void
+     * @return \SPL\Validator\Password
      */
     public function __construct(array $options = array())
     {
@@ -131,8 +131,6 @@ class Password implements ValidatorInterface
                         if(is_string(substr($passwd, $i, 1)) && preg_match('/[A-Z]/', substr($passwd, $i, 1)))
                         {
                             $uChr++;
-
-                            $checked = true;
                         }
                     }
                 }

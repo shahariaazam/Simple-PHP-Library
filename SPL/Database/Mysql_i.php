@@ -58,7 +58,7 @@ class Mysql_i implements AdapterInterface
      * Class constructor
      *
      * @param array $options
-     * @return void
+     * @return \SPL\Database\Mysql_i
      */
     public function __construct($options)
     {

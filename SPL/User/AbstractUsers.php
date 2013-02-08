@@ -122,7 +122,7 @@ abstract class AbstractUsers implements UsersInterface
     /**
      * Vault object
      *
-     * @var Vault
+     * @var SecurityInterface
      */
     protected $vault;
 
@@ -268,7 +268,7 @@ abstract class AbstractUsers implements UsersInterface
      * @param string $type
      * @param string $message
      * @param string $location
-     * @param string $number
+     * @param int $number
      * @param string $extra1
      * @param string $extra2
      * @return void
@@ -1077,9 +1077,6 @@ abstract class AbstractUsers implements UsersInterface
         }
         else
         {
-            // ==== Password complexity options ==== //
-            $options = array();
-
             // Creating the password validator object
             $passwdValidator = new Password();
 
@@ -1296,7 +1293,10 @@ abstract class AbstractUsers implements UsersInterface
             if($sql_error == '') // No error
             {
                 // ==== Getting the data from the database ==== //
-                $info = $this->db->fetch_assoc();
+                /**
+                 * TODO implement info
+                 */
+//                $info = $this->db->fetch_assoc();
             }
             else
             {

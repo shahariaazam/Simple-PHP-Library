@@ -84,7 +84,7 @@ class Benchmark
      * Sets different options
      *
      * @param array $options
-     * @return void
+     * @return \SPL\Benchmark\Benchmark
      */
     public function __construct(array $options=array())
     {

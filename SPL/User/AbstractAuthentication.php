@@ -101,14 +101,14 @@ abstract class AbstractAuthentication implements AuthenticationInterface
     /**
      * Database object
      *
-     * @var db_module
+     * @var DbInterface
      */
     protected $db;
 
     /**
      * Vault object
      *
-     * @var Vault
+     * @var SecurityInterface
      */
     protected $vault;
 
@@ -137,7 +137,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      *
      * UserAcc object
      *
-     * @var BaseUserAcc
+     * @var UsersInterface
      */
     protected $userAcc;
 

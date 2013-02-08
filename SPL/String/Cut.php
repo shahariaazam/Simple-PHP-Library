@@ -28,15 +28,14 @@ class Cut
     );
 
     /**
-    * Cuts a string to size similar to substr but it also checks for html entities to avoid
-    * cutting a html entity in half
-    *
-    * @param string $string
-    * @param integer $from
-    * @param integer $length
-    * @param array $more_entities Additional entities that the function can use to look for
-    * @return string on success or false on failure
-    */
+     * Cuts a string to size similar to substr but it also checks for html entities to avoid
+     * cutting a html entity in half
+     *
+     * @param string $string
+     * @param integer $from
+     * @param integer $length
+     * @return string on success or false on failure
+     */
    public static function keepEntities($string, $from, $length)
    {
        // ==== Getting $to limit ==== //

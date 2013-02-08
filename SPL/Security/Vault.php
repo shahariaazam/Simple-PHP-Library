@@ -48,13 +48,6 @@ class Vault implements SecurityInterface
     private $key;
 
     /**
-     * Array of IV's for each encryption layer
-     *
-     * @var array
-     */
-    private $ivs = array();
-
-    /**
      * Array of keys for each encryption layer
      *
      * @var array
@@ -212,7 +205,7 @@ class Vault implements SecurityInterface
             }
 
             // ==== Going through the characters of the previous key ==== //
-            foreach($prevkey as $k => $char)
+            foreach($prevkey as $char)
             {
                 // ==== Converting the character into ascii ==== //
                 $ascii = ord($char);
@@ -305,7 +298,7 @@ class Vault implements SecurityInterface
      *
      * @access public
      * @param string $data
-     * @return encrypted data or false if data not string
+     * @return string encrypted data or false if data not string
      */
     private function crypt($data)
     {
@@ -334,7 +327,7 @@ class Vault implements SecurityInterface
      *
      * @access public
      * @param string $data
-     * @return decrypted data or false if data not string
+     * @return string decrypted data or false if data not string
      */
     private function dcrypt($data)
     {
@@ -363,7 +356,7 @@ class Vault implements SecurityInterface
      *
      * @access public
      * @param string $data
-     * @return encrypted data or false if data not string
+     * @return string encrypted data or false if data not string
      */
     public function encrypt($data)
     {
@@ -430,7 +423,7 @@ class Vault implements SecurityInterface
      *
      * @access public
      * @param string $data
-     * @return encrypted data or false if data not string
+     * @return string encrypted data or false if data not string
      */
     public function decrypt($data)
     {

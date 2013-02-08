@@ -15,6 +15,8 @@
 
 namespace SPL\Archive;
 
+use ZipArchive;
+
 class Zip
 {
     /**

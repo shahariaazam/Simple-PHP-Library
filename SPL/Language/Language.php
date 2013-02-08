@@ -79,16 +79,16 @@ class Language
     /**
      * CodeIgniter object
      *
-     * @var CodeIgniter
+     * @var object
      */
     protected $CI;
 
     /**
      * Sets class options
      *
-     * @param Url $url
+     * @param \SPL\Url\UrlInterface $url
      * @param array $options
-     * @return void
+     * @return \SPL\Language\Language
      */
     public function __construct(UrlInterface $url, array $options = array())
     {
@@ -120,10 +120,13 @@ class Language
         // ==== Getting the Code Igniter object instance if the class has the support activated for it ==== //
         if($this->options['code_igniter'])
         {
-            $this->CI = &get_instance();
+            if(function_exists('get_instance'))
+            {
+                $this->CI = &get_instance();
 
-            // ==== Getting the cookie domain ==== //
-            $this->options['cookie_domain'] = $this->CI->config->item('cookie_domain');
+                // ==== Getting the cookie domain ==== //
+                $this->options['cookie_domain'] = $this->CI->config->item('cookie_domain');
+            }
         }
 
         // Getting the Url object

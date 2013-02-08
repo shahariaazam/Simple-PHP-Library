@@ -80,6 +80,7 @@ class Directory
             $files = scandir($dir);
 
             // Removing the "dot" files from the array
+            /** @noinspection PhpUnusedParameterInspection */
             array_walk($files, function($file, $index) use (&$contents, $dir, $recursive){
 
                 // Entry

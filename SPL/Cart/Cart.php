@@ -164,7 +164,7 @@ class Cart
      * Retrieves info about an item
      *
      * @access public
-     * @param numeric $id
+     * @param int $id
      * @return array of false when item is not found
      */
     public function getItem($id)
@@ -225,7 +225,7 @@ class Cart
 
         // ====== Calculating total price ======== //
         $total_price = 0;
-        foreach ($this->items as $itemid => $item_info)
+        foreach ($this->items as $item_info)
         {
             $total_price += $item_info['price'] * $item_info['qty'];
         }

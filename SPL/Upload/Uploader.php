@@ -79,7 +79,7 @@ class Uploader implements UploadInterface
      * Sets the class options
      *
      * @param array $options
-     * @return void
+     * @return \SPL\Upload\Uploader
      */
     public function __construct(array $options = array())
     {

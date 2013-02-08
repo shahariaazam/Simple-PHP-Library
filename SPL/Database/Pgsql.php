@@ -42,7 +42,7 @@ class Pgsql implements AdapterInterface
     /**
      * Established connection holder
      *
-     * @var connection_resource
+     * @var resource
      */
     private $link;
 

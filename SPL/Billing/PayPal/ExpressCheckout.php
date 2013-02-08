@@ -326,7 +326,6 @@ class ExpressCheckout extends PayPal
      */
     public function SetExpressCheckout(Items\Items $items, $returnUrl, $cancelUrl)
     {
-        $result = true;
         $log    = '';
 
         // Total price of the items
@@ -444,7 +443,6 @@ class ExpressCheckout extends PayPal
      */
     public function GetExpressCheckoutDetails()
     {
-        $result = true;
         $log    = '';
 
         // Token
@@ -517,9 +515,6 @@ class ExpressCheckout extends PayPal
      */
     public function DoExpressCheckoutPayment(Items\Items $items)
     {
-        // Status
-        $result = true;
-
         // Local log
         $log = '';
 
