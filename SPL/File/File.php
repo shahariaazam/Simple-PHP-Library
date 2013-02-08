@@ -157,6 +157,16 @@ class File implements FileInterface
     }
 
     /**
+     * Returns the FQPN of the file
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->fqpn;
+    }
+
+    /**
      * Renames a file
      *
      * @param string $name
