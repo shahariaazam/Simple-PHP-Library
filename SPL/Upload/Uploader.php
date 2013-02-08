@@ -15,7 +15,6 @@
 
 namespace SPL\Upload;
 
-use SPL\File\FileInfo;
 use SPL\File\FileInterface;
 
 class Uploader implements UploadInterface
@@ -308,7 +307,7 @@ class Uploader implements UploadInterface
         if(self::isFileValid($file->basename))
         {
             // ==== Getting file extension ==== //
-            $extension = FileInfo::getExtension($file->uploadpath);
+            $extension = $file->extension;
 
             // Checking if the extension is valid
             if(!empty($extension) && is_string($extension))
