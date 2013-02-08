@@ -95,6 +95,7 @@ class User extends \ArrayIterator implements UserInterface
     {
         $value = null;
 
+        /** @noinspection PhpVoidFunctionResultUsedInspection */
         if(parent::offsetExists($index))
         {
             $value = parent::offsetGet($index);

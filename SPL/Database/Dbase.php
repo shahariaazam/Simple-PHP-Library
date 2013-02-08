@@ -135,6 +135,8 @@ class Dbase implements DbInterface
      */
     public function fetch()
     {
+        $result = array();
+
         // ==== Getting the numer of rows in the database ==== //
         $num_rows = dbase_numrecords($this->link_id);
 
@@ -341,6 +343,9 @@ class Dbase implements DbInterface
      */
     public function last_id($query, $autoIncrementField)
     {
+        // Dummy code to prevent code inspections to view this as a notice/warning
+        unset($query);
+
         // ==== Result var ==== //
         $result = false;
 

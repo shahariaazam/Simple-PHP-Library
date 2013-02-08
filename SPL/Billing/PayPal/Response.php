@@ -68,6 +68,7 @@ class Response extends \ArrayIterator
     {
         $value = null;
 
+        /** @noinspection PhpVoidFunctionResultUsedInspection */
         if(parent::offsetExists($index))
         {
             $value = parent::offsetGet($index);

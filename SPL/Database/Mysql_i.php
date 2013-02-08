@@ -316,6 +316,7 @@ class Mysql_i implements AdapterInterface
     {
         // ==== Check variable for success/failure ==== //
         $failed = false;
+        $array = array();
 
         // ==== Checking to see if $this->result is an MySQLi_result object ==== //
         if(is_object($this->result))
@@ -351,6 +352,8 @@ class Mysql_i implements AdapterInterface
      */
     public function fetch_array($result_type = 'both')
     {
+        $array = array();
+
         // ==== Check variable for success/failure ==== //
         $failed = false;
 

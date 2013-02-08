@@ -72,7 +72,7 @@ use SPL\Url;
 use SPL\Http\Headers as Headers;
 use SPL\Security\SecurityInterface;
 use SPL\Variable\Variable as Variable;
-use SPL\Db\DbInterface;
+use SPL\Db\Adapter\AdapterInterface;
 
 abstract class AbstractAuthentication implements AuthenticationInterface
 {
@@ -101,7 +101,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
     /**
      * Database object
      *
-     * @var DbInterface
+     * @var AdapterInterface
      */
     protected $db;
 
@@ -144,13 +144,13 @@ abstract class AbstractAuthentication implements AuthenticationInterface
     /**
      * Sets different class properties and some options
      *
-     * @param DbInterface $db
+     * @param AdapterInterface $db
      * @param UsersInterface $userAcc
      * @param SecurityInterface $vault
      * @param array $options
      * @return \SPL\User\AbstractAuthentication
      */
-    public function __construct(DbInterface $db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
+    public function __construct(AdapterInterface $db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']   = '';

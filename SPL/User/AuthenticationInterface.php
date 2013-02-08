@@ -13,4 +13,7 @@
 
 namespace SPL\User;
 
-interface AuthenticationInterface{}
+interface AuthenticationInterface
+{
+    public function getErrors();
+}

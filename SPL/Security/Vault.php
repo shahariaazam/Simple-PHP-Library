@@ -374,16 +374,6 @@ class Vault implements SecurityInterface
                 // ==== Generating the keys ==== //
                 $this->generateKeys();
 
-                // ==== Debug data ==== //
-                if($this->options['debug'])
-                {
-                    // ==== Encrypted array ==== //
-                    $encrypted = array();
-
-                    // ==== Initial value ==== //
-                    $encrypted[0] = $data;
-                }
-
                 // ==== Encrypting the data with each key ==== //
                 for($i = 1; $i <= $this->options['layers']; $i++)
                 {
@@ -392,20 +382,6 @@ class Vault implements SecurityInterface
 
                     // ==== Encrypting ==== //
                     $data = $this->crypt($data);
-
-                    // ==== Debug data ==== //
-                    if($this->options['debug'])
-                    {
-                        // ==== Debug array ==== //
-                        $encrypted[$i] = $data;
-                    }
-                }
-
-                // ==== Debug data ==== //
-                if($this->options['debug'])
-                {
-                    echo 'Encrypted: <pre>' . print_r($encrypted, 1) . '</pre>';
-                    echo 'Keys: <pre>' . print_r($this->keys, 1) . '</pre><br />';
                 }
             }
         }
@@ -441,16 +417,6 @@ class Vault implements SecurityInterface
                 // ==== Generating the keys ==== //
                 $this->generateKeys();
 
-                // ==== Debug data ==== //
-                if($this->options['debug'])
-                {
-                    // ==== Decrypted array ==== //
-                    $decrypted = array();
-
-                    // ==== Initial value ==== //
-                    $decrypted[$this->options['layers']] = $data;
-                }
-
                 // ==== Encrypting the data with each key ==== //
                 for($i = $this->options['layers']; $i >= 1; $i--)
                 {
@@ -459,20 +425,6 @@ class Vault implements SecurityInterface
 
                     // ==== Decrypting ==== //
                     $data = $this->dcrypt($data);
-
-                    // ==== Debug data ==== //
-                    if($this->options['debug'])
-                    {
-                        // ==== Debug array ==== //
-                        $decrypted[$i - 1] = $data;
-                    }
-                }
-
-                // ==== Debug data ==== //
-                if($this->options['debug'])
-                {
-                    echo 'Decrypted: <pre>' . print_r($decrypted, 1) . '</pre>';
-                    echo 'Keys: <pre>' . print_r(array_reverse($this->keys, true), 1) . '</pre><br />';
                 }
             }
         }

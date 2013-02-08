@@ -411,6 +411,7 @@ abstract class AbstractUsers implements UsersInterface
                 if($sql_error == '' && $this->db->num_rows() == 1)
                 {
                     // ==== Retrieving the regdate info === //
+                    /** @noinspection PhpAssignmentInConditionInspection */
                     while($row = $this->db->fetch_assoc())
                     {
                         $result = $row['regdate'];
@@ -752,6 +753,7 @@ abstract class AbstractUsers implements UsersInterface
                     if($this->db->num_rows() >= 1)
                     {
                         // Going through the rows
+                        /** @noinspection PhpAssignmentInConditionInspection */
                         while($row = $this->db->fetch_assoc())
                         {
                             // Cloning the prototype object

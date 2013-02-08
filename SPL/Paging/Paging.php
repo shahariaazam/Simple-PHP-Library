@@ -132,6 +132,7 @@ class Paging
         if($db->num_rows() != 0)
         {
             // == Adding data from query to the data array == //
+            /** @noinspection PhpAssignmentInConditionInspection */
             while($data[] = $db->fetch_assoc());
 
             // == Getting number of rows == //
