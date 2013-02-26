@@ -22,7 +22,7 @@ class UrlTest extends PHPUnit_Framework_TestCase
 
     public function testIsUrlValidWithCUrl()
     {
-        $this->assertTrue(Url::isValid('http://www.google.ro', true));
+        $this->assertTrue(Url::isValid('http://www.google.com', true));
     }
 
     public function testIsUrlInvalidWithoutCUrl()
