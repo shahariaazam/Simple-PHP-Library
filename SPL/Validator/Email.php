@@ -25,7 +25,7 @@ class Email implements ValidatorInterface
      * @throws \RuntimeException
      * @return boolean
      */
-    public static function isValid($email, $checkDns = false)
+    public function isValid($email, $checkDns = false)
     {
         // ==== Check variable ==== //
         $isValid = true;

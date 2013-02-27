@@ -15,23 +15,33 @@ use SPL\Validator\Url;
 
 class UrlTest extends PHPUnit_Framework_TestCase
 {
-    public function testIsUrlValidWithoutCUrl()
+    /**
+     * @var \SPL\Validator\Url
+     */
+    protected $validator;
+
+    public function setUp()
     {
-        $this->assertTrue(Url::isValid('http://www.google.com'));
+        $this->validator = new Url();
     }
 
     public function testIsUrlValidWithCUrl()
     {
-        $this->assertTrue(Url::isValid('http://www.google.com', true));
-    }
-
-    public function testIsUrlInvalidWithoutCUrl()
-    {
-        $this->assertTrue(Url::isValid('http://12345'));
+        $this->assertTrue($this->validator->isValid('http://www.google.com', true));
     }
 
     public function testIsUrlInvalidWithCUrl()
     {
-        $this->assertFalse(Url::isValid('http://12345', true));
+        $this->assertFalse($this->validator->isValid('http://12345', true));
+    }
+
+    public function testIsUrlValidWithoutCUrl()
+    {
+        $this->assertTrue($this->validator->isValid('http://www.google.com'));
+    }
+
+    public function testIsUrlInvalidWithoutCUrl()
+    {
+        $this->assertTrue($this->validator->isValid('http://12345'));
     }
 }
