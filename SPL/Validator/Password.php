@@ -80,7 +80,10 @@ class Password implements ValidatorInterface
             $failed_count = 0;
 
             // ==== Checking if the length check is enabled ==== //
-            if(isset($this->options['length']) && is_numeric($this->options['length']))
+            if(isset($this->options['length'])
+                && is_numeric($this->options['length'])
+                && $this->options['length'] > 0
+            )
             {
                 // ==== Checking the length ==== //
                 if(strlen(trim($passwd)) < $this->options['length'])
@@ -90,7 +93,10 @@ class Password implements ValidatorInterface
             }
 
             // ==== Checking if the number or lowercase or uppercase check is active ==== //
-            if(isset($this->options['number']) || isset($this->options['lcase']) || isset($this->options['ucase']))
+            if($this->options['number'] == true
+                || $this->options['lcase'] == true
+                || $this->options['ucase'] == true
+            )
             {
                 // ==== Character counters ==== //
                 $lChr = 0;
@@ -104,7 +110,7 @@ class Password implements ValidatorInterface
                     $checked = false;
 
                     // ==== Number check ==== //
-                    if(isset($this->options['number']))
+                    if($this->options['number'] == true)
                     {
                         if(is_numeric(substr($passwd, $i, 1)))
                         {
@@ -115,7 +121,7 @@ class Password implements ValidatorInterface
                     }
 
                     // ==== Lowercase check ==== //
-                    if(isset($this->options['lcase']) && $checked == false)
+                    if($this->options['lcase'] == true && $checked == false)
                     {
                         if(is_string(substr($passwd, $i, 1)) && preg_match('/[a-z]/', substr($passwd, $i, 1)))
                         {
@@ -126,7 +132,7 @@ class Password implements ValidatorInterface
                     }
 
                     // ==== Uppercase check ==== //
-                    if(isset($this->options['ucase']) && $checked == false)
+                    if($this->options['ucase'] == true && $checked == false)
                     {
                         if(is_string(substr($passwd, $i, 1)) && preg_match('/[A-Z]/', substr($passwd, $i, 1)))
                         {
@@ -136,19 +142,19 @@ class Password implements ValidatorInterface
                 }
 
                 // ==== Checking number count ==== //
-                if(isset($this->options['number']) && $number == 0)
+                if($this->options['number'] == true && $number == 0)
                 {
                     $failed_count++;
                 }
 
                 // ==== Checking lowercase count ==== //
-                if(isset($this->options['lcase']) && $lChr == 0)
+                if($this->options['lcase'] == true && $lChr == 0)
                 {
                     $failed_count++;
                 }
 
                 // ==== Checking uppercase count ==== //
-                if(isset($this->options['ucase']) && $uChr == 0)
+                if($this->options['ucase'] == true && $uChr == 0)
                 {
                     $failed_count++;
                 }
