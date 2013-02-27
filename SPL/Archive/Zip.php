@@ -19,6 +19,8 @@ use ZipArchive;
 
 class Zip
 {
+    const DS = DIRECTORY_SEPARATOR;
+
     /**
      * @var \ZipArchive
      */
@@ -53,7 +55,12 @@ class Zip
                 $result = $this->packDir($path);
             }
 
-            $result = $this->zip->close();
+            $closeResult = $this->zip->close();
+
+            if($closeResult == false && $result == true)
+            {
+                $result = $closeResult;
+            }
         }
         else
         {
@@ -69,33 +76,31 @@ class Zip
      */
     protected function packDir($dir)
     {
-        $result = true;
-
         if($this->zip instanceof ZipArchive)
         {
             // Adding an empty directory to the archive
-            $this->zip->addEmptyDir($dir);
+            $result = $this->zip->addEmptyDir($dir);
 
-            // Getting all the paths from the directory
-            $paths = scandir(realpath($dir));
-
-            foreach($paths as $path)
+            if($result != false)
             {
-                if($path != '.' && $path != '..')
+                // Getting all the paths from the directory
+                $paths = scandir(realpath($dir));
+
+                foreach($paths as $path)
                 {
-                    if(is_dir($path))
+                    if($path != '.' && $path != '..')
                     {
-                        if($this->packDir($path) == false)
+                        if(is_dir(realpath($dir . self::DS . $path)))
                         {
-                            $result = false;
-                            break;
+                            $result = $this->packDir($dir . self::DS . $path);
                         }
-                    }
-                    else if(is_file(realpath($dir . DIRECTORY_SEPARATOR . $path)))
-                    {
-                        if($this->zip->addFile(basename($dir) . DIRECTORY_SEPARATOR . $path) == false)
+                        else if(is_file(realpath($dir . self::DS . $path)))
                         {
-                            $result = false;
+                            $result = $this->zip->addFile($dir . self::DS . $path);
+                        }
+
+                        if($result == false)
+                        {
                             break;
                         }
                     }
