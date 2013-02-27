@@ -29,6 +29,8 @@ class Directory
         // ==== Reading the files from the directory and deleting the ones not present in the whitelist ==== //
         if(is_dir($dir))
         {
+            $dir = realpath($dir) . DIRECTORY_SEPARATOR;
+
             // ==== Opening the directory ==== //
             $dh = opendir($dir);
 
@@ -44,7 +46,7 @@ class Directory
                         if(is_dir($dir . $file))
                         {
                             // ==== Recursive ==== //
-                            self::cleanup($dir . $file . '/', $whitelist);
+                            self::cleanup($dir . $file, $whitelist);
 
                             // ==== Removing directory ==== //
                             rmdir($dir . $file);
