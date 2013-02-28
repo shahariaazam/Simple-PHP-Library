@@ -15,28 +15,28 @@ class ZipTest extends PHPUnit_Framework_TestCase
      */
     protected $zip;
 
-    const TEST_DIR = 'test_archive_dir';
-    const TEST_FILE = 'random_file.txt';
+    const TEST_DIR     = 'test_archive_dir';
+    const TEST_FILE    = 'random_file.txt';
     const ARCHIVE_FILE = 'testArch.zip';
-    const DS = DIRECTORY_SEPARATOR;
+    const DS           = DIRECTORY_SEPARATOR;
 
     public static function setUpBeforeClass()
     {
-        if(!is_dir(self::TEST_DIR))
+        if (!is_dir(self::TEST_DIR))
         {
             mkdir(self::TEST_DIR);
 
             $last_dir = self::TEST_DIR;
 
-            for($i = 1; $i <= self::$layers; $i++)
+            for ($i = 1; $i <= self::$layers; $i++)
             {
                 $file = $last_dir . self::DS . self::TEST_FILE;
 
-                if(!is_file($file))
+                if (!is_file($file))
                 {
                     touch($file);
                     $file = realpath($file);
-                    $fh = fopen($file, 'w');
+                    $fh   = fopen($file, 'w');
                     fwrite($fh, 'This is a test file for the archive creation');
                     fclose($fh);
                 }
@@ -83,7 +83,10 @@ class ZipTest extends PHPUnit_Framework_TestCase
     {
         $this->zip->unpack(self::ARCHIVE_FILE, self::TEST_DIR . '_unpacked');
 
-        $this->assertTrue($this->compareDirectories(self::TEST_DIR, self::TEST_DIR . '_unpacked'));
+        $original = realpath(basename(self::TEST_DIR));
+        $copy     = realpath(self::TEST_DIR . '_unpacked' . self::DS . basename(self::TEST_DIR));
+
+        $this->assertTrue($this->compareDirectories($original, $copy));
     }
 
     /**
@@ -94,19 +97,53 @@ class ZipTest extends PHPUnit_Framework_TestCase
     protected function compareDirectories($original, $copy)
     {
         $result = true;
-// TODO: implement the compareDirectories method
-//        $originalContents = scandir($original);
-//
-//        foreach($originalContents as $path)
-//        {
-//            if($path != '.' && $path != '..')
-//            {
-//                if(!is_dir($copy . $path))
-//                {
-//
-//                }
-//            }
-//        }
+
+        foreach (scandir($original) as $path)
+        {
+            if ($path != '.' && $path != '..')
+            {
+                $fullPath = $original . self::DS . $path;
+
+                if (is_file($fullPath))
+                {
+                    if (is_file($copy . self::DS . $path))
+                    {
+                        $originalSize = filesize($fullPath);
+                        $copySize     = filesize($copy . self::DS . $path);
+
+                        if ($originalSize == false
+                            || $copySize == false
+                            || $originalSize !== $copySize
+                        )
+                        {
+                            $result = false;
+                        }
+                    }
+                    else
+                    {
+                        $result = false;
+                    }
+                }
+                else if (is_dir($fullPath))
+                {
+                    $copyPath = $copy . self::DS . $path;
+
+                    if (is_dir($copyPath))
+                    {
+                        $result = $this->compareDirectories($fullPath, $copyPath);
+                    }
+                    else
+                    {
+                        $result = false;
+                    }
+                }
+            }
+
+            if ($result == false)
+            {
+                break;
+            }
+        }
 
         return $result;
     }
@@ -118,16 +155,16 @@ class ZipTest extends PHPUnit_Framework_TestCase
             self::TEST_DIR . '_unpacked',
         );
 
-        foreach($cleanup as $dir)
+        foreach ($cleanup as $dir)
         {
-            if(is_dir($dir))
+            if (is_dir($dir))
             {
                 Directory::cleanup($dir);
                 rmdir($dir);
             }
         }
 
-        if(is_file(self::ARCHIVE_FILE))
+        if (is_file(self::ARCHIVE_FILE))
         {
             unlink(self::ARCHIVE_FILE);
         }

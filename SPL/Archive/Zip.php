@@ -17,19 +17,9 @@ namespace SPL\Archive;
 
 use ZipArchive;
 
-class Zip
+class Zip extends ZipArchive
 {
     const DS = DIRECTORY_SEPARATOR;
-
-    /**
-     * @var \ZipArchive
-     */
-    protected $zip;
-
-    public function __construct()
-    {
-        $this->zip = new ZipArchive();
-    }
 
     /**
      * Adds a file or a directory to a given archive
@@ -42,20 +32,20 @@ class Zip
     {
         $result = true;
 
-        $openArch = $this->zip->open($archiveName, ZIPARCHIVE::CREATE);
+        $openArch = $this->open($archiveName, ZIPARCHIVE::CREATE);
 
         if($openArch === true)
         {
             if(is_file($path))
             {
-                $result = $this->zip->addFile($path);
+                $result = $this->addFile($path);
             }
             else if (is_dir($path))
             {
                 $result = $this->packDir($path);
             }
 
-            $closeResult = $this->zip->close();
+            $closeResult = $this->close();
 
             if($closeResult == false && $result == true)
             {
@@ -76,10 +66,10 @@ class Zip
      */
     protected function packDir($dir)
     {
-        if($this->zip instanceof ZipArchive)
+        if($this instanceof ZipArchive)
         {
             // Adding an empty directory to the archive
-            $result = $this->zip->addEmptyDir($dir);
+            $result = $this->addEmptyDir($dir);
 
             if($result != false)
             {
@@ -96,7 +86,7 @@ class Zip
                         }
                         else if(is_file(realpath($dir . self::DS . $path)))
                         {
-                            $result = $this->zip->addFile($dir . self::DS . $path);
+                            $result = $this->addFile($dir . self::DS . $path);
                         }
 
                         if($result == false)
@@ -140,12 +130,12 @@ class Zip
         $isOk = true;
 
         // ==== Opening the archive ==== //
-        $archOpen = $this->zip->open($archive);
+        $archOpen = $this->open($archive);
 
         if($archOpen === true)
         {
-            $this->zip->extractTo($directory);
-            $this->zip->close();
+            $this->extractTo($directory);
+            $this->close();
         }
         else
         {
