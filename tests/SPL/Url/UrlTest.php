@@ -217,4 +217,30 @@ class UrlTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('https://localhost/?controller=contact&action=index&param1=test', $link);
     }
+
+    public function testGenerationWithNoParams()
+    {
+        $config = array(
+            'site_root' => 'http://localhost'
+        );
+
+        $url = new Url($config);
+
+        $link = $url->get('contact');
+
+        $this->assertEquals('http://localhost/?controller=contact', $link);
+    }
+
+    public function testGenerationWithParamsButNoAction()
+    {
+        $config = array(
+            'site_root' => 'http://localhost'
+        );
+
+        $url = new Url($config);
+
+        $link = $url->get('contact', array('param1' => 'test'));
+
+        $this->assertEquals('http://localhost/?controller=contact&action=index&param1=test', $link);
+    }
 }

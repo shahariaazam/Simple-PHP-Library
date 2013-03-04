@@ -14,24 +14,34 @@ use SPL\Validator\Email;
 
 class EmailTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \SPL\Validator\Email
+     */
+    protected $validator;
+
+    public function setUp()
+    {
+        $this->validator = new Email();
+    }
+
     public function testValidationFail()
     {
         $email = 'asdf@';
 
-        $this->assertFalse(Email::isValid($email));
+        $this->assertFalse($this->validator->isValid($email));
     }
 
     public function testValidationFailFakeDomain()
     {
         $email = 'asdf@asda.com';
 
-        $this->assertTrue(Email::isValid($email));
+        $this->assertTrue($this->validator->isValid($email));
     }
 
     public function testValidationFailFakeDomainWithDnsCheck()
     {
         $email = 'asdf@a11sda.com';
 
-        $this->assertFalse(Email::isValid($email, true));
+        $this->assertFalse($this->validator->isValid($email, true));
     }
 }
