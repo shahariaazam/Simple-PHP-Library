@@ -28,7 +28,7 @@ class Url extends AbstractValidator
      * @param boolean $checkIfAccessible [ optional ] When this parameter is set to true the function will make a cURL to the given URL
      * @return boolean
      */
-    public function isValid($url, $checkIfAccessible = false)
+    public static function isValid($url, $checkIfAccessible = false)
     {
         // ==== Check variable ==== //
         $isValid = false;

@@ -14,5 +14,5 @@ namespace SPL\Validator;
 
 interface ValidatorInterface
 {
-    public function isValid($value);
+
 }
