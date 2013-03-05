@@ -29,7 +29,7 @@ class User extends \ArrayIterator implements UserInterface
      * Constructor
      *
      * @param array $info
-     * @return void
+     * @return \SPL\User\User
      */
     public function __construct($info = array())
     {
@@ -95,6 +95,7 @@ class User extends \ArrayIterator implements UserInterface
     {
         $value = null;
 
+        /** @noinspection PhpVoidFunctionResultUsedInspection */
         if(parent::offsetExists($index))
         {
             $value = parent::offsetGet($index);

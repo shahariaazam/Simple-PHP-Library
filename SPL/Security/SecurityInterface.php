@@ -13,4 +13,9 @@
 
 namespace SPL\Security;
 
-interface SecurityInterface{}
+interface SecurityInterface
+{
+    public function encrypt($string);
+
+    public function decrypt($string);
+}

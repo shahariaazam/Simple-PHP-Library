@@ -7,47 +7,26 @@
  * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
- * 
+ *
  * @name Password
  * @version 1.0
- * 
+ *
  */
 
 namespace SPL\Validator;
 
-class Password implements ValidatorInterface
+class Password extends AbstractValidator
 {
-    /**
-     * Options for the validation
-     * 
-     * @var array
-     */
-    private $options = array();
-    
-    /**
-     * Sets the class options
-     * 
-     * @param array $options
-     * @return void
-     */
-    public function __construct(array $options = array())
-    {
-        // Some default options
-        $this->options['length'] = 8;       // Minimum password length
-        $this->options['number'] = true;    // Require numbers
-        $this->options['lcase']  = true;    // Require lowercase letters
-        $this->options['ucase']  = true;    // Require uppercase letters
-        
-        // ==== Replacing options with custom ones ==== //
-        if(count($options) > 0)
-        {
-            $this->options = array_replace($this->options, $options);
-        }
-    }
-    
+    protected $options = array(
+        'length' => 8, // Minimum password length
+        'number' => true, // Require numbers
+        'ucase' => true, // Require lowercase letters
+        'lcase' => true // Require uppercase letters
+    );
+
     /**
      * Used to set additional options
-     * 
+     *
      * @param string $name
      * @param string $value
      * @return void
@@ -55,115 +34,114 @@ class Password implements ValidatorInterface
     public function __set($name, $value)
     {
         // Checking if the $name exists in the options array (it's useless to create a new entry if it will never be used)
-        if(isset($this->options[$name]))
+        if (isset($this->options[$name]))
         {
             $this->options[$name] = $value;
         }
     }
-    
+
     /**
      * Checks if the password is valid according to the options provided (aka it checks the complexity using the given options)
      *
-     * @param string $passwd
-     * @param boolean $bypass
+     * @param string $value
      * @return boolean
      */
-    public function isValid($passwd, $bypass = false)
+    public function isValid($value)
     {
         // ==== Result variable ==== //
         $result = true;
 
-        // ==== Checking if overwrite is in effect ==== //
-        if($bypass === false)
+        // ==== Check variable ==== //
+        $failed_count = 0;
+
+        // ==== Checking if the length check is enabled ==== //
+        if (isset($this->options['length'])
+            && is_numeric($this->options['length'])
+            && $this->options['length'] > 0
+        )
         {
-            // ==== Check variable ==== //
-            $failed_count = 0;
-
-            // ==== Checking if the length check is enabled ==== //
-            if(isset($this->options['length']) && is_numeric($this->options['length']))
+            // ==== Checking the length ==== //
+            if (strlen(trim($value)) < $this->options['length'])
             {
-                // ==== Checking the length ==== //
-                if(strlen(trim($passwd)) < $this->options['length'])
-                {
-                    $failed_count++;
-                }
+                $failed_count++;
             }
+        }
 
-            // ==== Checking if the number or lowercase or uppercase check is active ==== //
-            if(isset($this->options['number']) || isset($this->options['lcase']) || isset($this->options['ucase']))
+        // ==== Checking if the number or lowercase or uppercase check is active ==== //
+        if ($this->options['number'] == true
+            || $this->options['lcase'] == true
+            || $this->options['ucase'] == true
+        )
+        {
+            // ==== Character counters ==== //
+            $lChr   = 0;
+            $number = 0;
+            $uChr   = 0;
+
+            // ==== Checking each character in the password ==== //
+            for ($i = 0; $i < strlen($value); $i++)
             {
-                // ==== Character counters ==== //
-                $lChr = 0;
-                $number = 0;
-                $uChr = 0;
+                // ==== Check variables ==== //
+                $checked = false;
 
-                // ==== Checking each character in the password ==== //
-                for ($i = 0; $i < strlen($passwd); $i++)
+                // ==== Number check ==== //
+                if ($this->options['number'] == true)
                 {
-                    // ==== Check variables ==== //
-                    $checked = false;
-
-                    // ==== Number check ==== //
-                    if(isset($this->options['number']))
+                    if (is_numeric(substr($value, $i, 1)))
                     {
-                        if(is_numeric(substr($passwd, $i, 1)))
-                        {
-                            $number++;
+                        $number++;
 
-                            $checked = true;
-                        }
-                    }
-
-                    // ==== Lowercase check ==== //
-                    if(isset($this->options['lcase']) && $checked == false)
-                    {
-                        if(is_string(substr($passwd, $i, 1)) && preg_match('/[a-z]/', substr($passwd, $i, 1)))
-                        {
-                            $lChr++;
-
-                            $checked = true;
-                        }
-                    }
-
-                    // ==== Uppercase check ==== //
-                    if(isset($this->options['ucase']) && $checked == false)
-                    {
-                        if(is_string(substr($passwd, $i, 1)) && preg_match('/[A-Z]/', substr($passwd, $i, 1)))
-                        {
-                            $uChr++;
-
-                            $checked = true;
-                        }
+                        $checked = true;
                     }
                 }
 
-                // ==== Checking number count ==== //
-                if(isset($this->options['number']) && $number == 0)
+                // ==== Lowercase check ==== //
+                if ($this->options['lcase'] == true && $checked == false)
                 {
-                    $failed_count++;
+                    if (is_string(substr($value, $i, 1)) && preg_match('/[a-z]/', substr($value, $i, 1)))
+                    {
+                        $lChr++;
+
+                        $checked = true;
+                    }
                 }
 
-                // ==== Checking lowercase count ==== //
-                if(isset($this->options['lcase']) && $lChr == 0)
+                // ==== Uppercase check ==== //
+                if ($this->options['ucase'] == true && $checked == false)
                 {
-                    $failed_count++;
-                }
-
-                // ==== Checking uppercase count ==== //
-                if(isset($this->options['ucase']) && $uChr == 0)
-                {
-                    $failed_count++;
+                    if (is_string(substr($value, $i, 1)) && preg_match('/[A-Z]/', substr($value, $i, 1)))
+                    {
+                        $uChr++;
+                    }
                 }
             }
 
-            // ==== Checking the failed count ==== //
-            if($failed_count != 0)
+            // ==== Checking number count ==== //
+            if ($this->options['number'] == true && $number == 0)
             {
-                $result = false;
+                $failed_count++;
             }
+
+            // ==== Checking lowercase count ==== //
+            if ($this->options['lcase'] == true && $lChr == 0)
+            {
+                $failed_count++;
+            }
+
+            // ==== Checking uppercase count ==== //
+            if ($this->options['ucase'] == true && $uChr == 0)
+            {
+                $failed_count++;
+            }
+        }
+
+        // ==== Checking the failed count ==== //
+        if ($failed_count != 0)
+        {
+            $result = false;
         }
 
         // ==== Returning result ==== //
         return $result;
-    }    
+    }
 }

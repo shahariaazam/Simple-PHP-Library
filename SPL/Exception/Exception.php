@@ -22,9 +22,9 @@ class Exception extends \Exception
     /**
      * Constructs the exception and prints it in a more readable format
      * 
-     * @param $message [optional]
-     * @param $code [optional]
-     * @param $previous [optional]
+     * @param string $message [ optional ]
+     * @param int $code [ optional ]
+     * @param \Exception $previous [ optional ]
      */
     public function __construct ($message = '', $code = 0, $previous = NULL){
         

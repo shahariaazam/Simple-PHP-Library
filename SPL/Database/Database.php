@@ -46,7 +46,8 @@ abstract class Database implements DbInterface
     /**
      * Called to create a database object
      *
-     * @param void
+     * @param array $options
+     * @param bool $new
      * @return object on success or integer on fail: 2 for wrong options, 3 for unsupported database type
      */
     public static function init(array $options = array(), $new = false)

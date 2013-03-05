@@ -16,19 +16,42 @@
 
 namespace SPL\Billing\PayPal\Items;
 
+/**
+ *
+ * @property $price
+ * @property $name
+ * @property $desc
+ * @property $quantity
+ */
+
 class Item
 {
-    private $name;
-    private $desc;
-    private $price;
-    private $quantity;
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $desc;
+
+    /**
+     * @var number
+     */
+    protected $price;
+
+    /**
+     * @var int
+     */
+    protected $quantity;
 
     /**
      * Items object
      *
      * @var \SPL\Billing\PayPal\Items\Items
      */
-    private $observer;
+    protected $observer;
 
     /**
      * Getter method

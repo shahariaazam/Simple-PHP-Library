@@ -42,7 +42,7 @@ class Mysql implements AdapterInterface
     /**
      * Database link identifier
      *
-     * @var link_indentifier
+     * @var resource
      */
     private $link_id;
 

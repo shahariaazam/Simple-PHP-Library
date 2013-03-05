@@ -32,25 +32,11 @@ class Dbase implements DbInterface
     private $options;
 
     /**
-     * Resource variable
+     * Established connection holder
      *
      * @var resource
      */
-    private $resource;
-
-    /**
-     * Established connection holder
-     *
-     * @var link_identifier
-     */
     private $link_id;
-
-    /**
-     * Determins if there was a connection attempt
-     *
-     * @var boolean
-     */
-    private $conn_trigger = false;
 
     /**
      *
@@ -59,22 +45,6 @@ class Dbase implements DbInterface
      * @param array
      */
     private $results = array();
-
-    /**
-     *
-     * Counters array. The array contains counters for some types of database opperations
-     *
-     * @var array
-     */
-    private $counters = array();
-
-    /**
-     *
-     * Holds the last query type
-     *
-     * @var string
-     */
-    private $query_type = '';
 
     /**
      *
@@ -165,6 +135,8 @@ class Dbase implements DbInterface
      */
     public function fetch()
     {
+        $result = array();
+
         // ==== Getting the numer of rows in the database ==== //
         $num_rows = dbase_numrecords($this->link_id);
 
@@ -362,15 +334,18 @@ class Dbase implements DbInterface
         return $string;
     }
 
-     /**
+    /**
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query
-     * @param string $autoincrementField
+     * @param $autoIncrementField
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField)
     {
+        // Dummy code to prevent code inspections to view this as a notice/warning
+        unset($query);
+
         // ==== Result var ==== //
         $result = false;
 

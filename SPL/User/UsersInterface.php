@@ -13,4 +13,10 @@
 
 namespace SPL\User;
 
-interface UsersInterface{}
+interface UsersInterface
+{
+    public function getErrors();
+    public function checkLogin(array $data);
+    public function getUserInfo();
+    public function setUserInfo($data);
+}

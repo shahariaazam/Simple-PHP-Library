@@ -79,16 +79,16 @@ class Language
     /**
      * CodeIgniter object
      *
-     * @var CodeIgniter
+     * @var object
      */
     protected $CI;
 
     /**
      * Sets class options
      *
-     * @param Url $url
+     * @param \SPL\Url\UrlInterface $url
      * @param array $options
-     * @return void
+     * @return \SPL\Language\Language
      */
     public function __construct(UrlInterface $url, array $options = array())
     {
@@ -120,10 +120,17 @@ class Language
         // ==== Getting the Code Igniter object instance if the class has the support activated for it ==== //
         if($this->options['code_igniter'])
         {
-            $this->CI = &get_instance();
+            if(function_exists('get_instance'))
+            {
+                $this->CI = &get_instance();
 
-            // ==== Getting the cookie domain ==== //
-            $this->options['cookie_domain'] = $this->CI->config->item('cookie_domain');
+                if(method_exists($this->CI->config, 'item'))
+                {
+                    // ==== Getting the cookie domain ==== //
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $this->options['cookie_domain'] = $this->CI->config->item('cookie_domain');
+                }
+            }
         }
 
         // Getting the Url object
@@ -418,7 +425,7 @@ class Language
             // ==== Adding debug data ==== //
             if($this->options['debug'])
             {
-                $log .= '<b>Notice:</b> Text <i><u>' . $txt . '</u></i> does not exist.<br /><br />';
+                $this->log .= '<b>Notice:</b> Text <i><u>' . $txt . '</u></i> does not exist.<br /><br />';
 
                 // ==== Backtracking ===== //
                 $backtrace = debug_backtrace();
@@ -427,7 +434,7 @@ class Language
                 $line = $backtrace[0]['line'];
                 $file = $backtrace[0]['file'];
 
-                $this->log .= '<br /><b>Info:</b><br />Line: ' . $line . '<br />File: ' . $file . '<br /><br />' . $log;
+                $this->log .= '<br /><b>Info:</b><br />Line: ' . $line . '<br />File: ' . $file . '<br /><br />' . $this->log;
             }
 
             return false;

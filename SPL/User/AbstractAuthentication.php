@@ -72,7 +72,7 @@ use SPL\Url;
 use SPL\Http\Headers as Headers;
 use SPL\Security\SecurityInterface;
 use SPL\Variable\Variable as Variable;
-use SPL\Db\DbInterface;
+use SPL\Db\Adapter\AdapterInterface;
 
 abstract class AbstractAuthentication implements AuthenticationInterface
 {
@@ -101,14 +101,14 @@ abstract class AbstractAuthentication implements AuthenticationInterface
     /**
      * Database object
      *
-     * @var db_module
+     * @var AdapterInterface
      */
     protected $db;
 
     /**
      * Vault object
      *
-     * @var Vault
+     * @var SecurityInterface
      */
     protected $vault;
 
@@ -137,20 +137,20 @@ abstract class AbstractAuthentication implements AuthenticationInterface
      *
      * UserAcc object
      *
-     * @var BaseUserAcc
+     * @var UsersInterface
      */
     protected $userAcc;
 
     /**
      * Sets different class properties and some options
      *
-     * @param DbInterface $db
+     * @param AdapterInterface $db
      * @param UsersInterface $userAcc
      * @param SecurityInterface $vault
      * @param array $options
      * @return \SPL\User\AbstractAuthentication
      */
-    public function __construct(DbInterface $db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
+    public function __construct(AdapterInterface $db, UsersInterface $userAcc, SecurityInterface $vault, array $options = array())
     {
         // ==== Default $options ==== //
         $this->options['unique_mail']   = '';
@@ -415,7 +415,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
         {
             $log = '<strong>Info:</strong><br />';
             $log .= 'Cookie name: ' . $this->options['cookie_name'] . '<br />';
-            $log .= 'Data: ' . Variable::print_array($data, 1) . '<br />';
+            $log .= 'Data: ' . '<pre>' . print_r($data, 1) . '</pre>' . '<br />';
             $log .= '<br /><br />';
 
             // ==== Adding log ==== //
@@ -599,7 +599,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             {
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Cookie name: ' . $this->options['cookie_name'] . '<br />';
-                $log .= 'Data: ' . Variable::print_array($data, 1) . '<br />';
+                $log .= 'Data: ' . '<pre>' . print_r($data, 1) . '</pre>' . '<br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //
@@ -659,8 +659,8 @@ abstract class AbstractAuthentication implements AuthenticationInterface
                     {
                         $log = '<strong>Info:</strong><br />';
                         $log .= 'Authentication falied.<br /><br />';
-                        $log .= '$this->session: ' . Variable::print_array($this->session, 1) . '<br />';
-                        $log .= '$_COOKIE: ' . Variable::print_array($_COOKIE, 1) . '<br />';
+                        $log .= '$this->session: <pre>' . print_r($this->session, 1) . '</pre><br />';
+                        $log .= '$_COOKIE: <pre>' . print_r($_COOKIE, 1) . '</pre><br />';
                         $log .= '$sql_error: ' . $sql_error . '<br />';
                         $log .= '<br /><br />';
 
@@ -778,7 +778,7 @@ abstract class AbstractAuthentication implements AuthenticationInterface
             {
                 $log = '<strong>Info:</strong><br />';
                 $log .= 'Skipped database authentication<br /><br />';
-                $log .= 'User info: ' . Variable::print_array($userinfo, 1) . '<br />';
+                $log .= 'User info: <pre>' . print_r($userinfo, 1) . '</pre><br />';
                 $log .= '<br /><br />';
 
                 // ==== Adding the error ==== //

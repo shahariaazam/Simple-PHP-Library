@@ -118,7 +118,7 @@ interface db_module
      * To avoid getting the wrong last id the method executes the query itself and then returns the last id
      *
      * @param string $query
-     * @param string $autoincrementField //This is important for compatibility with PostgreSQL
+     * @param $autoIncrementField
      * @return mixed false on fail or integer on success
      */
     public function last_id($query, $autoIncrementField);

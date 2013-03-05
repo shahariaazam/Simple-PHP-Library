@@ -108,7 +108,7 @@ class Image
 
         // === Getting image extension ==== //
         $img_data   = explode('.', $name);
-        $extension  = $img_data[sizeof($array)-1];
+        $extension  = $img_data[sizeof($img_data)-1];
 
         // ==== Getting the image short name (the one without extension) ==== //
         $real_name = substr($name, 0, strrpos($name, '.'));
@@ -226,7 +226,7 @@ class Image
      *
      * @param string $new_ext
      * @param boolean $random Flag that determins if the image name is random or not
-     * @return false on failure or image name on success
+     * @return boolean false on failure or image name on success
      */
     public function write($new_ext = '', $random=false)
     {
@@ -267,7 +267,7 @@ class Image
             if($random === true)
             {
                 // ==== Generating random name ==== //
-                $name = sha1($image . time());
+                $name = sha1($this->image . time());
 
                 // ==== Checking if the file exists or not ==== //
                 if(is_file($dir . '/' . $name . '.' . $this->supported[$ext]))
@@ -340,8 +340,13 @@ class Image
      */
     private function resizeImg($image)
     {
-        // ==== Result variable ==== //
         $result = false;
+        $new    = null;
+        $old    = null;
+        $width  = null;
+        $height = null;
+        $sY     = null;
+        $sX     = null;
 
         //////////////////////////////////////////////////////
         // CREATING THE IMAGE FROM THE FILE

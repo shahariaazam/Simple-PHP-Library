@@ -9,7 +9,7 @@
 
 use SPL\Autoload\Autoload;
 
-$path = realpath(dirname(__FILE__) . '/..');
+$path = realpath(dirname(__DIR__));
 
 include $path . '/SPL/Autoload/Autoload.php';
 
