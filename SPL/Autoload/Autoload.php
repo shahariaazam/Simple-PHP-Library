@@ -116,12 +116,10 @@ class Autoload
                     // Loading the file
                     include $file;
                 }
-            }
-
-            // Checking if the class file was loaded
-            if(!isset(self::$loaded[$class]) && self::$skip === false)
-            {
-                throw new Exception\RuntimeException('No file was found for class ' . $class);
+                else if (self::$skip === false)
+                {
+                    throw new Exception\RuntimeException('No file was found for class ' . $class);
+                }
             }
         }
     }
